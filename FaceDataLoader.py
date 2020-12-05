@@ -1,6 +1,7 @@
 import glob
 import os
 from os.path import join
+
 import dlib
 import numpy as np
 import torch
@@ -47,7 +48,9 @@ class CasiaDataset(Dataset):
         return np.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
 
     def cosine_formula(self, length_line1, length_line2, length_line3):
-        cos_a = -(length_line3 ** 2 - length_line2 ** 2 - length_line1 ** 2) / (2 * length_line2 * length_line1)
+        cos_a = -(length_line3 ** 2 - length_line2 ** 2 - length_line1 ** 2) / (
+            2 * length_line2 * length_line1
+        )
         return cos_a
 
     def rotate_point(self, origin, point, angle):
@@ -59,12 +62,15 @@ class CasiaDataset(Dataset):
         return qx, qy
 
     def is_between(self, point1, point2, point3, extra_point):
-        c1 = (point2[0] - point1[0]) * (extra_point[1] - point1[1]) - (point2[1] - point1[1]) * (
-                    extra_point[0] - point1[0])
-        c2 = (point3[0] - point2[0]) * (extra_point[1] - point2[1]) - (point3[1] - point2[1]) * (
-                    extra_point[0] - point2[0])
-        c3 = (point1[0] - point3[0]) * (extra_point[1] - point3[1]) - (point1[1] - point3[1]) * (
-                    extra_point[0] - point3[0])
+        c1 = (point2[0] - point1[0]) * (extra_point[1] - point1[1]) - (
+            point2[1] - point1[1]
+        ) * (extra_point[0] - point1[0])
+        c2 = (point3[0] - point2[0]) * (extra_point[1] - point2[1]) - (
+            point3[1] - point2[1]
+        ) * (extra_point[0] - point2[0])
+        c3 = (point1[0] - point3[0]) * (extra_point[1] - point3[1]) - (
+            point1[1] - point3[1]
+        ) * (extra_point[0] - point3[0])
         if (c1 < 0 and c2 < 0 and c3 < 0) or (c1 > 0 and c2 > 0 and c3 > 0):
             return True
         else:
@@ -86,7 +92,7 @@ class CasiaDataset(Dataset):
         label = split_path[-2]
 
         detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor('shape_predictor_5_face_landmarks.dat')
+        predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
 
         toTensor = torchvision.transforms.ToTensor()
 
@@ -104,7 +110,10 @@ class CasiaDataset(Dataset):
         shape = self.shape_to_normal(shape)
         nose, left_eye, right_eye = self.get_eyes_nose_dlib(shape)
 
-        center_of_forehead = ((left_eye[0] + right_eye[0]) // 2, (left_eye[1] + right_eye[1]) // 2)
+        center_of_forehead = (
+            (left_eye[0] + right_eye[0]) // 2,
+            (left_eye[1] + right_eye[1]) // 2,
+        )
 
         center_pred = (int((x + w) / 2), int((y + y) / 2))
 
