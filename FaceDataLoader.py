@@ -1,11 +1,12 @@
+import glob
 import os
 from os.path import join
-import glob
-from PIL import Image
-from torch.utils.data import Dataset
-import torchvision.transforms
+
 import numpy as np
 import torch
+import torchvision.transforms
+from PIL import Image
+from torch.utils.data import Dataset
 
 
 class CasiaDataset(Dataset):

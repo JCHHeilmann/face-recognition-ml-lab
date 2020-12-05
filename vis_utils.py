@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-import torchvision
 import numpy as np
 
 # Adopted from the PyTorch transfer learning turorial
