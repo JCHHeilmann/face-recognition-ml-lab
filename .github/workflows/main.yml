@@ -32,18 +32,14 @@ jobs:
       - name: Install Black
         run: pip install black
         
-      - name: Run black --check .
-        run: black --check .
+      - name: Run black
+        run: black .
 
       - name: Install isort
         run: pip install isort
       
-      - name: Run isort --check-only
-        run: isort --check-only
-      
-      - name: If needed, format files
-        run: black . && isort . --profile black
-
-      - name: If needed, commit black and isort changes to the pull request
-        if: failure()
+      - name: Run isort
+        run: isort .
+        
+      - name: Commit black and isort changes
         uses: EndBug/add-and-commit@v5.2.0
