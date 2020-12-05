@@ -15,14 +15,18 @@ class CasiaDataset(Dataset):
         self.encode_classes()
 
     def read_file_paths(self):
-        self.image_filenames = glob.glob(join(self.dataset_folder, "**/*.jpg"), recursive=True)
+        self.image_filenames = glob.glob(
+            join(self.dataset_folder, "**/*.jpg"), recursive=True
+        )
 
     def encode_classes(self):
         self.class_to_idx = dict()
         for filename in self.image_filenames:
             split_path = filename.split(os.sep)
             label = split_path[-2]
-            self.class_to_idx[label] = self.class_to_idx.get(label, len(self.class_to_idx))
+            self.class_to_idx[label] = self.class_to_idx.get(
+                label, len(self.class_to_idx)
+            )
 
     def __len__(self):
         return len(self.image_filenames)
@@ -41,18 +45,22 @@ class CasiaDataset(Dataset):
         shuffled_indices = np.random.permutation(n_samples)
 
         valandtest_ratio = 0.2
-        testandvalidationset_inds = shuffled_indices[:int(n_samples * valandtest_ratio)]
-        trainingset_inds = shuffled_indices[int(n_samples * valandtest_ratio):]
+        testandvalidationset_inds = shuffled_indices[
+            : int(n_samples * valandtest_ratio)
+        ]
+        trainingset_inds = shuffled_indices[int(n_samples * valandtest_ratio) :]
 
         test_ratio = 0.5
         n_samples_testandval = len(testandvalidationset_inds)
-        validationset_inds = testandvalidationset_inds[:int(n_samples_testandval * test_ratio)]
-        testset_inds = testandvalidationset_inds[int(n_samples_testandval * test_ratio):]
+        validationset_inds = testandvalidationset_inds[
+            : int(n_samples_testandval * test_ratio)
+        ]
+        testset_inds = testandvalidationset_inds[
+            int(n_samples_testandval * test_ratio) :
+        ]
 
         train_dataset = torch.utils.data.Subset(self, indices=trainingset_inds)
         val_dataset = torch.utils.data.Subset(self, indices=validationset_inds)
         test_dataset = torch.utils.data.Subset(self, indices=testset_inds)
 
         return train_dataset, val_dataset, test_dataset
-
-
