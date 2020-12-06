@@ -4,10 +4,8 @@ from torch.nn import functional as F
 
 
 class InceptionResnetV1(nn.Module):
-    def __init__(self, num_classes, dropout_prob=0.6, device=None):
+    def __init__(self, dropout_prob=0.6, device=None):
         super().__init__()
-
-        self.num_classes = num_classes
 
         # layers
         self.stem = Stem()
