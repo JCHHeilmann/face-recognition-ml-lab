@@ -10,7 +10,7 @@ from PIL import Image
 from torch.utils.data import Dataset
 
 
-class CasiaDataset(Dataset):
+class WebfaceDataset(Dataset):
     def __init__(self, dataset_folder):
         self.dataset_folder = dataset_folder
         self.read_file_paths()
