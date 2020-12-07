@@ -4,14 +4,18 @@ import torch
 def get_data_loaders(
     dataset, batch_size, train_proportion, val_proportion, test_proportion
 ):
-    dataset_length = len(dataset)
+    dataset_size = len(dataset)
+
+    train_size = int(train_proportion * dataset_size)
+    val_size = int(val_proportion * dataset_size)
+    test_size = int(test_proportion * dataset_size)
+
+    train_size += dataset_size - (
+        train_size + val_size + test_size
+    )  # correct rounding errors with train set size
+
     train_dataset, val_dataset, test_dataset = torch.utils.data.random_split(
-        dataset,
-        [
-            int(train_proportion * dataset_length),
-            int(val_proportion * dataset_length),
-            int(test_proportion * dataset_length),
-        ],
+        dataset, [train_size, val_size, test_size],
     )
 
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size, shuffle=True)
