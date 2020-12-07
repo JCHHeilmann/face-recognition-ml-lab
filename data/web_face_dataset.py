@@ -84,59 +84,56 @@ class WebfaceDataset(Dataset):
         image = image.resize((256, 256))
         split_path = self.image_filenames[idx].split(os.sep)
         label = split_path[-2]
-        toTensor = torchvision.transforms.ToTensor()
+        to_tensor = torchvision.transforms.ToTensor()
 
-        image = Image.open(self.image_filenames[idx])
-        image = image.resize((256, 256))
-        split_path = self.image_filenames[idx].split(os.sep)
-        label = split_path[-2]
+        image_tensor = to_tensor(image)
 
-        detector = dlib.get_frontal_face_detector()
-        predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
+        # detector = dlib.get_frontal_face_detector()
+        # predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
 
-        toTensor = torchvision.transforms.ToTensor()
+        # toTensor = torchvision.transforms.ToTensor()
 
-        image = np.array(image)
+        # image = np.array(image)
 
-        rects = detector(image, 0)
-        if len(rects) > 0:
-            for rect in rects:
-                x = rect.left()
-                y = rect.top()
-                w = rect.right()
-                h = rect.bottom()
-                shape = predictor(image, rect)
+        # rects = detector(image, 0)
+        # if len(rects) > 0:
+        #     for rect in rects:
+        #         x = rect.left()
+        #         y = rect.top()
+        #         w = rect.right()
+        #         h = rect.bottom()
+        #         shape = predictor(image, rect)
 
-        shape = self.shape_to_normal(shape)
-        nose, left_eye, right_eye = self.get_eyes_nose_dlib(shape)
+        # shape = self.shape_to_normal(shape)
+        # nose, left_eye, right_eye = self.get_eyes_nose_dlib(shape)
 
-        center_of_forehead = (
-            (left_eye[0] + right_eye[0]) // 2,
-            (left_eye[1] + right_eye[1]) // 2,
-        )
+        # center_of_forehead = (
+        #     (left_eye[0] + right_eye[0]) // 2,
+        #     (left_eye[1] + right_eye[1]) // 2,
+        # )
 
-        center_pred = (int((x + w) / 2), int((y + y) / 2))
+        # center_pred = (int((x + w) / 2), int((y + y) / 2))
 
-        length_line1 = self.feature_distance(center_of_forehead, nose)
-        length_line2 = self.feature_distance(center_pred, nose)
-        length_line3 = self.feature_distance(center_pred, center_of_forehead)
+        # length_line1 = self.feature_distance(center_of_forehead, nose)
+        # length_line2 = self.feature_distance(center_pred, nose)
+        # length_line3 = self.feature_distance(center_pred, center_of_forehead)
 
-        cos_a = self.cosine_formula(length_line1, length_line2, length_line3)
-        angle = np.arccos(cos_a)
+        # cos_a = self.cosine_formula(length_line1, length_line2, length_line3)
+        # angle = np.arccos(cos_a)
 
-        rotated_point = self.rotate_point(nose, center_of_forehead, angle)
-        rotated_point = (int(rotated_point[0]), int(rotated_point[1]))
-        if self.is_between(nose, center_of_forehead, center_pred, rotated_point):
-            angle = np.degrees(-angle)
-        else:
-            angle = np.degrees(angle)
+        # rotated_point = self.rotate_point(nose, center_of_forehead, angle)
+        # rotated_point = (int(rotated_point[0]), int(rotated_point[1]))
+        # if self.is_between(nose, center_of_forehead, center_pred, rotated_point):
+        #     angle = np.degrees(-angle)
+        # else:
+        #     angle = np.degrees(angle)
 
-        image = Image.fromarray(image)
-        image = np.array(image.rotate(angle))
+        # image = Image.fromarray(image)
+        # image = np.array(image.rotate(angle))
 
-        image = toTensor(image)
+        # image = toTensor(image)
 
-        return image, self.class_to_idx[label]
+        return image_tensor, self.class_to_idx[label]
 
     def split(self):
         n_samples = len(self)

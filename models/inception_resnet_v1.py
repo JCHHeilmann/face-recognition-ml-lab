@@ -2,7 +2,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-
+# from https://arxiv.org/pdf/1602.07261.pdf
 class InceptionResnetV1(nn.Module):
     def __init__(self, dropout_prob=0.6, device=None):
         super().__init__()
