@@ -1,8 +1,9 @@
 import torch
+from tqdm import tqdm
+
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
-from tqdm import tqdm
 
 from .loss_function import triplet_loss
 
@@ -62,4 +63,3 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 
     train(model, train_loader, val_loader, triplet_loss, optimizer, num_epochs=100)
-
