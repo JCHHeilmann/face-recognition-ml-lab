@@ -50,7 +50,7 @@ if __name__ == "__main__":
     else:
         model = InceptionResnetV1()
 
-    dataset = WebfaceDataset("../datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
         batch_size=1000,
