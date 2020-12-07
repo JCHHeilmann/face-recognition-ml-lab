@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 class OnlineTripletLoss(nn.Module):
     """
     Online Triplets loss
@@ -16,15 +17,21 @@ class OnlineTripletLoss(nn.Module):
         self.triplet_selector = triplet_selector
 
     def forward(self, embeddings, target):
-        
-        #Should be changed
-        #triplets = self.triplet_selector.get_triplets(embeddings, target)
-        
+
+        # Should be changed
+        # triplets = self.triplet_selector.get_triplets(embeddings, target)
+
         if embeddings.is_cuda:
             triplets = triplets.cuda()
 
-        anchor_positive_distances = (embeddings[triplets[:, 0]] - embeddings[triplets[:, 1]]).pow(2).sum(1)  # .pow(.5)
-        anchor_negative_distances = (embeddings[triplets[:, 0]] - embeddings[triplets[:, 2]]).pow(2).sum(1)  # .pow(.5)
-        losses = F.relu(anchor_positive_distances - anchor_negative_distances + self.margin)
+        anchor_positive_distances = (
+            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 1]]).pow(2).sum(1)
+        )  # .pow(.5)
+        anchor_negative_distances = (
+            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 2]]).pow(2).sum(1)
+        )  # .pow(.5)
+        losses = F.relu(
+            anchor_positive_distances - anchor_negative_distances + self.margin
+        )
 
         return losses.mean(), len(triplets)

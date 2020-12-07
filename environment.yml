@@ -69,6 +69,7 @@ dependencies:
   - toml=0.10.1=py_0
   - torchvision=0.8.1=py38_cpu
   - tornado=6.1=py38h9ed2024_0
+  - tqdm=4.54.0=pyhd3eb1b0_0
   - traitlets=5.0.5=py_0
   - typed-ast=1.4.1=py38h1de35cc_0
   - typing_extensions=3.7.4.3=py_0

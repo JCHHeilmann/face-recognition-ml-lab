@@ -2,6 +2,8 @@ datasets/*
 notebooks/*
 !.gitkeep
 
+wandb
+
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,visualstudiocode,macos,windows,linux
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,pycharm,visualstudiocode,macos,windows,linux
 
