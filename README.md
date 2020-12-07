@@ -1,4 +1,4 @@
-# application-challenges-ml-lab
+# Application Challenges ML-Lab
 
 ## Setup
 
@@ -17,3 +17,5 @@
 ## Training
 
 To start a training run from the project root: `python -m training.train`
+
+Note: Please commit any changes before starting, so that W&B can associate the correct repository state with the run.
