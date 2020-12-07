@@ -13,3 +13,7 @@
 * Install, preferably via conda
 * Update environment.yml by running:
 `conda env export > environment.yml`
+
+## Training
+
+To start a training run from the project root: `python -m training.train`
