@@ -5,21 +5,27 @@ from torch.nn import functional as F
 
 # from https://arxiv.org/pdf/1602.07261.pdf
 class InceptionResnetV1(nn.Module):
-    def __init__(self, dropout_prob=0.6, device=None):
+    def __init__(
+        self,
+        dropout_prob=0.6,
+        scale_inception_a=0.17,
+        scale_inception_b=0.10,
+        scale_inception_c=0.20,
+    ):
         super().__init__()
 
         # layers
         self.stem = Stem()
         self.inception_a_blocks = nn.Sequential(
-            *[InceptionA(scale=0.17) for _ in range(5)]
+            *[InceptionA(scale=scale_inception_a) for _ in range(5)]
         )
         self.reduction_a = ReductionA()
         self.inception_b_blocks = nn.Sequential(
-            *[InceptionB(scale=0.10) for _ in range(10)]
+            *[InceptionB(scale=scale_inception_b) for _ in range(10)]
         )
         self.reduction_b = ReductionB()
         self.inception_c_blocks = nn.Sequential(
-            *[InceptionC(scale=0.20) for _ in range(5)]
+            *[InceptionC(scale=scale_inception_c) for _ in range(5)]
         )
         self.inception_c = InceptionC(apply_relu=False)
         self.avg_pool = nn.AdaptiveAvgPool2d(output_size=1)
@@ -27,11 +33,6 @@ class InceptionResnetV1(nn.Module):
 
         self.linear = nn.Linear(1792, 512, bias=False)
         self.bn = nn.BatchNorm1d(512, eps=0.001, momentum=0.1, affine=True)
-
-        self.device = torch.device("cpu")
-        if device is not None:
-            self.device = device
-            self.to(device)
 
     def forward(self, x):
         x_1 = self.stem(x)
