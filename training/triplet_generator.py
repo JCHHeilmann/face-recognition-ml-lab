@@ -40,6 +40,7 @@ def get_triplets(embeddings, labels, device, margin, negative_selection_fn):
     for label in set(labels):
         label_mask = (labels == label)
         label_indices = np.where(label_mask)[0]
+        # If no same labels in batch skip
         if len(label_indices) < 2:
             continue
         
@@ -47,8 +48,8 @@ def get_triplets(embeddings, labels, device, margin, negative_selection_fn):
         anchor_positives = list(combinations(label_indices, 2))  # All anchor-positive pairs
         anchor_positives = np.array(anchor_positives)
 
-        # If no same labels in batch skip
-        anchor_positive_distances = distance_matrix[anchor_positives[:, 0], anchor_positives[:, 1]] # anchor_positives[:, 0] - anchor, anchor_positives[:, 1] - positive
+        # anchor_positives[:, 0] - anchor, anchor_positives[:, 1] - positive
+        anchor_positive_distances = distance_matrix[anchor_positives[:, 0], anchor_positives[:, 1]] 
         
         for anchor_positive, anchor_positive_distance in zip(anchor_positives, anchor_positive_distances):
             # calculating loss based on anchor_postive and every possible negative embedding
