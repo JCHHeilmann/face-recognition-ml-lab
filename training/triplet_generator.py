@@ -8,7 +8,6 @@ def pairwise_distances(vectors):
     distance_matrix = -2 * vectors.mm(torch.t(vectors)) + vectors.pow(2).sum(dim=1).view(1, -1) + vectors.pow(2).sum(dim=1).view(-1, 1)
     return distance_matrix
 
-
 def hardest_negative(loss_values):
     hard_negative = np.argmax(loss_values)
     return hard_negative if loss_values[hard_negative] > 0 else None
@@ -24,63 +23,61 @@ def semihard_negative(loss_values, margin):
     return np.random.choice(semihard_negatives) if len(semihard_negatives) > 0 else None
 
 
-class NegativeTripletSelector:
-    """
-    For each positive pair, takes the hardest negative sample (with the greatest triplet loss value) to create a triplet
-    Margin should match the margin used in triplet loss.
-    negative_selection_fn should take array of loss_values for a given anchor-positive pair and all negative samples
-    and return a negative index for that pair
-    """
+def get_triplets(embeddings, labels, device, margin, negative_selection_fn):
+    if device == 'cuda':
+        embeddings = embeddings.cuda()
+    else:
+        embeddings = embeddings.cpu()
+    distance_matrix = pairwise_distances(embeddings)
+    if device == 'cuda':
+        distance_matrix = distance_matrix.cuda()
+    else:
+        distance_matrix = distance_matrix.cpu()
 
-    def __init__(self, margin, negative_selection_fn, device="cpu"):
-        super(NegativeTripletSelector, self).__init__()
-        self.device = device
-        self.margin = margin
-        self.negative_selection_fn = negative_selection_fn
+    labels = labels.cpu().data.numpy()
+    triplets = []
 
-    def get_triplets(self, embeddings, labels):
-        if self.device == 'cuda':
-            embeddings = embeddings.cuda()
-        distance_matrix = pairwise_distances(embeddings)
-        if self.device == 'cuda':
-            distance_matrix = distance_matrix.cuda()
+    for label in set(labels):
+        label_mask = (labels == label)
+        label_indices = np.where(label_mask)[0]
+        if len(label_indices) < 2:
+            continue
+        
+        negative_indices = np.where(np.logical_not(label_mask))[0] # Find all indices of images with False label 
+        anchor_positives = list(combinations(label_indices, 2))  # All anchor-positive pairs
+        anchor_positives = np.array(anchor_positives)
 
-        labels = labels.cpu().data.numpy()
-        triplets = []
+        # If no same labels in batch skip
+        anchor_positive_distances = distance_matrix[anchor_positives[:, 0], anchor_positives[:, 1]] # anchor_positives[:, 0] - anchor, anchor_positives[:, 1] - positive
+        
+        for anchor_positive, anchor_positive_distance in zip(anchor_positives, anchor_positive_distances):
+            # calculating loss based on anchor_postive and every possible negative embedding
+            loss_values = anchor_positive_distance - distance_matrix[torch.LongTensor(np.array([anchor_positive[0]])), torch.LongTensor(negative_indices)] + margin 
+            loss_values = loss_values.data.cpu().numpy()
+            
+            # return indices of the image that have hard/semihard/random loss
+            hard_negative = negative_selection_fn(loss_values)
+            max_dist = np.argmax(loss_values)
+            
+            if hard_negative is not None:
+                hard_negative = negative_indices[hard_negative]
+                triplets.append([anchor_positive[0], anchor_positive[1], hard_negative])
 
-        for label in set(labels):
-            label_mask = (labels == label)
-            label_indices = np.where(label_mask)[0]
-            if len(label_indices) < 2:
-                continue
-            negative_indices = np.where(np.logical_not(label_mask))[0]
-            anchor_positives = list(combinations(label_indices, 2))  # All anchor-positive pairs
-            anchor_positives = np.array(anchor_positives)
+    #This line is not good, if there is no more than one label in the batch anchor_positive[0] is never assigned
+    #if len(triplets) == 0:
+    #    triplets.append([anchor_positive[0], anchor_positive[1], negative_indices[0]])
 
-            anchor_positive_distances = distance_matrix[anchor_positives[:, 0], anchor_positives[:, 1]]
-            for anchor_positive, anchor_positive_distance in zip(anchor_positives, anchor_positive_distances):
-                loss_values = anchor_positive_distance - distance_matrix[torch.LongTensor(np.array([anchor_positive[0]])), torch.LongTensor(negative_indices)] + self.margin
-                loss_values = loss_values.data.cpu().numpy()
-                hard_negative = self.negative_selection_fn(loss_values)
-                if hard_negative is not None:
-                    hard_negative = negative_indices[hard_negative]
-                    triplets.append([anchor_positive[0], anchor_positive[1], hard_negative])
+    triplets = np.array(triplets)
 
-        if len(triplets) == 0:
-            triplets.append([anchor_positive[0], anchor_positive[1], negative_indices[0]])
+    return torch.LongTensor(triplets)
 
-        triplets = np.array(triplets)
-
-        return torch.LongTensor(triplets)
-
-
-def HardestNegativeTripletSelector(margin, device="cuda"): 
-    return NegativeTripletSelector(margin=margin,negative_selection_fn=hardest_negative,device=device)
+def get_hardest(embeddings, labels, device, margin): 
+    return get_triplets(embeddings, labels, device, margin, negative_selection_fn=hardest_negative)
 
 
-def RandomNegativeTripletSelector(margin, device="cuda"): 
-    return NegativeTripletSelector(margin=margin, negative_selection_fn=random_hard_negative,device=device)
+def get_random(embeddings, labels, device, margin): 
+    return get_triplets(embeddings, labels, device, margin, negative_selection_fn=random_hard_negative)
 
 
-def SemihardNegativeTripletSelector(margin, device="cuda"): 
-    return NegativeTripletSelector(margin=margin,negative_selection_fn=lambda x: semihard_negative(x, margin), device=device)
+def get_semihard(embeddings, labels, device, margin): 
+    return get_triplets(embeddings, labels, device, margin, negative_selection_fn=lambda x: semihard_negative(x, margin))
