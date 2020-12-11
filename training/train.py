@@ -4,9 +4,8 @@ from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
 from tqdm import tqdm
-
-from .loss_function import triplet_loss
-
+from training import loss_function
+from training import triplet_generator
 
 def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
     for epoch in range(epochs):
@@ -19,29 +18,41 @@ def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
 
 def train_epoch(model, train_loader, loss_function, optimizer):
     total_loss = 0
+    model.train()
+    losses = []
 
-    for i, (anchor, positive, negative) in tqdm(
-        enumerate(train_loader), total=len(train_loader)
-    ):
-        if torch.cuda.is_available():
-            anchor, positive, negative = anchor.cuda(), positive.cuda(), negative.cuda()
+    for batch_idx, (data, target) in enumerate(train_loader):
+        print(batch_idx)
+
+        target = target if len(target) > 0 else None
+
+        if not type(data) in (tuple, list):
+            data = (data,)
 
         optimizer.zero_grad()
 
-        anchor_embedding = model(anchor)
-        positive_embedding = model(positive)
-        negative_embedding = model(negative)
+        outputs = model(*data)
 
-        loss = loss_function(anchor_embedding, positive_embedding, negative_embedding)
+        if type(outputs) not in (tuple, list):
+            outputs = (outputs,)
+
+        loss_inputs = outputs
+
+        if target is not None:
+            target = (target,)
+            loss_inputs += target
+        loss_outputs = loss_function(*loss_inputs)
+
+        loss = loss_outputs[0] if type(loss_outputs) in (tuple, list) else loss_outputs
+        losses.append(loss.item())
         total_loss += loss.item()
         loss.backward()
-
         optimizer.step()
 
-        if i % (len(train_loader) // 10) == 0:  # 10 logs per batch
-            wandb.log({"training_loss": total_loss / (i + 1)})
+    total_loss /= (batch_idx + 1)
+    print("Total Loss Epoch", total_loss)
+    return total_loss
 
-        return (total_loss) / len(train_loader)
 
 
 def evaluate(model, val_loader):
@@ -49,18 +60,19 @@ def evaluate(model, val_loader):
 
 
 if __name__ == "__main__":
-    EPOCHS = 100
-    BATCH_SIZE = 1000
+    EPOCHS = 2
+    BATCH_SIZE = 12
     LEARNING_RATE = 0.001
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
     SCALE_INCEPTION_C = 0.20
+    MARGIN = 1
 
     wandb.init(
         project="face-recognition",
         entity="application-challenges-ml-lab",
-        mode="enabled",
+        mode="disabled",
         config={
             "epochs": EPOCHS,
             "batch_size": BATCH_SIZE,
@@ -80,7 +92,8 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("../datasets/webface")
+    print(dataset)
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
         batch_size=BATCH_SIZE,
@@ -90,6 +103,6 @@ if __name__ == "__main__":
     )
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-
+    triplet_loss = loss_function.OnlineTripletLoss(MARGIN, triplet_generator.RandomNegativeTripletSelector(MARGIN))
     train(model, train_loader, val_loader, triplet_loss, optimizer, epochs=EPOCHS)
 
