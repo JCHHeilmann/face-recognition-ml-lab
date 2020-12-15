@@ -80,7 +80,7 @@ class WebfaceDataset(Dataset):
         return len(self.image_filenames)
 
     def __getitem__(self, idx):
-        image = Image.open(self.image_filenames[idx])
+        image = Image.open(self.image_filenames[idx]).convert("RGB")
         image = image.resize((256, 256))
         split_path = self.image_filenames[idx].split(os.sep)
         label = split_path[-2]

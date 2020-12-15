@@ -16,10 +16,14 @@ class OnlineTripletLoss(nn.Module):
         self.margin = margin
         self.triplet_selector = triplet_selector
 
-    def forward(self, embeddings, target):
+    def forward(self, embeddings, targets):
 
-        # Should be changed
-        # triplets = self.triplet_selector.get_triplets(embeddings, target)
+        if torch.cuda.is_available():
+            device = torch.device("cuda:0")
+        else:
+            device = torch.device("cpu")
+
+        triplets = self.triplet_selector(embeddings, targets, device, 1)
 
         if embeddings.is_cuda:
             triplets = triplets.cuda()

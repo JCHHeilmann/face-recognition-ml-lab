@@ -45,12 +45,15 @@ def get_triplets(embeddings, labels, device, margin, negative_selection_fn):
     labels = labels.cpu().data.numpy()
     triplets = []
 
+    number_of_anchors = 0
     for label in set(labels):
         label_mask = labels == label
         label_indices = np.where(label_mask)[0]
         # If no same labels in batch skip
         if len(label_indices) < 2:
             continue
+        else:
+            number_of_anchors += 1
 
         negative_indices = np.where(np.logical_not(label_mask))[
             0
@@ -92,6 +95,8 @@ def get_triplets(embeddings, labels, device, margin, negative_selection_fn):
     #    triplets.append([anchor_positive[0], anchor_positive[1], negative_indices[0]])
 
     triplets = np.array(triplets)
+
+    print(f"Found {len(triplets)} triplets from {number_of_anchors} anchors")
 
     return torch.LongTensor(triplets)
 
