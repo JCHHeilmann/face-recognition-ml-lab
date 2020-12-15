@@ -33,7 +33,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
     losses = []
 
     for batch_idx, (data, target) in tqdm(
-        enumerate(train_loader), total=len(train_loader)
+        enumerate(train_loader), total=len(train_loader), desc="processing batch: "
     ):
         target = target if len(target) > 0 else None
 
@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("../../data/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
