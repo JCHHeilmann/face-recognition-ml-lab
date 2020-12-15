@@ -36,6 +36,7 @@ class InceptionResnetV1(nn.Module):
 
         if torch.cuda.is_available():
             self.to(torch.device("cuda"))
+            print(self.get_device())
 
     def forward(self, x):
         x_1 = self.stem(x)
