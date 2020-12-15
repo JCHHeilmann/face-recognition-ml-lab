@@ -1,13 +1,15 @@
-from utils.vis_utils import extract_embeddings, plot_embeddings
+from pathlib import Path
+
 import torch
 import wandb
+from tqdm import tqdm
+
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
-from tqdm import tqdm
-from training.loss_function import OnlineTripletLoss
 from training import triplet_generator
-from pathlib import Path
+from training.loss_function import OnlineTripletLoss
+from utils.vis_utils import extract_embeddings, plot_embeddings
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
@@ -126,4 +128,3 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_generator.get_semihard)
     train(model, train_loader, val_loader, triplet_loss, optimizer, epochs=EPOCHS)
-
