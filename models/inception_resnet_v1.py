@@ -34,6 +34,9 @@ class InceptionResnetV1(nn.Module):
         self.linear = nn.Linear(1792, 512, bias=False)
         self.bn = nn.BatchNorm1d(512, eps=0.001, momentum=0.1, affine=True)
 
+        if torch.cuda.is_available():
+            self = self.cuda()
+
     def forward(self, x):
         x_1 = self.stem(x)
         x_2 = self.inception_a_blocks(x_1)
