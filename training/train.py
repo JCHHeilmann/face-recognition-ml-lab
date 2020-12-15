@@ -111,7 +111,7 @@ if __name__ == "__main__":
         DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
     )
     if torch.cuda.is_available():
-        model.cuda()
+        model = model.cuda()
 
     wandb.watch(model)
 
