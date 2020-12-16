@@ -2,7 +2,7 @@ from itertools import combinations
 
 import numpy as np
 import torch
-import tqdm
+from tqdm import tqdm
 
 
 def pairwise_distances(vectors):
