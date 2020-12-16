@@ -40,6 +40,11 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         if not type(data) in (tuple, list):
             data = (data,)
 
+        if torch.cuda.is_available():
+            data = tuple(d.cuda() for d in data)
+            if target is not None:
+                target = target.cuda()
+
         optimizer.zero_grad()
 
         outputs = model(*data)
