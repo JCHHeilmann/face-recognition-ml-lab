@@ -65,7 +65,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         loss.backward()
         optimizer.step()
 
-        if batch_idx % (len(train_loader) // 10) == 0:  # 10 logs per batch
+        if batch_idx % 10 == 0:  # 10
             wandb.log({"training_loss": total_loss / (batch_idx + 1)})
 
     total_loss /= batch_idx + 1
