@@ -80,7 +80,7 @@ def evaluate(model, val_loader):
 def save_model(model, epoch_num):
     model_folder = Path("models/")
     model_folder.mkdir(parents=True, exist_ok=True)
-    model_file = model_folder / wandb.run.name + f"epoch_{epoch_num}"
+    model_file = model_folder / (wandb.run.name + f"epoch_{epoch_num}")
     torch.save(model.state_dict(), model_file)
     wandb.save(str(model_file))
 
@@ -125,8 +125,8 @@ if __name__ == "__main__":
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
         batch_size=BATCH_SIZE,
-        train_proportion=0.01,
-        val_proportion=0.89,
+        train_proportion=0.8,
+        val_proportion=0.1,
         test_proportion=0.1,
     )
 
