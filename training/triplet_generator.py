@@ -49,7 +49,7 @@ def get_triplets(embeddings, labels, device, margin, negative_selection_fn):
 
     number_of_anchors = 0
     for label in tqdm(
-        set(labels), total=len(set(labels), desc="generating triplets: ")
+        set(labels), total=len(set(labels)), desc="generating triplets: "
     ):
         label_mask = labels == label
         label_indices = np.where(label_mask)[0]
