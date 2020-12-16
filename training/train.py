@@ -89,13 +89,16 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     EPOCHS = 10
-    BATCH_SIZE = 250
     LEARNING_RATE = 0.001
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
     SCALE_INCEPTION_C = 0.20
     MARGIN = 1
+
+    CLASSES_PER_BATCH = 10
+    SAMPLES_PER_CLASS = 25
+    BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     wandb.init(
         project="face-recognition",
@@ -104,6 +107,8 @@ if __name__ == "__main__":
         config={
             "epochs": EPOCHS,
             "batch_size": BATCH_SIZE,
+            "classes_per_batch": CLASSES_PER_BATCH,
+            "samples_per_class": SAMPLES_PER_CLASS,
             "learning_rate": LEARNING_RATE,
             "dropout_prob": DROPOUT_PROB,
             "scale_inception_a": SCALE_INCEPTION_A,
@@ -121,10 +126,12 @@ if __name__ == "__main__":
     wandb.watch(model)
 
     dataset = WebfaceDataset("../../data/CASIA-WebFace")
+    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
-        batch_size=BATCH_SIZE,
+        CLASSES_PER_BATCH,
+        SAMPLES_PER_CLASS,
         train_proportion=0.8,
         val_proportion=0.1,
         test_proportion=0.1,

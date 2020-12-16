@@ -12,6 +12,7 @@ from torch.utils.data import Dataset
 class WebfaceDataset(Dataset):
     def __init__(self, dataset_folder):
         self.dataset_folder = dataset_folder
+
         self.read_file_paths()
         self.encode_classes()
 
@@ -22,12 +23,15 @@ class WebfaceDataset(Dataset):
 
     def encode_classes(self):
         self.class_to_idx = dict()
+        self.labels = []
+
         for filename in self.image_filenames:
             split_path = filename.split(os.sep)
             label = split_path[-2]
             self.class_to_idx[label] = self.class_to_idx.get(
                 label, len(self.class_to_idx)
             )
+            self.labels.append(label)
 
     def __len__(self):
         return len(self.image_filenames)
