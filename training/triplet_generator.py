@@ -2,7 +2,6 @@ from itertools import combinations
 
 import numpy as np
 import torch
-from tqdm import tqdm
 
 
 def pairwise_distances(vectors):
@@ -48,9 +47,7 @@ def get_triplets(embeddings, labels, device, margin, negative_selection_fn):
     triplets = []
 
     number_of_anchors = 0
-    for label in tqdm(
-        set(labels), total=len(set(labels)), desc="generating triplets: "
-    ):
+    for label in set(labels):
         label_mask = labels == label
         label_indices = np.where(label_mask)[0]
         # If no same labels in batch skip
