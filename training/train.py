@@ -125,8 +125,8 @@ if __name__ == "__main__":
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
         batch_size=BATCH_SIZE,
-        train_proportion=0.01,
-        val_proportion=0.89,
+        train_proportion=0.8,
+        val_proportion=0.1,
         test_proportion=0.1,
     )
 
