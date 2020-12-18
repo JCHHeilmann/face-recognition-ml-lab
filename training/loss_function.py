@@ -25,6 +25,9 @@ class OnlineTripletLoss(nn.Module):
 
         triplets = self.triplet_selector(embeddings, targets, device, 1)
 
+        if len(triplets) == 0:
+            return None
+
         if embeddings.is_cuda:
             triplets = triplets.cuda()
 

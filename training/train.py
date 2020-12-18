@@ -59,6 +59,9 @@ def train_epoch(model, train_loader, loss_function, optimizer):
             loss_inputs += target
         loss_outputs = loss_function(*loss_inputs)
 
+        if loss_outputs is None:
+            continue
+
         loss = loss_outputs[0] if type(loss_outputs) in (tuple, list) else loss_outputs
         losses.append(loss.item())
         total_loss += loss.item()
@@ -125,15 +128,15 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("../../data/CASIA-WebFace")
-    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    # dataset = WebfaceDataset("../../data/CASIA-WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.8,
-        val_proportion=0.1,
+        train_proportion=0.01,
+        val_proportion=0.89,
         test_proportion=0.1,
     )
 
