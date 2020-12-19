@@ -2,14 +2,14 @@ from pathlib import Path
 
 import torch
 import wandb
-from tqdm import tqdm
-
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
+from tqdm import tqdm
+from utils.vis_utils import extract_embeddings, plot_embeddings
+
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
-from utils.vis_utils import extract_embeddings, plot_embeddings
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
@@ -20,11 +20,16 @@ def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
 
         evaluate(model, val_loader)
 
-        save_model(model, epoch)
+        save_checkpoint(model, epoch)
 
         train_embeddings_otl, train_labels_otl = extract_embeddings(train_loader, model)
         plt = plot_embeddings(train_embeddings_otl, train_labels_otl)
         wandb.log({"embedding_plot": plt})
+
+        # model_copy = copy.deepcopy(model).cpu()
+        # executor = ThreadPoolExecutor()
+        # executor.submit(plot_and_log_embeddings, train_loader, model)
+        # executor.shutdown(wait=False)
 
 
 def train_epoch(model, train_loader, loss_function, optimizer):
@@ -80,12 +85,20 @@ def evaluate(model, val_loader):
     pass
 
 
-def save_model(model, epoch_num):
-    model_folder = Path("models/")
-    model_folder.mkdir(parents=True, exist_ok=True)
-    model_file = model_folder / (wandb.run.name + f"epoch_{epoch_num}")
-    torch.save(model.state_dict(), model_file)
-    wandb.save(str(model_file))
+def save_checkpoint(model, optimizer, epoch_num):
+    checkpoint_folder = Path("checkpoints/")
+    checkpoint_folder.mkdir(parents=True, exist_ok=True)
+    checkpoint_file = checkpoint_folder / (wandb.run.name + f"epoch_{epoch_num}")
+    torch.save(
+        {
+            "epoch": epoch_num,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "run_name": wandb.run.name,
+        },
+        checkpoint_file,
+    )
+    wandb.save(str(checkpoint_file))
 
 
 if __name__ == "__main__":

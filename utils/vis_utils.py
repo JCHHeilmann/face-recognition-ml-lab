@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+import wandb
 
 # Adopted from the PyTorch transfer learning turorial
 
@@ -46,6 +47,12 @@ def imshow(inp, title=None, denormalize=False):
         #######################################################################
 
         pass
+
+
+def plot_and_log_embeddings(train_loader, model, xlim=None, ylim=None):
+    train_embeddings_otl, train_labels_otl = extract_embeddings(train_loader, model)
+    plt = plot_embeddings(train_embeddings_otl, train_labels_otl, xlim, ylim)
+    wandb.log({"embedding_plot": plt})
 
 
 def plot_embeddings(embeddings, targets, xlim=None, ylim=None):

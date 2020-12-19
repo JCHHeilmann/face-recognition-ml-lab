@@ -2,6 +2,7 @@ from itertools import combinations
 
 import numpy as np
 import torch
+import wandb
 
 
 def pairwise_distances(vectors):
@@ -91,13 +92,9 @@ def get_triplets(embeddings, labels, device, margin, negative_selection_fn):
                 hard_negative = negative_indices[hard_negative]
                 triplets.append([anchor_positive[0], anchor_positive[1], hard_negative])
 
-    # This line is not good, if there is no more than one label in the batch anchor_positive[0] is never assigned
-    # if len(triplets) == 0:
-    #    triplets.append([anchor_positive[0], anchor_positive[1], negative_indices[0]])
-
     triplets = np.array(triplets)
 
-    print(f"Found {len(triplets)} triplets from {number_of_anchors} anchors")
+    wandb.log({"number_triplets": len(triplets), "number_anchors": number_of_anchors})
 
     return torch.LongTensor(triplets)
 
