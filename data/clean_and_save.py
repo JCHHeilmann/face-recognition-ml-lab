@@ -20,10 +20,7 @@ def process_folder(target_folder):
     target_files = glob.glob(image_glob)
 
     for target_file in target_files:
-
-        img = Image.open(target_file)
-        img = img.resize((256, 256))
-        FaceAlignment.make_align(img, target_file, cln_name, not_detected_file_path)
+        FaceAlignment.make_align(target_file, cln_name, not_detected_file_path)
 
 
 if __name__ == "__main__":
