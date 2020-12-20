@@ -5,8 +5,8 @@ from PIL import Image
 
 def make_align(face_file_path, target_folder, not_detected_file_path):
 
-    detector = dlib.cnn_face_detection_model_v1("data/mmod_human_face_detector.dat")
-    predictor = dlib.shape_predictor("data/shape_predictor_5_face_landmarks.dat")
+    detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
+    predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
 
     img = dlib.load_rgb_image(face_file_path)
 
