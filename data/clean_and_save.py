@@ -6,8 +6,8 @@ import os
 
 import multiprocessing as mp
 
-# data_folder = "../../../data/"
-data_folder = "../datasets/"
+data_folder = "../../../data/"
+# data_folder = "../datasets/"
 not_detected_file_path = join(data_folder, "not_detected.csv")
 
 
