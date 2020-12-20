@@ -3,7 +3,6 @@ notebooks/*
 !.gitkeep
 
 wandb
-models
 checkpoints
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,pycharm,visualstudiocode,macos,windows,linux
