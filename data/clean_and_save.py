@@ -6,8 +6,8 @@ import os
 
 import multiprocessing as mp
 
-data_folder = "../../../data/"
-# data_folder = "../datasets/"
+# data_folder = "../../../data/"
+data_folder = "../datasets/"
 not_detected_file_path = join(data_folder, "not_detected.csv")
 
 
@@ -26,5 +26,5 @@ def process_folder(target_folder):
 if __name__ == "__main__":
     target_folders = glob.glob(join(data_folder, "CASIA-WebFace", "*"))
 
-    with mp.Pool(processes=(mp.cpu_count() - 1)) as pool:
+    with mp.Pool(processes=10) as pool:
         pool.map(process_folder, [folder for folder in target_folders])
