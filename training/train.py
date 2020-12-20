@@ -1,4 +1,5 @@
 from pathlib import Path
+from time import perf_counter
 
 import torch
 import wandb
@@ -20,20 +21,28 @@ def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
 
         evaluate(model, val_loader)
 
-        save_checkpoint(model, epoch)
+        save_checkpoint(model, optimizer, epoch)
 
+        embedding_visualization_timing = perf_counter()
         train_embeddings_otl, train_labels_otl = extract_embeddings(train_loader, model)
         plt = plot_embeddings(train_embeddings_otl, train_labels_otl)
-        wandb.log({"embedding_plot": plt})
-
-        # model_copy = copy.deepcopy(model).cpu()
-        # executor = ThreadPoolExecutor()
-        # executor.submit(plot_and_log_embeddings, train_loader, model)
-        # executor.shutdown(wait=False)
+        wandb.log(
+            {
+                "embedding_plot": plt,
+                "embedding_visualization_timing": (
+                    perf_counter() - embedding_visualization_timing
+                ),
+            }
+        )
 
 
 def train_epoch(model, train_loader, loss_function, optimizer):
+
     total_loss = 0
+    model_forward_timing = 0
+    loss_timing = 0
+    loss_backward_timing = 0
+    optimizer_step_timing = 0
     model.train()
     losses = []
 
@@ -52,7 +61,9 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
         optimizer.zero_grad()
 
+        timing = perf_counter()
         outputs = model(*data)
+        model_forward_timing += perf_counter() - timing
 
         if type(outputs) not in (tuple, list):
             outputs = (outputs,)
@@ -62,7 +73,9 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         if target is not None:
             target = (target,)
             loss_inputs += target
+        timing = perf_counter()
         loss_outputs = loss_function(*loss_inputs)
+        loss_timing += perf_counter() - timing
 
         if loss_outputs is None:
             continue
@@ -70,15 +83,24 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         loss = loss_outputs[0] if type(loss_outputs) in (tuple, list) else loss_outputs
         losses.append(loss.item())
         total_loss += loss.item()
+        timing = perf_counter()
         loss.backward()
+        loss_backward_timing += perf_counter() - timing
+
+        timing = perf_counter()
         optimizer.step()
+        optimizer_step_timing += perf_counter() - timing
 
         if batch_idx % 10 == 0:  # 10
-            wandb.log({"training_loss": total_loss / (batch_idx + 1)})
-
-    total_loss /= batch_idx + 1
-    print("Total Loss Epoch", total_loss)
-    return total_loss
+            wandb.log(
+                {
+                    "training_loss": total_loss / (batch_idx + 1),
+                    "model_forward_timing": model_forward_timing / (batch_idx + 1),
+                    "loss_timing": loss_timing / (batch_idx + 1),
+                    "loss_backward_timing": loss_backward_timing / (batch_idx + 1),
+                    "optimizer_step_timing": optimizer_step_timing / (batch_idx + 1),
+                }
+            )
 
 
 def evaluate(model, val_loader):
