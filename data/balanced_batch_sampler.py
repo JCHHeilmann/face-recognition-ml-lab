@@ -1,5 +1,5 @@
-from torch.utils.data.sampler import BatchSampler
 import numpy as np
+from torch.utils.data.sampler import BatchSampler
 
 
 class BalancedBatchSampler(BatchSampler):

@@ -3,14 +3,14 @@ from time import perf_counter
 
 import torch
 import wandb
+from tqdm import tqdm
+
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
-from tqdm import tqdm
-from utils.vis_utils import extract_embeddings, plot_embeddings
-
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
+from utils.vis_utils import extract_embeddings, plot_embeddings
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
