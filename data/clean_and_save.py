@@ -26,5 +26,5 @@ def process_folder(target_folder):
 if __name__ == "__main__":
     target_folders = glob.glob(join(data_folder, "CASIA-WebFace", "*"))
 
-    with mp.Pool(processes=40) as pool:
+    with mp.Pool(processes=45) as pool:
         pool.map(process_folder, [folder for folder in target_folders])
