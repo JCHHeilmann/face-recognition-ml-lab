@@ -1,10 +1,10 @@
-from os.path import join
 import glob
+import multiprocessing as mp
+import os
+from os.path import join
+
 import face_alignment
 from PIL import Image
-import os
-
-import multiprocessing as mp
 
 data_folder = "../../../data/"
 # data_folder = "../datasets/"

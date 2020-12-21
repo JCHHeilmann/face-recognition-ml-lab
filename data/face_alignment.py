@@ -1,5 +1,6 @@
-import dlib
 from os.path import join
+
+import dlib
 from PIL import Image
 
 
@@ -32,4 +33,3 @@ def make_align(face_file_path, target_folder, not_detected_file_path):
         target_split = face_file_path.split("/")
         crnt_img = target_split[-1]
         output_image.save(join(target_folder, crnt_img), "JPEG")
-
