@@ -135,7 +135,7 @@ if __name__ == "__main__":
     MARGIN = 1
 
     CLASSES_PER_BATCH = 10
-    SAMPLES_PER_CLASS = 25
+    SAMPLES_PER_CLASS = 50
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     wandb.init(
