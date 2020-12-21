@@ -127,7 +127,7 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     EPOCHS = 10
-    LEARNING_RATE = 0.001
+    LEARNING_RATE = 0.01
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
