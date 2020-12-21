@@ -134,8 +134,8 @@ if __name__ == "__main__":
     SCALE_INCEPTION_C = 0.20
     MARGIN = 1
 
-    CLASSES_PER_BATCH = 10
-    SAMPLES_PER_CLASS = 50
+    CLASSES_PER_BATCH = 30
+    SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     wandb.init(
