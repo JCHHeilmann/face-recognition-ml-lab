@@ -87,7 +87,7 @@ def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
 def extract_embeddings(dataloader, model):
     with torch.no_grad():
         model.eval()
-        embeddings = np.zeros((len(dataloader.dataset), 512))
+        embeddings = np.zeros((len(dataloader.dataset), 256))
         labels = np.zeros(len(dataloader.dataset))
         k = 0
         for images, target in dataloader:
