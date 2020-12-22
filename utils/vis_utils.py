@@ -59,6 +59,10 @@ def plot_and_log_embeddings(train_loader, model, xlim=None, ylim=None):
 
 
 def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
+    if torch.cuda.is_available():
+        embeddings = embeddings.cpu()
+        targets = targets.cpu()
+
     data = pd.DataFrame(
         {"dim_1": embeddings[:, 0], "dim_2": embeddings[:, 1], "targets": targets}
     )
