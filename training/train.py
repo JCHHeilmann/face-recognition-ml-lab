@@ -10,25 +10,25 @@ from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
-from utils.vis_utils import extract_embeddings, plot_embeddings
+from utils.vis_utils import plot_embeddings
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
     for epoch in range(epochs):
         print(f"epoch {epoch + 1} of {epochs}")
 
-        train_epoch(model, train_loader, loss_function, optimizer)
+        embeddings, targets = train_epoch(model, train_loader, loss_function, optimizer)
 
         evaluate(model, val_loader)
 
         save_checkpoint(model, optimizer, epoch)
 
         embedding_visualization_timing = perf_counter()
-        train_embeddings_otl, train_labels_otl = extract_embeddings(train_loader, model)
-        plt = plot_embeddings(train_embeddings_otl, train_labels_otl)
+        fig = plot_embeddings(embeddings, targets)
+        fig.show()
         wandb.log(
             {
-                "embedding_plot": plt,
+                "embedding_plot": fig,
                 "embedding_visualization_timing": (
                     perf_counter() - embedding_visualization_timing
                 ),
@@ -102,6 +102,11 @@ def train_epoch(model, train_loader, loss_function, optimizer):
                 }
             )
 
+    return (
+        outputs[0].detach(),
+        target[0],
+    )  # return final batch embeddings for visualization
+
 
 def evaluate(model, val_loader):
     pass
@@ -110,7 +115,7 @@ def evaluate(model, val_loader):
 def save_checkpoint(model, optimizer, epoch_num):
     checkpoint_folder = Path("checkpoints/")
     checkpoint_folder.mkdir(parents=True, exist_ok=True)
-    checkpoint_file = checkpoint_folder / (wandb.run.name + f"epoch_{epoch_num}")
+    checkpoint_file = checkpoint_folder / (wandb.run.name + f"_epoch_{epoch_num}")
     torch.save(
         {
             "epoch": epoch_num,
@@ -163,15 +168,15 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
-    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.8,
-        val_proportion=0.1,
+        train_proportion=0.01,
+        val_proportion=0.89,
         test_proportion=0.1,
     )
 

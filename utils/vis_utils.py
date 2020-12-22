@@ -1,9 +1,10 @@
+from time import perf_counter
+
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
+import plotly.express as px
 import torch
-import wandb
-
-# Adopted from the PyTorch transfer learning turorial
 
 
 def imshow(inp, title=None, denormalize=False):
@@ -52,36 +53,19 @@ def imshow(inp, title=None, denormalize=False):
 def plot_and_log_embeddings(train_loader, model, xlim=None, ylim=None):
     train_embeddings_otl, train_labels_otl = extract_embeddings(train_loader, model)
     plt = plot_embeddings(train_embeddings_otl, train_labels_otl, xlim, ylim)
-    wandb.log({"embedding_plot": plt})
+    return plt
 
 
 def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
-    colors = [
-        "#1f77b4",
-        "#ff7f0e",
-        "#2ca02c",
-        "#d62728",
-        "#9467bd",
-        "#8c564b",
-        "#e377c2",
-        "#7f7f7f",
-        "#bcbd22",
-        "#17becf",
-    ]
-    classes = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    data = pd.DataFrame(
+        {"dim_1": embeddings[:, 0], "dim_2": embeddings[:, 1], "targets": targets}
+    )
+    data["targets"] = data["targets"].astype(
+        str
+    )  # convert to string, so plotly interprets it as categorical variable
 
-    plt.figure(figsize=(10, 10))
-    for i in range(10):
-        inds = np.where(targets == i)[0]
-        plt.scatter(
-            embeddings[inds, 0], embeddings[inds, 1], alpha=0.5, color=colors[i]
-        )
-    if xlim:
-        plt.xlim(xlim[0], xlim[1])
-    if ylim:
-        plt.ylim(ylim[0], ylim[1])
-    plt.legend(classes)
-    return plt
+    fig = px.scatter(data, x="dim_1", y="dim_2", color="targets")
+    return fig
 
 
 def extract_embeddings(dataloader, model):
