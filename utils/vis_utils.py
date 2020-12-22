@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import torch
+import wandb
 
 
 def imshow(inp, title=None, denormalize=False):
@@ -63,6 +65,23 @@ def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
     data["targets"] = data["targets"].astype(
         str
     )  # convert to string, so plotly interprets it as categorical variable
+
+    # table = wandb.Table(dataframe=data)
+    # return wandb.plot.scatter(table, "dim_1", "dim_2"), table
+
+    # fig = go.Figure()
+
+    # for target in targets:
+    #     target_data = data[data["targets"] == str(target.item())]
+    #     fig.add_trace(
+    #         go.Scatter(
+    #             x=target_data["dim_1"],
+    #             y=target_data["dim_2"],
+    #             name=str(target.item()),
+    #             mode="markers",
+    #             # marker_color="rgba(152, 0, 0, .8)",
+    #         )
+    #     )
 
     fig = px.scatter(data, x="dim_1", y="dim_2", color="targets")
     return fig

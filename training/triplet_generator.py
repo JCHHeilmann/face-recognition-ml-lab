@@ -94,8 +94,6 @@ def get_triplets(embeddings, labels, device, margin, negative_selection_fn):
 
     triplets = np.array(triplets)
 
-    wandb.log({"number_triplets": len(triplets), "number_anchors": number_of_anchors})
-
     return torch.LongTensor(triplets)
 
 

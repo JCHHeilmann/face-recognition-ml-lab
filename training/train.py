@@ -25,7 +25,6 @@ def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
 
         embedding_visualization_timing = perf_counter()
         fig = plot_embeddings(embeddings, targets)
-        fig.show()
         wandb.log(
             {
                 "embedding_plot": fig,
@@ -43,46 +42,33 @@ def train_epoch(model, train_loader, loss_function, optimizer):
     loss_timing = 0
     loss_backward_timing = 0
     optimizer_step_timing = 0
+    total_num_triplets = 0
+
     model.train()
-    losses = []
 
     for batch_idx, (data, target) in tqdm(
         enumerate(train_loader), total=len(train_loader), desc="processing batch: "
     ):
-        target = target if len(target) > 0 else None
-
-        if not type(data) in (tuple, list):
-            data = (data,)
-
         if torch.cuda.is_available():
-            data = tuple(d.cuda() for d in data)
-            if target is not None:
-                target = target.cuda()
+            data = data.cuda()
+            target = target.cuda()
 
         optimizer.zero_grad()
 
         timing = perf_counter()
-        outputs = model(*data)
+        outputs = model(data)
         model_forward_timing += perf_counter() - timing
 
-        if type(outputs) not in (tuple, list):
-            outputs = (outputs,)
-
-        loss_inputs = outputs
-
-        if target is not None:
-            target = (target,)
-            loss_inputs += target
         timing = perf_counter()
-        loss_outputs = loss_function(*loss_inputs)
+        loss, num_triplets = loss_function(outputs, target)
         loss_timing += perf_counter() - timing
 
-        if loss_outputs is None:
+        if num_triplets == 0:
             continue
 
-        loss = loss_outputs[0] if type(loss_outputs) in (tuple, list) else loss_outputs
-        losses.append(loss.item())
         total_loss += loss.item()
+        total_num_triplets += num_triplets
+
         timing = perf_counter()
         loss.backward()
         loss_backward_timing += perf_counter() - timing
@@ -99,12 +85,13 @@ def train_epoch(model, train_loader, loss_function, optimizer):
                     "loss_timing": loss_timing / (batch_idx + 1),
                     "loss_backward_timing": loss_backward_timing / (batch_idx + 1),
                     "optimizer_step_timing": optimizer_step_timing / (batch_idx + 1),
+                    "average_num_triplets": total_num_triplets / (batch_idx + 1),
                 }
             )
 
     return (
-        outputs[0].detach(),
-        target[0],
+        outputs.detach(),
+        target,
     )  # return final batch embeddings for visualization
 
 
@@ -168,8 +155,8 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
-    dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
