@@ -14,7 +14,7 @@ from training.loss_function import OnlineTripletLoss
 from utils.vis_utils import plot_embeddings
 
 
-def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
+def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
     for epoch in range(epochs):
         print(f"epoch {epoch + 1} of {epochs}")
 
@@ -121,7 +121,7 @@ def save_checkpoint(model, optimizer, epoch_num):
 if __name__ == "__main__":
     torch.manual_seed(42)
 
-    EPOCHS = 10
+    EPOCHS = 20
     LEARNING_RATE = 0.05
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
