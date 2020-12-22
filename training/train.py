@@ -3,14 +3,15 @@ from time import perf_counter
 
 import torch
 import wandb
-from tqdm import tqdm
-
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
+from torch.optim.lr_scheduler import MultiStepLR
+from tqdm import tqdm
+from utils.vis_utils import plot_embeddings
+
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
-from utils.vis_utils import plot_embeddings
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
@@ -22,6 +23,8 @@ def train(model, train_loader, val_loader, loss_function, optimizer, epochs):
         evaluate(model, val_loader)
 
         save_checkpoint(model, optimizer, epoch)
+
+        scheduler.step()
 
         embedding_visualization_timing = perf_counter()
         fig = plot_embeddings(embeddings, targets)
@@ -119,7 +122,7 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     EPOCHS = 10
-    LEARNING_RATE = 0.01
+    LEARNING_RATE = 0.05
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
@@ -144,6 +147,8 @@ if __name__ == "__main__":
             "scale_inception_a": SCALE_INCEPTION_A,
             "scale_inception_b": SCALE_INCEPTION_B,
             "scale_inception_c": SCALE_INCEPTION_C,
+            "scheduler": "MultiStepLR",
+            "triplet_generation": "semi hard",
         },
     )
 
@@ -162,11 +167,20 @@ if __name__ == "__main__":
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.01,
-        val_proportion=0.89,
+        train_proportion=0.8,
+        val_proportion=0.1,
         test_proportion=0.1,
     )
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    scheduler = MultiStepLR(optimizer, milestones=[5, 15], gamma=0.1)
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_generator.get_semihard)
-    train(model, train_loader, val_loader, triplet_loss, optimizer, epochs=EPOCHS)
+    train(
+        model,
+        train_loader,
+        val_loader,
+        triplet_loss,
+        optimizer,
+        scheduler,
+        epochs=EPOCHS,
+    )
