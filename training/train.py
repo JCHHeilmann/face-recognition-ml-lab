@@ -148,7 +148,7 @@ if __name__ == "__main__":
             "scale_inception_b": SCALE_INCEPTION_B,
             "scale_inception_c": SCALE_INCEPTION_C,
             "scheduler": "MultiStepLR",
-            "triplet_generation": "semi hard",
+            "triplet_generation": "hardest",
         },
     )
 
