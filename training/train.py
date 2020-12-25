@@ -20,7 +20,7 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
 
         embeddings, targets = train_epoch(model, train_loader, loss_function, optimizer)
 
-        evaluate(model, val_loader)
+        evaluate(model, val_loader, loss_function)
 
         save_checkpoint(model, optimizer, epoch)
 
@@ -98,8 +98,40 @@ def train_epoch(model, train_loader, loss_function, optimizer):
     )  # return final batch embeddings for visualization
 
 
-def evaluate(model, val_loader):
-    pass
+def evaluate(model, val_loader, loss_function):
+    
+    val_loss = 0
+    val_num_triplets = 0
+
+    with torch.no_grad():
+        model.eval()
+
+        for batch_idx, (data, target) in tqdm(
+            enumerate(val_loader), total=len(val_loader), desc="processing batch: "
+        ):
+            if torch.cuda.is_available():
+                data = data.cuda()
+                target = target.cuda()
+
+            outputs = model(data)
+
+            loss, num_triplets = loss_function(outputs, target)
+
+            if num_triplets == 0:
+                continue
+
+            val_loss += loss.item()
+            val_num_triplets += num_triplets
+
+            if batch_idx % 10 == 0:  # 10
+                wandb.log(
+                    {
+                        "validation_loss": val_loss / (batch_idx + 1),
+                        "average_num_triplets": val_num_triplets / (batch_idx + 1),
+                    }
+                )
+
+    return val_loss
 
 
 def save_checkpoint(model, optimizer, epoch_num):
