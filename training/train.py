@@ -99,7 +99,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
 
 def evaluate(model, val_loader, loss_function):
-    
+
     val_loss = 0
     val_num_triplets = 0
 
