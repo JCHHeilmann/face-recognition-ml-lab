@@ -1,34 +1,30 @@
 from os.path import join
 import glob
-import FaceAlignment
+import face_alignment
 from PIL import Image
 import os
 
-from tqdm.contrib.concurrent import process_map
 import multiprocessing as mp
 
 data_folder = "../../../data/"
+# data_folder = "../datasets/"
 not_detected_file_path = join(data_folder, "not_detected.csv")
 
 
 def process_folder(target_folder):
     split_path = target_folder.split("/")
-    cln_name = join(data_folder, "Clean", split_path[-1])
+    cln_name = join(data_folder, "Aligned_CASIA_WebFace", split_path[-1])
     os.makedirs(cln_name)
 
     image_glob = join(data_folder, "CASIA-WebFace", split_path[-1], "*.jpg")
     target_files = glob.glob(image_glob)
 
     for target_file in target_files:
-        FaceAlignment.make_align(target_file, cln_name, not_detected_file_path)
+        face_alignment.make_align(target_file, cln_name, not_detected_file_path)
 
 
 if __name__ == "__main__":
     target_folders = glob.glob(join(data_folder, "CASIA-WebFace", "*"))
 
-    process_map(
-        process_folder,
-        [folder for folder in target_folders],
-        max_workers=mp.cpu_count(),
-        chunksize=10,
-    )
+    with mp.Pool(processes=45) as pool:
+        pool.map(process_folder, [folder for folder in target_folders])
