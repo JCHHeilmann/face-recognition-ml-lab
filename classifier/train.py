@@ -23,19 +23,24 @@ def get_data():
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.8,
-        val_proportion=0.1,
+        train_proportion=0.01,
+        val_proportion=0.89,
         test_proportion=0.1,
     )
 
     if torch.cuda.is_available():
-        checkpoint = torch.load("checkpoints/young-leaf-128_epoch_19")
+        checkpoint = torch.load(
+            "checkpoints/young-leaf-128_epoch_19", map_location=torch.device("cuda")
+        )
     else:
         checkpoint = torch.load(
             "checkpoints/young-leaf-128_epoch_19", map_location=torch.device("cpu")
         )
     model = InceptionResnetV1()
     model.load_state_dict(checkpoint["model_state_dict"])
+
+    if torch.cuda.is_available():
+        model = model.cuda()
 
     embeddings, targets = extract_embeddings(train_loader, model)
 
