@@ -6,7 +6,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import torch
-import wandb
+from tqdm import tqdm
 
 
 def imshow(inp, title=None, denormalize=False):
@@ -80,7 +80,7 @@ def extract_embeddings(dataloader, model):
         embeddings = np.zeros((len(dataloader.dataset), 512))
         labels = np.zeros(len(dataloader.dataset))
         k = 0
-        for images, target in dataloader:
+        for images, target in tqdm(dataloader, total=len(dataloader)):
             if torch.cuda.is_available():
                 images = images.cuda()
             embeddings[k : k + len(images)] = model(images).data.cpu().numpy()
