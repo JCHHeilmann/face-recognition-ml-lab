@@ -1,12 +1,16 @@
 from time import perf_counter
+from time import time
+from datetime import datetime
 
 import torch
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from joblib import dump
 from models.inception_resnet_v1 import InceptionResnetV1
-from sklearn.neighbors import RadiusNeighborsClassifier
+from pai4sk.svm import LinearSVC
 from utils.vis_utils import extract_embeddings
+
+# from sklearn.neighbors import RadiusNeighborsClassifier
 
 
 def get_data():
@@ -23,8 +27,8 @@ def get_data():
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.8,
-        val_proportion=0.1,
+        train_proportion=0.01,
+        val_proportion=0.89,
         test_proportion=0.1,
     )
 
@@ -53,7 +57,8 @@ def train_classifier(embeddings, targets):
     print("training classifier...")
     timing = perf_counter()
 
-    classifier = RadiusNeighborsClassifier(radius=1, outlier_label=-1, n_jobs=-1)
+    # classifier = RadiusNeighborsClassifier(radius=1, outlier_label=-1, n_jobs=-1)
+    classifier = LinearSVC(random_state=42, verbose=True)
     print("initialized model")
     classifier.fit(embeddings, targets)
     print(f"took {perf_counter() - timing}")
@@ -63,7 +68,10 @@ def train_classifier(embeddings, targets):
 
 def save_classifier(classifier):
     print("saving...")
-    dump(classifier, "face_recognition_classifier.joblib")
+    dump(
+        classifier,
+        f"face_recognition_classifier_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
+    )
     print("done")
 
 
