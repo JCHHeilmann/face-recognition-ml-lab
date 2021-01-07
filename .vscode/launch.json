@@ -13,10 +13,17 @@
     },
 
     {
-      "name": "Python: Module",
+      "name": "Python: Module Train Model",
       "type": "python",
       "request": "launch",
       "module": "training.train"
+    },
+
+    {
+      "name": "Python: Module Train Classifier",
+      "type": "python",
+      "request": "launch",
+      "module": "classifier.train"
     }
   ]
 }
