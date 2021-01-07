@@ -1,6 +1,5 @@
-from time import perf_counter
-from time import time
 from datetime import datetime
+from time import perf_counter, time
 
 import torch
 from data.data_loaders import get_data_loaders
@@ -8,6 +7,7 @@ from data.web_face_dataset import WebfaceDataset
 from joblib import dump
 from models.inception_resnet_v1 import InceptionResnetV1
 from pai4sk.svm import LinearSVC
+from sklearn.metrics import accuracy_score
 from utils.vis_utils import extract_embeddings
 
 # from sklearn.neighbors import RadiusNeighborsClassifier
@@ -48,7 +48,7 @@ def get_data():
 
     embeddings, targets = extract_embeddings(train_loader, model)
 
-    print(f"took {perf_counter() - timing}")
+    print(f"took {perf_counter() - timing} seconds")
 
     return embeddings[:10], targets[:10]
 
@@ -61,7 +61,16 @@ def train_classifier(embeddings, targets):
     classifier = LinearSVC(random_state=42, verbose=True)
     print("initialized model")
     classifier.fit(embeddings, targets)
-    print(f"took {perf_counter() - timing}")
+    print(f"took {perf_counter() - timing} seconds")
+
+    print("testing...")
+    timing = perf_counter()
+
+    predictions = classifier.predict(embeddings)
+    accuracy = accuracy_score(targets, predictions)
+    print(f"train accuracy {accuracy}")
+
+    print(f"took {perf_counter() - timing} seconds")
 
     return classifier
 
