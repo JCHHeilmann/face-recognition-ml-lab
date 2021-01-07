@@ -27,10 +27,12 @@ def get_data():
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.1,
-        val_proportion=0.8,
+        train_proportion=0.8,
+        val_proportion=0.1,
         test_proportion=0.1,
     )
+
+    print("loading model...")
 
     if torch.cuda.is_available():
         checkpoint = torch.load(
@@ -45,6 +47,8 @@ def get_data():
 
     if torch.cuda.is_available():
         model = model.cuda()
+
+    print("calculating embeddings...")
 
     embeddings, targets = extract_embeddings(train_loader, model)
 
