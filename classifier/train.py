@@ -27,8 +27,8 @@ def get_data():
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.01,
-        val_proportion=0.89,
+        train_proportion=0.1,
+        val_proportion=0.8,
         test_proportion=0.1,
     )
 
