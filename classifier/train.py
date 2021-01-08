@@ -54,7 +54,7 @@ def get_data():
 
     print(f"took {perf_counter() - timing} seconds")
 
-    return embeddings[:10], targets[:10]
+    return embeddings, targets
 
 
 def train_classifier(embeddings, targets):
