@@ -62,7 +62,7 @@ def train_classifier(embeddings, targets):
     timing = perf_counter()
 
     # classifier = RadiusNeighborsClassifier(radius=1, outlier_label=-1, n_jobs=-1)
-    classifier = LinearSVC(random_state=42, verbose=True)
+    classifier = LinearSVC(verbose=True)
     print("initialized model")
     classifier.fit(embeddings, targets)
     print(f"took {perf_counter() - timing} seconds")
