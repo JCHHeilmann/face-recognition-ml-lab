@@ -54,6 +54,11 @@ def get_data():
 
     print(f"took {perf_counter() - timing} seconds")
 
+    dump(
+        (embeddings, targets),
+        f"../../data/embeddings_young-leaf-128_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
+    )
+
     return embeddings, targets
 
 
@@ -65,15 +70,6 @@ def train_classifier(embeddings, targets):
     classifier = LinearSVC(verbose=True)
     print("initialized model")
     classifier.fit(embeddings, targets)
-    print(f"took {perf_counter() - timing} seconds")
-
-    print("testing...")
-    timing = perf_counter()
-
-    predictions = classifier.predict(embeddings)
-    accuracy = accuracy_score(targets, predictions)
-    print(f"train accuracy {accuracy}")
-
     print(f"took {perf_counter() - timing} seconds")
 
     return classifier
@@ -88,9 +84,21 @@ def save_classifier(classifier):
     print("done")
 
 
+def evaluate_classifier(classifier, embeddings, targets):
+    print("testing...")
+    timing = perf_counter()
+
+    predictions = classifier.predict(embeddings)
+    accuracy = accuracy_score(targets, predictions)
+    print(f"train accuracy {accuracy}")
+
+    print(f"took {perf_counter() - timing} seconds")
+
+
 if __name__ == "__main__":
     torch.manual_seed(42)
 
     embeddings, targets = get_data()
     classifier = train_classifier(embeddings, targets)
     save_classifier(classifier)
+    evaluate_classifier(classifier, embeddings, targets)
