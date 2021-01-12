@@ -14,9 +14,7 @@ from training.loss_function import OnlineTripletLoss
 from utils.vis_utils import plot_embeddings
 
 
-def train(
-    model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs
-):
+def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
     for epoch in range(epochs):
         print(f"epoch {epoch + 1} of {epochs}")
 
