@@ -14,13 +14,15 @@ from training.loss_function import OnlineTripletLoss
 from utils.vis_utils import plot_embeddings
 
 
-def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs, margin):
+def train(
+    model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs, margin
+):
     for epoch in range(epochs):
         print(f"epoch {epoch + 1} of {epochs}")
-        
-        if not((epoch+1) % 4):
+
+        if not ((epoch + 1) % 4):
             margin *= 0.2
-        
+
         loss_function = OnlineTripletLoss(margin, triplet_generator.get_semihard)
 
         embeddings, targets = train_epoch(model, train_loader, loss_function, optimizer)
@@ -220,5 +222,5 @@ if __name__ == "__main__":
         optimizer,
         scheduler,
         epochs=EPOCHS,
-        margin=MARGIN
+        margin=MARGIN,
     )
