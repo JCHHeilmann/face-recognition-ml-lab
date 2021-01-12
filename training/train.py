@@ -187,7 +187,7 @@ if __name__ == "__main__":
             "scale_inception_b": SCALE_INCEPTION_B,
             "scale_inception_c": SCALE_INCEPTION_C,
             "scheduler": "MultiStepLR",
-            "triplet_generation": "semihard",
+            "triplet_generation": "hardest",
         },
     )
 
@@ -213,7 +213,7 @@ if __name__ == "__main__":
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     scheduler = MultiStepLR(optimizer, milestones=[5, 15], gamma=0.1)
-    triplet_loss = OnlineTripletLoss(MARGIN, triplet_generator.get_semihard)
+    triplet_loss = OnlineTripletLoss(MARGIN, triplet_generator.get_hardest)
     train(
         model,
         train_loader,
