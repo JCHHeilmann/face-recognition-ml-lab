@@ -27,10 +27,12 @@ def random_hard_negative(loss_values):
 
 
 def semihard_negative(loss_values, margin):
-    semihard_negatives = np.where(
-        np.logical_and(loss_values < margin, loss_values > 0)
-    )[0]
-    return np.random.choice(semihard_negatives) if len(semihard_negatives) > 0 else None
+    if margin==0:
+        semihard_negatives = hardest_negative(loss_values)
+        return semihard_negatives
+    else:
+        semihard_negatives = np.where(np.logical_and(loss_values < margin, loss_values > 0))[0]
+        return np.random.choice(semihard_negatives) if len(semihard_negatives) > 0 else None
 
 
 def get_triplets(embeddings, labels, device, margin, negative_selection_fn):

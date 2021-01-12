@@ -14,9 +14,14 @@ from training.loss_function import OnlineTripletLoss
 from utils.vis_utils import plot_embeddings
 
 
-def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
+def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs, margin):
     for epoch in range(epochs):
         print(f"epoch {epoch + 1} of {epochs}")
+        
+        if not((epoch+1) % 4):
+            margin *= 0.2
+        
+        loss_function = OnlineTripletLoss(margin, triplet_generator.get_semihard)
 
         embeddings, targets = train_epoch(model, train_loader, loss_function, optimizer)
 
@@ -159,7 +164,7 @@ if __name__ == "__main__":
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
     SCALE_INCEPTION_C = 0.20
-    MARGIN = 0.2
+    MARGIN = 1
 
     CLASSES_PER_BATCH = 30
     SAMPLES_PER_CLASS = 40
@@ -180,7 +185,7 @@ if __name__ == "__main__":
             "scale_inception_b": SCALE_INCEPTION_B,
             "scale_inception_c": SCALE_INCEPTION_C,
             "scheduler": "MultiStepLR",
-            "triplet_generation": "hardest",
+            "triplet_generation": "semihard",
         },
     )
 
@@ -206,7 +211,7 @@ if __name__ == "__main__":
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     scheduler = MultiStepLR(optimizer, milestones=[5, 15], gamma=0.1)
-    triplet_loss = OnlineTripletLoss(MARGIN, triplet_generator.get_hardest)
+    triplet_loss = OnlineTripletLoss(MARGIN, triplet_generator.get_semihard)
     train(
         model,
         train_loader,
@@ -215,4 +220,5 @@ if __name__ == "__main__":
         optimizer,
         scheduler,
         epochs=EPOCHS,
+        margin=MARGIN
     )
