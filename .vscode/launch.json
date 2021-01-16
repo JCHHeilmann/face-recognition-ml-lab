@@ -5,6 +5,14 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Launch Edge",
+      "request": "launch",
+      "type": "pwa-msedge",
+      "url": "http://localhost:5000",
+      "webRoot": "${workspaceFolder}/web-app/src"
+    },
+
+    {
       "name": "Python: Current File",
       "type": "python",
       "request": "launch",

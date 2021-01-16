@@ -22,6 +22,12 @@ Note: Please commit any changes before starting, so that W&B can associate the c
 
 ## Starting the API Backend
 
-From project root run: `hypercorn api.main:app`
+From project root run: `python -m api.main`
 
-Add `--reload` for automatic reloads during development.
+## Starting the Web-App
+
+Navigate to web-app folder: `cd web-app`
+
+With node and npm installed, start locally: `npm run dev`
+
+For more information have a look at the readme.
