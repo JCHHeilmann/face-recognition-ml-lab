@@ -19,3 +19,9 @@
 To start a training run from the project root: `python -m training.train`
 
 Note: Please commit any changes before starting, so that W&B can associate the correct repository state with the run.
+
+## Starting the API Backend
+
+From project root run: `hypercorn api.main:app`
+
+Add `--reload` for automatic reloads during development.
