@@ -170,6 +170,15 @@ if __name__ == "__main__":
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
+    model = InceptionResnetV1(
+        DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
+    )
+
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    scheduler = MultiStepLR(optimizer, milestones=[5, 15], gamma=0.1)
+
+    triplet_gen = triplet_generator.get_semihard
+
     wandb.init(
         project="face-recognition",
         entity="application-challenges-ml-lab",
@@ -184,21 +193,20 @@ if __name__ == "__main__":
             "scale_inception_a": SCALE_INCEPTION_A,
             "scale_inception_b": SCALE_INCEPTION_B,
             "scale_inception_c": SCALE_INCEPTION_C,
-            "scheduler": "MultiStepLR",
-            "triplet_generation": "hardest",
+            "optimizer": str(optimizer),
+            "scheduler": str(scheduler),
+            "triplet_generation": str(triplet_gen),
+            "margin": MARGIN,
         },
     )
 
-    model = InceptionResnetV1(
-        DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
-    )
     if torch.cuda.is_available():
         model = model.cuda()
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
-    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
@@ -209,9 +217,7 @@ if __name__ == "__main__":
         test_proportion=0.1,
     )
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-    scheduler = MultiStepLR(optimizer, milestones=[5, 15], gamma=0.1)
-    triplet_loss = OnlineTripletLoss(MARGIN, triplet_generator.get_semihard)
+    triplet_loss = OnlineTripletLoss(MARGIN, triplet_gen)
     train(
         model,
         train_loader,
