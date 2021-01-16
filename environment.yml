@@ -2,6 +2,7 @@ name: face-recognition
 channels:
   - pytorch
   - conda-forge
+  - https://public.dhe.ibm.com/ibmdl/export/pub/software/server/ibm-ai/conda/
   - defaults
 dependencies:
   - appdirs=1.4.4=py_0
@@ -99,23 +100,33 @@ dependencies:
     - configparser==5.0.1
     - dlib==19.21.1
     - docker-pycreds==0.4.0
+    - fastapi==0.63.0
     - gitdb==4.0.5
     - gitpython==3.1.11
+    - h11==0.12.0
+    - h2==4.0.0
+    - hpack==4.0.0
+    - hypercorn==0.11.2
+    - hyperframe==6.0.0
     - idna==2.10
     - imutils==0.5.3
     - opencv-python==4.4.0.46
     - pathtools==0.1.2
+    - priority==1.3.0
     - promise==2.3
     - protobuf==3.14.0
     - psutil==5.7.3
+    - pydantic==1.7.3
     - pyyaml==5.3.1
     - requests==2.25.0
     - sentry-sdk==0.19.4
     - shortuuid==1.0.1
     - smmap==3.0.4
+    - starlette==0.13.6
     - subprocess32==3.5.4
     - urllib3==1.26.2
     - wandb==0.10.12
     - watchdog==0.10.4
+    - wsproto==1.0.0
 prefix: /Users/johannesh/opt/anaconda3/envs/face-recognition
 
