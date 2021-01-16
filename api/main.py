@@ -24,8 +24,9 @@ def recognize_face(image: bytes = File(...)):
 
 if __name__ == "__main__":
     import asyncio
-    from hypercorn.config import Config
+
     from hypercorn.asyncio import serve
+    from hypercorn.config import Config
 
     config = Config()
     config.loglevel = "DEBUG"
