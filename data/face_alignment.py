@@ -3,7 +3,7 @@ from os.path import join
 from PIL import Image
 
 
-def make_align(img, target_folder, not_detected_file_path):
+def make_align(img):
 
     detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
     predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
