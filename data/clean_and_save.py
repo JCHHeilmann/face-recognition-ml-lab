@@ -10,10 +10,6 @@ data_folder = "../../../data/"
 not_detected_file_path = join(data_folder, "not_detected.csv")
 
 class clean_and_save:
-    def __init__(self):
-        self.data_folder = "../../../data/"
-        self.not_detected_file_path = join(self.data_folder, "not_detected.csv")
-
 
     def process_file(self, target_file_path, cln_name):
 
