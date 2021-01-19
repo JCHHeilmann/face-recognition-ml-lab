@@ -3,13 +3,15 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-import faiss
+import logging
 import time
+
 import numpy as np
 
-import logging
+import faiss
 
 LOG = logging.getLogger(__name__)
+
 
 def knn_ground_truth(xq, db_iterator, k, metric_type=faiss.METRIC_L2):
     """Computes the exact KNN search results for a dataset that possibly
@@ -23,7 +25,7 @@ def knn_ground_truth(xq, db_iterator, k, metric_type=faiss.METRIC_L2):
 
     index = faiss.IndexFlat(d, metric_type)
     if faiss.get_num_gpus():
-        LOG.info('running on %d GPUs' % faiss.get_num_gpus())
+        LOG.info("running on %d GPUs" % faiss.get_num_gpus())
         index = faiss.index_cpu_to_all_gpus(index)
 
     # compute ground-truth by blocks, and add to heaps
@@ -43,10 +45,9 @@ def knn_ground_truth(xq, db_iterator, k, metric_type=faiss.METRIC_L2):
 
     return rh.D, rh.I
 
+
 # knn function used to be here
 knn = faiss.knn
-
-
 
 
 def range_search_gpu(xq, r2, index_gpu, index_cpu):
@@ -92,21 +93,22 @@ def range_search_gpu(xq, r2, index_gpu, index_cpu):
     return lims, np.hstack(D_res), np.hstack(I_res)
 
 
-def range_ground_truth(xq, db_iterator, threshold, metric_type=faiss.METRIC_L2,
-                       shard=False, ngpu=-1):
+def range_ground_truth(
+    xq, db_iterator, threshold, metric_type=faiss.METRIC_L2, shard=False, ngpu=-1
+):
     """Computes the range-search search results for a dataset that possibly
     does not fit in RAM but for which we have an iterator that
     returns it block by block.
     """
     nq, d = xq.shape
     t0 = time.time()
-    xq = np.ascontiguousarray(xq, dtype='float32')
+    xq = np.ascontiguousarray(xq, dtype="float32")
 
     index = faiss.IndexFlat(d, metric_type)
     if ngpu == -1:
         ngpu = faiss.get_num_gpus()
     if ngpu:
-        LOG.info('running on %d GPUs' % ngpu)
+        LOG.info("running on %d GPUs" % ngpu)
         co = faiss.GpuMultipleClonerOptions()
         co.shard = shard
         index_gpu = faiss.index_cpu_to_all_gpus(index, co=co, ngpu=ngpu)
@@ -135,8 +137,8 @@ def range_ground_truth(xq, db_iterator, threshold, metric_type=faiss.METRIC_L2,
         i0 += ni
         LOG.info("%d db elements, %.3f s" % (i0, time.time() - t0))
 
-    empty_I = np.zeros(0, dtype='int64')
-    empty_D = np.zeros(0, dtype='float32')
+    empty_I = np.zeros(0, dtype="int64")
+    empty_D = np.zeros(0, dtype="float32")
     # import pdb; pdb.set_trace()
     D = [(np.hstack(i) if i != [] else empty_D) for i in D]
     I = [(np.hstack(i) if i != [] else empty_I) for i in I]
@@ -153,7 +155,7 @@ def threshold_radius_nres(nres, dis, ids, thresh):
     new_nres = np.zeros_like(nres)
     o = 0
     for i, nr in enumerate(nres):
-        nr = int(nr)   # avoid issues with int64 + uint64
+        nr = int(nr)  # avoid issues with int64 + uint64
         new_nres[i] = mask[o : o + nr].sum()
         o += nr
     return new_nres, dis[mask], ids[mask]
@@ -177,23 +179,29 @@ def apply_maxres(res_batches, target_nres):
     alldis.partition(target_nres)
     radius = alldis[target_nres]
 
-    if alldis.dtype == 'float32':
+    if alldis.dtype == "float32":
         radius = float(radius)
     else:
         radius = int(radius)
-    LOG.debug('   setting radius to %s' % radius)
+    LOG.debug("   setting radius to %s" % radius)
     totres = 0
     for i, (nres, dis, ids) in enumerate(res_batches):
         nres, dis, ids = threshold_radius_nres(nres, dis, ids, radius)
         totres += len(dis)
         res_batches[i] = nres, dis, ids
-    LOG.debug('   updated previous results, new nb results %d' % totres)
+    LOG.debug("   updated previous results, new nb results %d" % totres)
     return radius, totres
 
 
-def range_search_max_results(index, query_iterator, radius,
-                             max_results=None, min_results=None,
-                             shard=False, ngpu=0):
+def range_search_max_results(
+    index,
+    query_iterator,
+    radius,
+    max_results=None,
+    min_results=None,
+    shard=False,
+    ngpu=0,
+):
     """Performs a range search with many queries (given by an iterator)
     and adjusts the threshold on-the-fly so that the total results
     table does not grow larger than max_results.
@@ -210,7 +218,7 @@ def range_search_max_results(index, query_iterator, radius,
         ngpu = faiss.get_num_gpus()
 
     if ngpu:
-        LOG.info('running on %d GPUs' % ngpu)
+        LOG.info("running on %d GPUs" % ngpu)
         co = faiss.GpuMultipleClonerOptions()
         co.shard = shard
         index_gpu = faiss.index_cpu_to_all_gpus(index, co=co, ngpu=ngpu)
@@ -235,29 +243,34 @@ def range_search_max_results(index, query_iterator, radius,
         if xqi.dtype != np.float32:
             # for binary indexes
             # weird Faiss quirk that returns floats for Hamming distances
-            Di = Di.astype('int16')
+            Di = Di.astype("int16")
 
         totres += len(Di)
         res_batches.append((nres_i, Di, Ii))
 
         if max_results is not None and totres > max_results:
-            LOG.info('too many results %d > %d, scaling back radius' %
-                     (totres, max_results))
+            LOG.info(
+                "too many results %d > %d, scaling back radius" % (totres, max_results)
+            )
             radius, totres = apply_maxres(res_batches, min_results)
         t2 = time.time()
         t_search += t1 - t0
         t_post_process += t2 - t1
-        LOG.debug('   [%.3f s] %d queries done, %d results' % (
-            time.time() - t_start, qtot, totres))
+        LOG.debug(
+            "   [%.3f s] %d queries done, %d results"
+            % (time.time() - t_start, qtot, totres)
+        )
 
-    LOG.info('   search done in %.3f s + %.3f s, total %d results, end threshold %g' % (
-        t_search, t_post_process, totres, radius))
+    LOG.info(
+        "   search done in %.3f s + %.3f s, total %d results, end threshold %g"
+        % (t_search, t_post_process, totres, radius)
+    )
 
     nres = np.hstack([nres_i for nres_i, dis_i, ids_i in res_batches])
     dis = np.hstack([dis_i for nres_i, dis_i, ids_i in res_batches])
     ids = np.hstack([ids_i for nres_i, dis_i, ids_i in res_batches])
 
-    lims = np.zeros(len(nres) + 1, dtype='uint64')
+    lims = np.zeros(len(nres) + 1, dtype="uint64")
     lims[1:] = np.cumsum(nres)
 
     return radius, lims, dis, ids
