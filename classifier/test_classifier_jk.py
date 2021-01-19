@@ -1,6 +1,7 @@
-from classifier_jk import classify_image, add_face_to_known, initalize
-import shutil
 import os
+import shutil
+
+from classifier_jk import add_face_to_known, classify_image, initalize
 
 #If the folder already exists, delete it for testing
 if os.path.exists("./PeopleKnown/Lewandowski"):
