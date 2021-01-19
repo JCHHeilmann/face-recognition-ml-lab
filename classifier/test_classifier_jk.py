@@ -6,7 +6,7 @@ import os
 if os.path.exists("./PeopleKnown/Lewandowski"):
     shutil.rmtree("./PeopleKnown/Lewandowski", ignore_errors=True)
 
-#Initalize the already known images
+#Initalize the already known images into the face database
 initalize()
 
 classify_image("./PeopleUnknown/Lewandowski_Test.jpeg")
