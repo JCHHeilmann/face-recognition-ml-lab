@@ -20,7 +20,7 @@ class clean_and_save:
 
         # If no face is detected, then saving filepath in csv file
         if aln_obj is None:
-            with open(self.not_detected_file_path, "a") as csv_file_name:
+            with open(not_detected_file_path, "a") as csv_file_name:
                 csv_file_name.write(target_file_path + ",\n")
 
         # Upon face detection, saving the cleaned image in JPEG format
@@ -32,10 +32,10 @@ class clean_and_save:
 
     def process_folder(self, target_folder):
         split_path = target_folder.split("/")
-        cln_name = join(self.data_folder, "Aligned_CASIA_WebFace", split_path[-1])
+        cln_name = join(data_folder, "Aligned_CASIA_WebFace", split_path[-1])
         os.makedirs(cln_name)
 
-        image_glob = join(self.data_folder, "CASIA-WebFace", split_path[-1], "*.jpg")
+        image_glob = join(data_folder, "CASIA-WebFace", split_path[-1], "*.jpg")
         target_files = glob.glob(image_glob)
 
         for target_file in target_files:
