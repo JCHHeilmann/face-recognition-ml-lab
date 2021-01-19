@@ -23,4 +23,3 @@ print(D)
 D, I = index.search(xq, k)  # actual search
 print(I[:5])  # neighbors of the 5 first queries
 print(I[-5:])  # neighbors of the 5 last queries
-

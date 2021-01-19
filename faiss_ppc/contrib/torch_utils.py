@@ -7,10 +7,9 @@ import contextlib
 import inspect
 import sys
 
+import faiss
 import numpy as np
 import torch
-
-import faiss
 
 
 def swig_ptr_from_UInt8Tensor(x):

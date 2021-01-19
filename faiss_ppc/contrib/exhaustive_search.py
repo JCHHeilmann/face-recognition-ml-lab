@@ -6,9 +6,8 @@
 import logging
 import time
 
-import numpy as np
-
 import faiss
+import numpy as np
 
 LOG = logging.getLogger(__name__)
 
