@@ -2,25 +2,29 @@ import dlib
 from os.path import join
 from PIL import Image
 
+class face_alignment:
 
-def make_align(img):
+    def __init__(self):
 
-    detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
-    predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
+        self.detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
+        self.predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
+        self.face = dlib.full_object_detections()
 
-    detections = [det.rect for det in detector(img, 1)]
+    def make_align(self,img):
 
-    num_faces = len(detections)
+        detections = [det.rect for det in self.detector(img, 1)]
 
-    if num_faces != 0:
-        face = dlib.full_object_detections()
+        self.num_faces = len(detections)
 
-        face.append(predictor(img, detections[0]))
+        if self.num_faces != 0:
 
-        image = dlib.get_face_chips(img, face, size=256)
-        output_image = Image.fromarray(image[0])
+            self.face.append(self.predictor(img, detections[0]))
 
-        return output_image
+            image = dlib.get_face_chips(img, self.face, size=256)
+            output_image = Image.fromarray(image[0])
 
-    else:
-        return None
+            return output_image
+
+        else:
+            return None
+
