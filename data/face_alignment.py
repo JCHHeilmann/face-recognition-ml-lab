@@ -3,24 +3,28 @@ from os.path import join
 from PIL import Image
 
 
-def make_align(img, target_folder, not_detected_file_path):
+class face_alignment:
 
-    detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
-    predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
+    def __init__(self):
 
-    detections = [det.rect for det in detector(img, 1)]
+        self.detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
+        self.predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
+        self.face = dlib.full_object_detections()
 
-    num_faces = len(detections)
+    def make_align(self,img):
 
-    if num_faces != 0:
-        face = dlib.full_object_detections()
+        detections = [det.rect for det in self.detector(img, 1)]
 
-        face.append(predictor(img, detections[0]))
+        self.num_faces = len(detections)
 
-        image = dlib.get_face_chips(img, face, size=256)
-        output_image = Image.fromarray(image[0])
+        if self.num_faces != 0:
 
-        return output_image
+            self.face.append(self.predictor(img, detections[0]))
 
-    else:
-        return None
+            image = dlib.get_face_chips(img, self.face, size=256)
+            output_image = Image.fromarray(image[0])
+
+            return output_image
+
+        else:
+            return None
