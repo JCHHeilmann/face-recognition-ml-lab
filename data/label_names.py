@@ -8,5 +8,7 @@ class label_names:
 
     def read_from_pickle(self, folder_tag):
         #returns a name from dictionary
-        #for example read_from_pickle("0000045") returns Bruce_Lee
+        #for example read_from_pickle("45") returns Bruce_Lee
+        folder_tag = str(int(folder_tag))
+        folder_tag = folder_tag.zfill(7)
         return self.dictionary[folder_tag]
