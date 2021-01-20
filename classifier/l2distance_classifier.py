@@ -10,7 +10,7 @@ from PIL import Image
 from models.inception_resnet_v1 import InceptionResnetV1
 
 
-class L2DistanzClassifier:
+class L2DistanceClassifier:
     def __init__(self) -> None:
         super().__init__()
         self.face_database = {}

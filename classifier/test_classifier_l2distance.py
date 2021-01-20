@@ -2,10 +2,10 @@ import os
 import shutil
 import dlib
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-from classifier.l2distanze_classifier import L2DistanzClassifier
+from classifier.l2distance_classifier import L2DistanceClassifier
 
 
-Classifier = L2DistanzClassifier()
+Classifier = L2DistanceClassifier()
 
 if os.path.exists("./PeopleKnown/Lewandowski"):
     shutil.rmtree("./PeopleKnown/Lewandowski", ignore_errors=True)
