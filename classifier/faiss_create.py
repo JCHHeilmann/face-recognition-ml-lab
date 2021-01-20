@@ -1,6 +1,8 @@
 import argparse
 from argparse import ArgumentParser
+
 import joblib
+
 import faiss_ppc
 
 parser = ArgumentParser(
@@ -24,7 +26,7 @@ embeddings, labels = joblib.load(EmbeddingFile)
 # define the index with dimensionality 512
 index = faiss_ppc.IndexFlatL2(512)
 indexIDMap = faiss_ppc.IndexIDMap(index)
-indexIDMap.add_with_ids(embeddings.astype('float32'), labels.astype('int'))
+indexIDMap.add_with_ids(embeddings.astype("float32"), labels.astype("int"))
 
 # save the index
-faiss_ppc.write_index(indexIDMap, 'vector.index')
+faiss_ppc.write_index(indexIDMap, "vector.index")
