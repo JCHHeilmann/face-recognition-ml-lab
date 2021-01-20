@@ -11,6 +11,9 @@ not_detected_file_path = join(data_folder, "not_detected.csv")
 
 class clean_and_save:
 
+    def __init__(self):
+        self.csv_file = open(not_detected_file_path, 'a')
+
     def process_file(self, target_file_path, cln_name):
 
         img = dlib.load_rgb_image(target_file_path)
@@ -20,8 +23,9 @@ class clean_and_save:
 
         # If no face is detected, then saving filepath in csv file
         if aln_obj is None:
-            with open(not_detected_file_path, "a") as csv_file_name:
-                csv_file_name.write(target_file_path + ",\n")
+            self.csv_file.write(target_file_path + ",\n")
+            # with open(not_detected_file_path, "a") as csv_file_name:
+            #     csv_file_name.write(target_file_path + ",\n")
 
         # Upon face detection, saving the cleaned image in JPEG format
         else:
@@ -40,6 +44,8 @@ class clean_and_save:
 
         for target_file in target_files:
             self.process_file(target_file,cln_name)
+
+        self.csv_file.close()
 
     def process_single_file(self,target_file_path, cln_name):
         target_file_path = target_file_path[0]
