@@ -1,9 +1,10 @@
 import os
 import shutil
-import dlib
-os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-from classifier.l2distance_classifier import L2DistanceClassifier
 
+import dlib
+
+os.environ["KMP_DUPLICATE_LIB_OK"] = "True"
+from classifier.l2distance_classifier import L2DistanceClassifier
 
 Classifier = L2DistanceClassifier()
 

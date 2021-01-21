@@ -1,12 +1,13 @@
-
 import os
 from pathlib import Path
+
 import cv2
 import dlib
 import numpy as np
 import torch
 import torchvision
 from PIL import Image
+
 from models.inception_resnet_v1 import InceptionResnetV1
 
 
@@ -17,7 +18,9 @@ class L2DistanceClassifier:
         self.to_tensor = torchvision.transforms.ToTensor()
         self.threshold = 0.2
 
-        self.checkpoint = torch.load("charmed-cosmos-135_epoch_19", map_location=torch.device("cpu"))
+        self.checkpoint = torch.load(
+            "charmed-cosmos-135_epoch_19", map_location=torch.device("cpu")
+        )
         self.model = InceptionResnetV1()
         self.model.load_state_dict(self.checkpoint["model_state_dict"])
         self.model.eval()
@@ -26,17 +29,18 @@ class L2DistanceClassifier:
         self.initalize()
         print("Ended initaliziation")
 
-
     def initalize(self):
         self.listdir_nohidden("./PeopleKnown")
         PathKnownPersons = "./PeopleKnown"
         for name in self.listdir_nohidden(PathKnownPersons):
-            #i=0
+            # i=0
             for image in self.listdir_nohidden(os.path.join(PathKnownPersons, name)):
                 identity = os.path.splitext(os.path.basename(image))[0]
-                #identity = name + "_" + str(i)
-                self.face_database[identity] = self.img_path_to_encoding(os.path.join(PathKnownPersons, name, image), self.model)
-                #i = i+1
+                # identity = name + "_" + str(i)
+                self.face_database[identity] = self.img_path_to_encoding(
+                    os.path.join(PathKnownPersons, name, image), self.model
+                )
+                # i = i+1
 
     def listdir_nohidden(self, path):
         return [f for f in os.listdir(path) if not f.startswith(".")]
@@ -46,6 +50,7 @@ class L2DistanceClassifier:
         return self.img_to_encoding(img, model)
 
         # Calculate the Embeddings from one Image
+
     def img_to_encoding(self, image, model):
         image_tensor = self.to_tensor(image)
         image_tensor = image_tensor.unsqueeze(0)
@@ -89,7 +94,9 @@ class L2DistanceClassifier:
         output = Path(image_path).stem
         image_aligned = self.make_aligned(image_path)
         outputName = "./PeopleKnown/" + label + "/" + output + ".jpeg"
-        image_aligned.save(outputName, "JPEG", quality=80, optimize=True, progressive=True)
+        image_aligned.save(
+            outputName, "JPEG", quality=80, optimize=True, progressive=True
+        )
         # Save Identity in face_database
         identity = label
         self.face_database[identity] = self.img_to_encoding(image_aligned, self.model)
@@ -98,8 +105,7 @@ class L2DistanceClassifier:
     def classify(self, image_path):
         # makes them aligned
         image_aligned = self.make_aligned(image_path)
-        identity, min_distance = self.get_min_dist(self.img_to_encoding(image_aligned, self.model), self.face_database)
+        identity, min_distance = self.get_min_dist(
+            self.img_to_encoding(image_aligned, self.model), self.face_database
+        )
         return identity, min_distance
-
-
-

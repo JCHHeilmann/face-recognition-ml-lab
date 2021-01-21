@@ -1,18 +1,18 @@
-from os.path import join
 import glob
-from face_alignment import face_alignment
-import os
-import dlib
-
 import multiprocessing as mp
+import os
+from os.path import join
+
+import dlib
+from face_alignment import face_alignment
 
 data_folder = "../../../data/"
 not_detected_file_path = join(data_folder, "not_detected.csv")
 
-class clean_and_save:
 
+class clean_and_save:
     def __init__(self):
-        self.csv_file = open(not_detected_file_path, 'a')
+        self.csv_file = open(not_detected_file_path, "a")
 
     def process_file(self, target_file_path, cln_name):
 
@@ -33,7 +33,6 @@ class clean_and_save:
             crnt_img = target_split[-1]
             aln_obj.save(join(cln_name, crnt_img), "JPEG")
 
-
     def process_folder(self, target_folder):
         split_path = target_folder.split("/")
         cln_name = join(data_folder, "Aligned_CASIA_WebFace", split_path[-1])
@@ -43,13 +42,14 @@ class clean_and_save:
         target_files = glob.glob(image_glob)
 
         for target_file in target_files:
-            self.process_file(target_file,cln_name)
+            self.process_file(target_file, cln_name)
 
         self.csv_file.close()
 
-    def process_single_file(self,target_file_path, cln_name):
+    def process_single_file(self, target_file_path, cln_name):
         target_file_path = target_file_path[0]
         self.process_file(target_file_path, cln_name)
+
 
 if __name__ == "__main__":
     target_folders = glob.glob(join(data_folder, "CASIA-WebFace", "*"))
