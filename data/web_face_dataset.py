@@ -45,7 +45,7 @@ class WebfaceDataset(Dataset):
 
         image_tensor = to_tensor(image)
 
-        return image_tensor, self.class_to_idx[label]
+        return image_tensor, int(label)
 
     def split(self):
         n_samples = len(self)
