@@ -19,7 +19,7 @@ class L2DistanceClassifier:
         self.threshold = 0.2
 
         self.checkpoint = torch.load(
-            "charmed-cosmos-135_epoch_19", map_location=torch.device("cpu")
+            "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cpu")
         )
         self.model = InceptionResnetV1()
         self.model.load_state_dict(self.checkpoint["model_state_dict"])
@@ -30,8 +30,8 @@ class L2DistanceClassifier:
         print("Ended initaliziation")
 
     def initalize(self):
-        self.listdir_nohidden("./PeopleKnown")
-        PathKnownPersons = "./PeopleKnown"
+        self.listdir_nohidden("classifier/PeopleKnown")
+        PathKnownPersons = "classifier/PeopleKnown"
         for name in self.listdir_nohidden(PathKnownPersons):
             # i=0
             for image in self.listdir_nohidden(os.path.join(PathKnownPersons, name)):
@@ -72,8 +72,9 @@ class L2DistanceClassifier:
     def make_aligned(self, inputName):
         detector = dlib.get_frontal_face_detector()
         # detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
-        predictor = dlib.shape_predictor("../data/shape_predictor_5_face_landmarks.dat")
-        img = dlib.load_rgb_image(inputName)
+        predictor = dlib.shape_predictor("data/shape_predictor_5_face_landmarks.dat")
+        # img = dlib.load_rgb_image(inputName)
+        img = np.array(inputName)
         dets = detector(img, 1)
         num_faces = len(dets)
         if num_faces == 0:
@@ -88,12 +89,12 @@ class L2DistanceClassifier:
         return img
 
     def add_person(self, image_path, label: str):
-        path = "./PeopleKnown/" + label
+        path = "classifier/PeopleKnown/" + label
         if not os.path.exists(path):
             os.makedirs(path)
         output = Path(image_path).stem
         image_aligned = self.make_aligned(image_path)
-        outputName = "./PeopleKnown/" + label + "/" + output + ".jpeg"
+        outputName = "classifier/PeopleKnown/" + label + "/" + output + ".jpeg"
         image_aligned.save(
             outputName, "JPEG", quality=80, optimize=True, progressive=True
         )
@@ -104,7 +105,8 @@ class L2DistanceClassifier:
 
     def classify(self, image_path):
         # makes them aligned
-        image_aligned = self.make_aligned(image_path)
+        # image_aligned = self.make_aligned(image_path)
+        image_aligned = image_path
         identity, min_distance = self.get_min_dist(
             self.img_to_encoding(image_aligned, self.model), self.face_database
         )

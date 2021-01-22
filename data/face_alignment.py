@@ -1,6 +1,7 @@
 from os.path import join
 
 import dlib
+import numpy as np
 from PIL import Image
 
 
@@ -12,6 +13,7 @@ class FaceAlignment:
         self.face = dlib.full_object_detections()
 
     def make_align(self, img):
+        img = np.array(img)
 
         detections = [det.rect for det in self.detector(img, 1)]
 

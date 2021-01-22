@@ -1,13 +1,14 @@
 <script>
   import ImageUpload from './ImageUpload.svelte';
   import Loading from './Loading.svelte';
+  import Result from './Result.svelte';
 
   let recognitionPromise;
 
   async function handleUpload(event) {
     const file = event.detail.file;
     const formData = new FormData();
-    formData.append('image', file, file.name);
+    formData.append('image_data', file, file.name);
 
     recognitionPromise = fetch('http://localhost:8000/recognize-face/', {
       method: 'POST',
@@ -24,7 +25,7 @@
     <Loading />
   {:then recognitionResponse}
     {#await recognitionResponse.json() then recognitionResult}
-      {JSON.stringify(recognitionResult)}
+      <Result resultData={JSON.stringify(recognitionResult).result} />
     {/await}
   {:catch error}
     <p style="color: red">{error.message}</p>
