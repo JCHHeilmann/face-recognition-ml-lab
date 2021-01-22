@@ -4,7 +4,7 @@ from time import perf_counter, time
 import torch
 from joblib import dump
 # from pai4sk.svm import LinearSVC
-from sklearn.metrics import accuracy_score
+#from sklearn.metrics import accuracy_score
 
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
@@ -85,15 +85,15 @@ def save_classifier(classifier):
     print("done")
 
 
-def evaluate_classifier(classifier, embeddings, targets):
-    print("testing...")
-    timing = perf_counter()
+# def evaluate_classifier(classifier, embeddings, targets):
+#     print("testing...")
+#     timing = perf_counter()
 
-    predictions = classifier.predict(embeddings)
-    accuracy = accuracy_score(targets, predictions)
-    print(f"train accuracy {accuracy}")
+#     predictions = classifier.predict(embeddings)
+#     accuracy = accuracy_score(targets, predictions)
+#     print(f"train accuracy {accuracy}")
 
-    print(f"took {perf_counter() - timing} seconds")
+#     print(f"took {perf_counter() - timing} seconds")
 
 
 if __name__ == "__main__":
