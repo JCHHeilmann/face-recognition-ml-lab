@@ -4,7 +4,6 @@ import os
 from os.path import join
 
 import dlib
-
 from face_alignment import FaceAlignment
 
 data_folder = "../../../data/"
