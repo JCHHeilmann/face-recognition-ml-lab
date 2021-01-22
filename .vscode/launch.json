@@ -32,6 +32,13 @@
       "type": "python",
       "request": "launch",
       "module": "classifier.train"
+    },
+
+    {
+      "name": "Python: Module API",
+      "type": "python",
+      "request": "launch",
+      "module": "api.main"
     }
   ]
 }

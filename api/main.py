@@ -1,5 +1,10 @@
-from fastapi import FastAPI, File
+import io
+
+from fastapi import Depends, FastAPI, File
 from fastapi.middleware.cors import CORSMiddleware
+from PIL import Image
+
+from classifier.l2distance_classifier import L2DistanceClassifier
 
 app = FastAPI()
 
@@ -18,8 +23,13 @@ def read_root():
 
 
 @app.post("/recognize-face/")
-def recognize_face(image: bytes = File(...)):
-    return {"result": "Max Mustermann"}
+def recognize_face(
+    image_data: bytes = File(...), classifier: L2DistanceClassifier = Depends()
+):
+    image = Image.open(io.BytesIO(image_data)).convert("RGB")
+    result = classifier.classify(image)
+
+    return f"{{result: {result}}}"
 
 
 if __name__ == "__main__":

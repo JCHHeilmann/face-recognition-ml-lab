@@ -3,13 +3,15 @@ from time import perf_counter, time
 
 import torch
 from joblib import dump
-from pai4sk.svm import LinearSVC
-from sklearn.metrics import accuracy_score
 
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
-from utils.vis_utils import extract_embeddings
+from utils.vis_utils import extract_embeddings_withoutzeros
+
+# from pai4sk.svm import LinearSVC
+# from sklearn.metrics import accuracy_score
+
 
 # from sklearn.neighbors import RadiusNeighborsClassifier
 
@@ -37,11 +39,11 @@ def get_data():
 
     if torch.cuda.is_available():
         checkpoint = torch.load(
-            "checkpoints/young-leaf-128_epoch_19", map_location=torch.device("cuda")
+            "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cuda")
         )
     else:
         checkpoint = torch.load(
-            "checkpoints/young-leaf-128_epoch_19", map_location=torch.device("cpu")
+            "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cpu")
         )
     model = InceptionResnetV1()
     model.load_state_dict(checkpoint["model_state_dict"])
@@ -51,29 +53,29 @@ def get_data():
 
     print("calculating embeddings...")
 
-    embeddings, targets = extract_embeddings(train_loader, model)
+    embeddings, targets = extract_embeddings_withoutzeros(train_loader, model)
 
     print(f"took {perf_counter() - timing} seconds")
 
     dump(
         (embeddings, targets),
-        f"../../data/embeddings_young-leaf-128_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
+        f"../../data/embeddings_charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
     )
 
     return embeddings, targets
 
 
-def train_classifier(embeddings, targets):
-    print("training classifier...")
-    timing = perf_counter()
+# def train_classifier(embeddings, targets):
+#     print("training classifier...")
+#     timing = perf_counter()
 
-    # classifier = RadiusNeighborsClassifier(radius=1, outlier_label=-1, n_jobs=-1)
-    classifier = LinearSVC(verbose=True)
-    print("initialized model")
-    classifier.fit(embeddings, targets)
-    print(f"took {perf_counter() - timing} seconds")
+#     # classifier = RadiusNeighborsClassifier(radius=1, outlier_label=-1, n_jobs=-1)
+#     classifier = LinearSVC(verbose=True)
+#     print("initialized model")
+#     classifier.fit(embeddings, targets)
+#     print(f"took {perf_counter() - timing} seconds")
 
-    return classifier
+#     return classifier
 
 
 def save_classifier(classifier):
@@ -85,21 +87,21 @@ def save_classifier(classifier):
     print("done")
 
 
-def evaluate_classifier(classifier, embeddings, targets):
-    print("testing...")
-    timing = perf_counter()
+# def evaluate_classifier(classifier, embeddings, targets):
+#     print("testing...")
+#     timing = perf_counter()
 
-    predictions = classifier.predict(embeddings)
-    accuracy = accuracy_score(targets, predictions)
-    print(f"train accuracy {accuracy}")
+#     predictions = classifier.predict(embeddings)
+#     accuracy = accuracy_score(targets, predictions)
+#     print(f"train accuracy {accuracy}")
 
-    print(f"took {perf_counter() - timing} seconds")
+#     print(f"took {perf_counter() - timing} seconds")
 
 
 if __name__ == "__main__":
     torch.manual_seed(42)
 
     embeddings, targets = get_data()
-    classifier = train_classifier(embeddings, targets)
-    save_classifier(classifier)
-    evaluate_classifier(classifier, embeddings, targets)
+    # classifier = train_classifier(embeddings, targets)
+    # save_classifier(classifier)
+    # evaluate_classifier(classifier, embeddings, targets)

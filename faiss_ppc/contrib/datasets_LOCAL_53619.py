@@ -4,13 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
-<<<<<<< HEAD
 import numpy as np
-=======
-
->>>>>>> af580e6dc5120f85e7e5810801a15a622bfc1dbb
 import faiss
-import numpy as np
 
 from .vecs_io import fvecs_read, ivecs_read, bvecs_mmap, fvecs_mmap
 from .exhaustive_search import knn

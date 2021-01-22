@@ -3,15 +3,17 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-import logging
+import faiss
 import time
-
+<<<<<<< HEAD
 import numpy as np
 
-import faiss
+import logging
+=======
 
 import faiss
 import numpy as np
+>>>>>>> af580e6dc5120f85e7e5810801a15a622bfc1dbb
 
 LOG = logging.getLogger(__name__)
 

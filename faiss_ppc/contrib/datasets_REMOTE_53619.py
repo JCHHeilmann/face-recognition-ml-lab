@@ -4,16 +4,13 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
-<<<<<<< HEAD
-import numpy as np
-=======
 
->>>>>>> af580e6dc5120f85e7e5810801a15a622bfc1dbb
 import faiss
 import numpy as np
 
-from .vecs_io import fvecs_read, ivecs_read, bvecs_mmap, fvecs_mmap
 from .exhaustive_search import knn
+from .vecs_io import bvecs_mmap, fvecs_mmap, fvecs_read, ivecs_read
+
 
 class Dataset:
     """ Generic abstract class for a test dataset """
@@ -21,7 +18,7 @@ class Dataset:
     def __init__(self):
         """ the constructor should set the following fields: """
         self.d = -1
-        self.metric = 'L2'   # or IP
+        self.metric = "L2"  # or IP
         self.nq = -1
         self.nb = -1
         self.nt = -1
@@ -50,7 +47,7 @@ class Dataset:
         nsplit, rank = split
         i0, i1 = self.nb * rank // nsplit, self.nb * (rank + 1) // nsplit
         for j0 in range(i0, i1, bs):
-            yield xb[j0: min(j0 + bs, i1)]
+            yield xb[j0 : min(j0 + bs, i1)]
 
     def get_groundtruth(self, k=None):
         """ return the ground truth for k-nearest neighbor search """
@@ -61,15 +58,17 @@ class Dataset:
         raise NotImplementedError()
 
     def __str__(self):
-        return (f"dataset in dimension {self.d}, with metric {self.metric}, "
-                f"size: Q {self.nq} B {self.nb} T {self.nt}")
+        return (
+            f"dataset in dimension {self.d}, with metric {self.metric}, "
+            f"size: Q {self.nq} B {self.nb} T {self.nt}"
+        )
 
     def check_sizes(self):
         """ runs the previous and checks the sizes of the matrices """
         assert self.get_queries().shape == (self.nq, self.d)
         if self.nt > 0:
             xt = self.get_train(maxtrain=123)
-            assert xt.shape == (123, self.d), "shape=%s" % (xt.shape, )
+            assert xt.shape == (123, self.d), "shape=%s" % (xt.shape,)
         assert self.get_database().shape == (self.nb, self.d)
         assert self.get_groundtruth(k=13).shape == (self.nq, 13)
 
@@ -79,10 +78,10 @@ class SyntheticDataset(Dataset):
     index
     """
 
-    def __init__(self, d, nt, nb, nq, metric='L2'):
+    def __init__(self, d, nt, nb, nq, metric="L2"):
         Dataset.__init__(self)
         self.d, self.nt, self.nb, self.nq = d, nt, nb, nq
-        d1 = 10     # intrinsic dimension (more or less)
+        d1 = 10  # intrinsic dimension (more or less)
         n = nb + nt + nq
         rs = np.random.RandomState(1338)
         x = rs.normal(size=(n, d1))
@@ -91,11 +90,11 @@ class SyntheticDataset(Dataset):
         # higher factor (>4) -> higher frequency -> less linear
         x = x * (rs.rand(d) * 4 + 0.1)
         x = np.sin(x)
-        x = x.astype('float32')
+        x = x.astype("float32")
         self.metric = metric
         self.xt = x[:nt]
-        self.xb = x[nt:nt + nb]
-        self.xq = x[nt + nb:]
+        self.xb = x[nt : nt + nb]
+        self.xq = x[nt + nb :]
 
     def get_queries(self):
         return self.xq
@@ -109,8 +108,10 @@ class SyntheticDataset(Dataset):
 
     def get_groundtruth(self, k=100):
         return knn(
-            self.xq, self.xb, k,
-            faiss.METRIC_L2 if self.metric == 'L2' else faiss.METRIC_INNER_PRODUCT
+            self.xq,
+            self.xb,
+            k,
+            faiss.METRIC_L2 if self.metric == "L2" else faiss.METRIC_INNER_PRODUCT,
         )[1]
 
 
@@ -122,8 +123,9 @@ class SyntheticDataset(Dataset):
 
 
 for dataset_basedir in (
-        '/datasets01/simsearch/041218/',
-        '/mnt/vol/gfsai-flash3-east/ai-group/datasets/simsearch/'):
+    "/datasets01/simsearch/041218/",
+    "/mnt/vol/gfsai-flash3-east/ai-group/datasets/simsearch/",
+):
     if os.path.exists(dataset_basedir):
         break
 else:
@@ -139,7 +141,7 @@ class DatasetSIFT1M(Dataset):
     def __init__(self):
         Dataset.__init__(self)
         self.d, self.nt, self.nb, self.nq = 128, 100000, 1000000, 10000
-        self.basedir = dataset_basedir + 'sift1M/'
+        self.basedir = dataset_basedir + "sift1M/"
 
     def get_queries(self):
         return fvecs_read(self.basedir + "sift_query.fvecs")
@@ -160,7 +162,7 @@ class DatasetSIFT1M(Dataset):
 
 
 def sanitize(x):
-    return np.ascontiguousarray(x, dtype='float32')
+    return np.ascontiguousarray(x, dtype="float32")
 
 
 class DatasetBigANN(Dataset):
@@ -173,19 +175,19 @@ class DatasetBigANN(Dataset):
         Dataset.__init__(self)
         assert nb_M in (1, 2, 5, 10, 20, 50, 100, 200, 500, 1000)
         self.nb_M = nb_M
-        nb = nb_M * 10**6
-        self.d, self.nt, self.nb, self.nq = 128, 10**8, nb, 10000
-        self.basedir = dataset_basedir + 'bigann/'
+        nb = nb_M * 10 ** 6
+        self.d, self.nt, self.nb, self.nq = 128, 10 ** 8, nb, 10000
+        self.basedir = dataset_basedir + "bigann/"
 
     def get_queries(self):
-        return sanitize(bvecs_mmap(self.basedir + 'bigann_query.bvecs')[:])
+        return sanitize(bvecs_mmap(self.basedir + "bigann_query.bvecs")[:])
 
     def get_train(self, maxtrain=None):
         maxtrain = maxtrain if maxtrain is not None else self.nt
-        return sanitize(bvecs_mmap(self.basedir + 'bigann_learn.bvecs')[:maxtrain])
+        return sanitize(bvecs_mmap(self.basedir + "bigann_learn.bvecs")[:maxtrain])
 
     def get_groundtruth(self, k=None):
-        gt = ivecs_read(self.basedir + 'gnd/idx_%dM.ivecs' % self.nb_M)
+        gt = ivecs_read(self.basedir + "gnd/idx_%dM.ivecs" % self.nb_M)
         if k is not None:
             assert k <= 100
             gt = gt[:, :k]
@@ -193,14 +195,14 @@ class DatasetBigANN(Dataset):
 
     def get_database(self):
         assert self.nb_M < 100, "dataset too large, use iterator"
-        return sanitize(bvecs_mmap(self.basedir + 'bigann_base.bvecs')[:self.nb])
+        return sanitize(bvecs_mmap(self.basedir + "bigann_base.bvecs")[: self.nb])
 
     def database_iterator(self, bs=128, split=(1, 0)):
-        xb = bvecs_mmap(self.basedir + 'bigann_base.bvecs')
+        xb = bvecs_mmap(self.basedir + "bigann_base.bvecs")
         nsplit, rank = split
         i0, i1 = self.nb * rank // nsplit, self.nb * (rank + 1) // nsplit
         for j0 in range(i0, i1, bs):
-            yield sanitize(xb[j0: min(j0 + bs, i1)])
+            yield sanitize(xb[j0 : min(j0 + bs, i1)])
 
 
 class DatasetDeep1B(Dataset):
@@ -210,20 +212,22 @@ class DatasetDeep1B(Dataset):
     on how to get the data
     """
 
-    def __init__(self, nb=10**9):
+    def __init__(self, nb=10 ** 9):
         Dataset.__init__(self)
         nb_to_name = {
-            10**5: '100k',
-            10**6: '1M',
-            10**7: '10M',
-            10**8: '100M',
-            10**9: '1B'
+            10 ** 5: "100k",
+            10 ** 6: "1M",
+            10 ** 7: "10M",
+            10 ** 8: "100M",
+            10 ** 9: "1B",
         }
         assert nb in nb_to_name
         self.d, self.nt, self.nb, self.nq = 96, 358480000, nb, 10000
-        self.basedir = dataset_basedir + 'deep1b/'
+        self.basedir = dataset_basedir + "deep1b/"
         self.gt_fname = "%sdeep%s_groundtruth.ivecs" % (
-            self.basedir, nb_to_name[self.nb])
+            self.basedir,
+            nb_to_name[self.nb],
+        )
 
     def get_queries(self):
         return sanitize(fvecs_read(self.basedir + "deep1B_queries.fvecs"))
@@ -240,15 +244,15 @@ class DatasetDeep1B(Dataset):
         return gt
 
     def get_database(self):
-        assert self.nb <= 10**8, "dataset too large, use iterator"
-        return sanitize(fvecs_mmap(self.basedir + "base.fvecs")[:self.nb])
+        assert self.nb <= 10 ** 8, "dataset too large, use iterator"
+        return sanitize(fvecs_mmap(self.basedir + "base.fvecs")[: self.nb])
 
     def database_iterator(self, bs=128, split=(1, 0)):
         xb = fvecs_mmap(self.basedir + "base.fvecs")
         nsplit, rank = split
         i0, i1 = self.nb * rank // nsplit, self.nb * (rank + 1) // nsplit
         for j0 in range(i0, i1, bs):
-            yield sanitize(xb[j0: min(j0 + bs, i1)])
+            yield sanitize(xb[j0 : min(j0 + bs, i1)])
 
 
 class DatasetGlove(Dataset):
@@ -258,28 +262,29 @@ class DatasetGlove(Dataset):
 
     def __init__(self, loc=None, download=False):
         import h5py
+
         assert not download, "not implemented"
         if not loc:
-            loc = dataset_basedir + 'glove/glove-100-angular.hdf5'
-        self.glove_h5py = h5py.File(loc, 'r')
+            loc = dataset_basedir + "glove/glove-100-angular.hdf5"
+        self.glove_h5py = h5py.File(loc, "r")
         # IP and L2 are equivalent in this case, but it is traditionally seen as an IP dataset
-        self.metric = 'IP'
+        self.metric = "IP"
         self.d, self.nt = 100, 0
-        self.nb = self.glove_h5py['train'].shape[0]
-        self.nq = self.glove_h5py['test'].shape[0]
+        self.nb = self.glove_h5py["train"].shape[0]
+        self.nq = self.glove_h5py["test"].shape[0]
 
     def get_queries(self):
-        xq = np.array(self.glove_h5py['test'])
+        xq = np.array(self.glove_h5py["test"])
         faiss.normalize_L2(xq)
         return xq
 
     def get_database(self):
-        xb = np.array(self.glove_h5py['train'])
+        xb = np.array(self.glove_h5py["train"])
         faiss.normalize_L2(xb)
         return xb
 
     def get_groundtruth(self, k=None):
-        gt = self.glove_h5py['neighbors']
+        gt = self.glove_h5py["neighbors"]
         if k is not None:
             assert k <= 100
             gt = gt[:, :k]
@@ -294,22 +299,22 @@ class DatasetMusic100(Dataset):
 
     def __init__(self):
         Dataset.__init__(self)
-        self.d, self.nt, self.nb, self.nq = 100, 0, 10**6, 10000
-        self.metric = 'IP'
-        self.basedir = dataset_basedir + 'music-100/'
+        self.d, self.nt, self.nb, self.nq = 100, 0, 10 ** 6, 10000
+        self.metric = "IP"
+        self.basedir = dataset_basedir + "music-100/"
 
     def get_queries(self):
-        xq = np.fromfile(self.basedir + 'query_music100.bin', dtype='float32')
+        xq = np.fromfile(self.basedir + "query_music100.bin", dtype="float32")
         xq = xq.reshape(-1, 100)
         return xq
 
     def get_database(self):
-        xb = np.fromfile(self.basedir + 'database_music100.bin', dtype='float32')
+        xb = np.fromfile(self.basedir + "database_music100.bin", dtype="float32")
         xb = xb.reshape(-1, 100)
         return xb
 
     def get_groundtruth(self, k=None):
-        gt = np.load(self.basedir + 'gt.npy')
+        gt = np.load(self.basedir + "gt.npy")
         if k is not None:
             assert k <= 100
             gt = gt[:, :k]
