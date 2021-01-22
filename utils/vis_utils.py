@@ -87,3 +87,30 @@ def extract_embeddings(dataloader, model):
             labels[k : k + len(images)] = target.numpy()
             k += len(images)
     return embeddings, labels
+
+def extract_embeddings_withoutzeros(dataloader, model):
+    with torch.no_grad():
+        model.eval()
+        embeddings_list = []
+        labels_list = []
+        for images, target in tqdm(dataloader, total=len(dataloader)):
+            if torch.cuda.is_available():
+                images = images.cuda()
+            embeddings_list.append(model(images).data.cpu().numpy())
+            labels_list.append(target.numpy())
+
+        flat_list_l = []
+        for sublist in labels_list:
+            for item in sublist:
+                flat_list_l.append(item)
+        labels = np.array(flat_list_l)
+
+        flat_list_e = []
+        for sublist in embeddings_list:
+            for item in sublist:
+                flat_list_e.append(item)
+        embeddings = np.array(flat_list_e)
+
+        print(embeddings.shape, labels.shape)
+
+    return embeddings, labels
