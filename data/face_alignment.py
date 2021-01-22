@@ -2,7 +2,7 @@ import dlib
 from os.path import join
 from PIL import Image
 
-class face_alignment:
+class FaceAlignment:
 
     def __init__(self):
 
