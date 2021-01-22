@@ -1,9 +1,10 @@
 import io
 
-from classifier.l2distance_classifier import L2DistanceClassifier
 from fastapi import Depends, FastAPI, File
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
+
+from classifier.l2distance_classifier import L2DistanceClassifier
 
 app = FastAPI()
 
