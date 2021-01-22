@@ -3,26 +3,27 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-import unittest
-from multiprocessing.dummy import Pool as ThreadPool
-
 import numpy as np
+import unittest
+
+from multiprocessing.dummy import Pool as ThreadPool
 
 ###############################################################
 # Simple functions to evaluate knn results
 
-
 def knn_intersection_measure(I1, I2):
-    """computes the intersection measure of two result tables"""
+    """ computes the intersection measure of two result tables
+    """
     nq, rank = I1.shape
     assert I2.shape == (nq, rank)
-    ninter = sum(np.intersect1d(I1[i], I2[i]).size for i in range(nq))
+    ninter = sum(
+        np.intersect1d(I1[i], I2[i]).size
+        for i in range(nq)
+    )
     return ninter / I1.size
-
 
 ###############################################################
 # Range search results can be compared with Precision-Recall
-
 
 def filter_range_results(lims, D, I, thresh):
     """ select a set of results """
@@ -36,13 +37,13 @@ def filter_range_results(lims, D, I, thresh):
 
 def range_PR(lims_ref, Iref, lims_new, Inew, mode="overall"):
     """compute the precision and recall of range search results. The
-    function does not take the distances into account."""
+    function does not take the distances into account. """
 
     def ref_result_for(i):
-        return Iref[lims_ref[i] : lims_ref[i + 1]]
+        return Iref[lims_ref[i]:lims_ref[i + 1]]
 
     def new_result_for(i):
-        return Inew[lims_new[i] : lims_new[i + 1]]
+        return Inew[lims_new[i]:lims_new[i + 1]]
 
     nq = lims_ref.size - 1
     assert lims_new.size - 1 == nq
@@ -67,12 +68,15 @@ def range_PR(lims_ref, Iref, lims_new, Inew, mode="overall"):
     pool.map(compute_PR_for, range(nq))
 
     return counts_to_PR(
-        lims_ref[1:] - lims_ref[:-1], lims_new[1:] - lims_new[:-1], ninter, mode=mode
+        lims_ref[1:] - lims_ref[:-1],
+        lims_new[1:] - lims_new[:-1],
+        ninter,
+        mode=mode
     )
 
 
 def counts_to_PR(ngt, nres, ninter, mode="overall"):
-    """computes a  precision-recall for a ser of queries.
+    """ computes a  precision-recall for a ser of queries.
     ngt = nb of GT results per query
     nres = nb of found results per query
     ninter = nb of correct results per query (smaller than nres of course)
@@ -117,7 +121,6 @@ def counts_to_PR(ngt, nres, ninter, mode="overall"):
     else:
         raise AssertionError()
 
-
 def sort_range_res_2(lims, D, I):
     """ sort 2 arrays using the first as key """
     I2 = np.empty_like(I)
@@ -144,9 +147,12 @@ def sort_range_res_1(lims, I):
 
 
 def range_PR_multiple_thresholds(
-    lims_ref, Iref, lims_new, Dnew, Inew, thresholds, mode="overall", do_sort="ref,new"
-):
-    """compute precision-recall values for range search results
+            lims_ref, Iref,
+            lims_new, Dnew, Inew,
+            thresholds,
+            mode="overall", do_sort="ref,new"
+    ):
+    """ compute precision-recall values for range search results
     for several thresholds on the "new" results.
     This is to plot PR curves
     """
@@ -159,7 +165,7 @@ def range_PR_multiple_thresholds(
         Inew, Dnew = sort_range_res_2(lims_new, Dnew, Inew)
 
     def ref_result_for(i):
-        return Iref[lims_ref[i] : lims_ref[i + 1]]
+        return Iref[lims_ref[i]:lims_ref[i + 1]]
 
     def new_result_for(i):
         l0, l1 = lims_new[i], lims_new[i + 1]
@@ -182,7 +188,7 @@ def range_PR_multiple_thresholds(
             return
 
         # which offsets we are interested in
-        nres = np.searchsorted(res_dis, thresholds)
+        nres= np.searchsorted(res_dis, thresholds)
         counts[q, :, 1] = nres
 
         if gt_ids.size == 0:
@@ -205,7 +211,8 @@ def range_PR_multiple_thresholds(
     recalls = np.zeros(nt)
     for t in range(nt):
         p, r = counts_to_PR(
-            counts[:, t, 0], counts[:, t, 1], counts[:, t, 2], mode=mode
+                counts[:, t, 0], counts[:, t, 1], counts[:, t, 2],
+                mode=mode
         )
         precisions[t] = p
         recalls[t] = r
@@ -213,18 +220,19 @@ def range_PR_multiple_thresholds(
     return precisions, recalls
 
 
+
+
 ###############################################################
 # Functions that compare search results with a reference result.
 # They are intended for use in tests
-
 
 def test_ref_knn_with_draws(Dref, Iref, Dnew, Inew):
     """ test that knn search results are identical, raise if not """
     np.testing.assert_array_almost_equal(Dref, Dnew, decimal=5)
     # here we have to be careful because of draws
-    testcase = unittest.TestCase()  # because it makes nice error messages
+    testcase = unittest.TestCase()   # because it makes nice error messages
     for i in range(len(Iref)):
-        if np.all(Iref[i] == Inew[i]):  # easy case
+        if np.all(Iref[i] == Inew[i]): # easy case
             continue
         # we can deduce nothing about the latest line
         skip_dis = Dref[i, -1]
@@ -235,9 +243,10 @@ def test_ref_knn_with_draws(Dref, Iref, Dnew, Inew):
             testcase.assertEqual(set(Iref[i, mask]), set(Inew[i, mask]))
 
 
-def test_ref_range_results(lims_ref, Dref, Iref, lims_new, Dnew, Inew):
-    """compare range search results wrt. a reference result,
-    throw if it fails"""
+def test_ref_range_results(lims_ref, Dref, Iref,
+                           lims_new, Dnew, Inew):
+    """ compare range search results wrt. a reference result,
+    throw if it fails """
     np.testing.assert_array_equal(lims_ref, lims_new)
     nq = len(lims_ref) - 1
     for i in range(nq):
@@ -246,14 +255,12 @@ def test_ref_range_results(lims_ref, Dref, Iref, lims_new, Dnew, Inew):
         Ii_new = Inew[l0:l1]
         Di_ref = Dref[l0:l1]
         Di_new = Dnew[l0:l1]
-        if np.all(Ii_ref == Ii_new):  # easy
+        if np.all(Ii_ref == Ii_new): # easy
             pass
         else:
-
             def sort_by_ids(I, D):
                 o = I.argsort()
                 return I[o], D[o]
-
             # sort both
             (Ii_ref, Di_ref) = sort_by_ids(Ii_ref, Di_ref)
             (Ii_new, Di_new) = sort_by_ids(Ii_new, Di_new)

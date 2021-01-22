@@ -3,24 +3,20 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-import logging
 import platform
 import subprocess
+import logging
 
 
 def instruction_set():
     if platform.system() == "Darwin":
-        if (
-            subprocess.check_output(["/usr/sbin/sysctl", "hw.optional.avx2_0"])[-1]
-            == "1"
-        ):
+        if subprocess.check_output(["/usr/sbin/sysctl", "hw.optional.avx2_0"])[-1] == '1':
             return "AVX2"
         else:
             return "default"
     elif platform.system() == "Linux":
         import numpy.distutils.cpuinfo
-
-        if "avx2" in numpy.distutils.cpuinfo.cpu.info[0].get("flags", ""):
+        if "avx2" in numpy.distutils.cpuinfo.cpu.info[0].get('flags', ""):
             return "AVX2"
         else:
             return "default"
