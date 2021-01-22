@@ -1,4 +1,5 @@
 from PIL import Image
+
 from data.face_alignment import FaceAlignment
 
 img = Image.open("classifier/PeopleKnown/Alex Rodriguez/AlexRodriguez0.jpg").convert(
