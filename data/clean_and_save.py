@@ -4,13 +4,14 @@ import os
 from os.path import join
 
 import dlib
-from face_alignment import face_alignment
+
+from face_alignment import FaceAlignment
 
 data_folder = "../../../data/"
 not_detected_file_path = join(data_folder, "not_detected.csv")
 
 
-class clean_and_save:
+class CleanAndSave:
     def __init__(self):
         self.csv_file = open(not_detected_file_path, "a")
 
@@ -18,7 +19,7 @@ class clean_and_save:
 
         img = dlib.load_rgb_image(target_file_path)
         # aln_obj will be an image if face is detected, otherwise None.
-        face_align_object = face_alignment()
+        face_align_object = FaceAlignment()
         aln_obj = face_align_object.make_align(img)
 
         # If no face is detected, then saving filepath in csv file
@@ -55,4 +56,4 @@ if __name__ == "__main__":
     target_folders = glob.glob(join(data_folder, "CASIA-WebFace", "*"))
 
     with mp.Pool(processes=45) as pool:
-        pool.map(clean_and_save.process_folder, [folder for folder in target_folders])
+        pool.map(CleanAndSave.process_folder, [folder for folder in target_folders])

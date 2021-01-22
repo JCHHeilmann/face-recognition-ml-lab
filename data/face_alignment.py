@@ -4,12 +4,11 @@ import dlib
 from PIL import Image
 
 
-class face_alignment:
+class FaceAlignment:
     def __init__(self):
-        self.detector = dlib.get_frontal_face_detector()
 
-        # self.detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
-        # self.predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
+        self.detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
+        self.predictor = dlib.shape_predictor("shape_predictor_5_face_landmarks.dat")
         self.face = dlib.full_object_detections()
 
     def make_align(self, img):

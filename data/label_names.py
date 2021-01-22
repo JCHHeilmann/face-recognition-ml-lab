@@ -1,7 +1,7 @@
 import pickle
 
 
-class label_names:
+class LabelNames:
     def __init__(self, pickle_file):
         with open(pickle_file, "rb") as pickle_file:
             self.dictionary = pickle.load(pickle_file)
