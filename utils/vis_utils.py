@@ -88,6 +88,7 @@ def extract_embeddings(dataloader, model):
             k += len(images)
     return embeddings, labels
 
+
 def extract_embeddings_withoutzeros(dataloader, model):
     with torch.no_grad():
         model.eval()
