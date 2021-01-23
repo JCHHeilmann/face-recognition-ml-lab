@@ -27,7 +27,7 @@ class FaceAlignment:
 
             self.face.append(self.predictor(img, detections[0]))
 
-            image = dlib.get_face_chips(img, self.face, size=256)
+            image = dlib.get_face_chips(img, self.face, size=128)
             output_image = Image.fromarray(image[0])
 
             return output_image

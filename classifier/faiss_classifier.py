@@ -1,10 +1,10 @@
 from random import randint
 
+# import faiss_ppc as faiss
+import faiss
 import numpy as np
 import torch
 import torchvision
-
-import faiss_ppc
 from data.face_alignment import FaceAlignment
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
@@ -14,10 +14,10 @@ class FaissClassifier:
     def __init__(self) -> None:
         super().__init__()
 
-        self.threshold = 0.00001
+        self.threshold = 0.1
         self.to_tensor = torchvision.transforms.ToTensor()
-        self.indexIDMap = faiss_ppc.read_index("./classifier/vector.index")
-        self.dictionary = LabelNames("./data/data.p")
+        self.indexIDMap = faiss.read_index("classifier/vector.index")
+        self.dictionary = LabelNames("data/data.p")
         self.preprocessor = FaceAlignment()
 
         self.checkpoint = torch.load(
@@ -41,6 +41,10 @@ class FaissClassifier:
     def classify(self, image):
 
         image_aligned = self.preprocessor.make_align(image)
+        if not image_aligned:
+            print("No face found")
+            return "Unknown"
+
         embedding = self.img_to_encoding(image_aligned, self.model)
 
         k = 1
@@ -81,6 +85,40 @@ class FaissClassifier:
         # names_dictionary.update(self.dictionary)
 
         self.indexIDMap.add_with_ids(embedding_new, random_label_array)
-        faiss_ppc.write_index(self.indexIDMap, "./classifier/vector.index")
+        faiss.write_index(self.indexIDMap, "classifier/vector.index")
 
         return "New person is added."
+
+
+if __name__ == "__main__":
+    from glob import glob
+    from tqdm import tqdm
+    from PIL import Image
+
+    image_paths = glob("datasets/test/0000107/*.jpg")
+    images = [Image.open(path).convert("RGB") for path in image_paths]
+
+    classifier = FaissClassifier()
+
+    results = [classifier.classify(img) for img in tqdm(images)]
+
+    correct = 0
+    incorrect = 0
+    unknown = 0
+    for result in results:
+        if result == "Kim_Basinger":
+            correct += 1
+        elif result == "Unknown":
+            unknown += 1
+        else:
+            incorrect += 1
+
+    print(
+        f"Results:\ncorrect: {correct},\nincorrect: {incorrect},\nunknown: {unknown} (includes images in which no face was found)\n"
+    )
+
+    values, counts = np.unique(results, return_counts=True)
+    unique_counts = list(zip(values, counts))
+
+    pass
+
