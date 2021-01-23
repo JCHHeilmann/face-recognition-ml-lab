@@ -33,7 +33,7 @@ def get_data():
         train_proportion=0.8,
         val_proportion=0.1,
         test_proportion=0.1,
-        batch_size=400,
+        batch_size=2000,
     )
 
     print("loading model...")
