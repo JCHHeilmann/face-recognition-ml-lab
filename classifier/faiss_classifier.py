@@ -5,6 +5,7 @@ import faiss
 import numpy as np
 import torch
 import torchvision
+
 from data.face_alignment import FaceAlignment
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
@@ -92,8 +93,9 @@ class FaissClassifier:
 
 if __name__ == "__main__":
     from glob import glob
-    from tqdm import tqdm
+
     from PIL import Image
+    from tqdm import tqdm
 
     image_paths = glob("datasets/test/0000107/*.jpg")
     images = [Image.open(path).convert("RGB") for path in image_paths]
@@ -121,4 +123,3 @@ if __name__ == "__main__":
     unique_counts = list(zip(values, counts))
 
     pass
-
