@@ -1,9 +1,10 @@
 from random import randint
 
-import faiss_ppc
 import numpy as np
 import torch
 import torchvision
+
+import faiss_ppc
 from data.face_alignment import FaceAlignment
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
