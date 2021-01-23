@@ -69,23 +69,37 @@ def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
 
 
 def extract_embeddings(dataloader, model):
-    if torch.cuda.is_available():
-        model = model.cuda()
+    # if torch.cuda.is_available():
+    #     model = model.cuda()
 
+    # with torch.no_grad():
+    #     model.eval()
+
+    #     embeddings = torch.empty(0)
+    #     labels = torch.empty(0)
+
+    #     images, labels = next(iter(dataloader))
+    #     if torch.cuda.is_available():
+    #         images = images.cuda()
+    #     embeddings = model(images)
+
+    #     return embeddings.cpu().numpy(), labels.numpy()
+
+    model.eval()
     with torch.no_grad():
-        model.eval()
+        embeddings = np.zeros((len(dataloader.dataset), 512))
+        labels = np.zeros(len(dataloader.dataset))
 
-        embeddings = torch.empty(0)
-        labels = torch.empty(0)
+        k = 0
+        for images, target in tqdm(dataloader, total=len(dataloader)):
+            if torch.cuda.is_available():
+                images = images.cuda()
 
-        print(len(dataloader))
+            embeddings[k : k + len(images)] = model(images).data.cpu().numpy()
+            labels[k : k + len(images)] = target.numpy()
 
-        images, labels = next(iter(dataloader))
-        if torch.cuda.is_available():
-            images = images.cuda()
-        embeddings = model(images)
-
-        return embeddings.cpu().numpy(), labels.numpy()
+            k += len(images)
+    return embeddings, labels
 
 
 def extract_embeddings_withoutzeros(dataloader, model):

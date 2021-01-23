@@ -33,7 +33,7 @@ def get_data():
         train_proportion=0.8,
         val_proportion=0.1,
         test_proportion=0.1,
-        use_batch_sampler=False,
+        batch_size=400,
     )
 
     print("loading model...")
@@ -61,7 +61,7 @@ def get_data():
     dump(
         (embeddings, targets),
         f"../../data/embeddings_charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
-        # f"data/embeddings_charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
+        # f"datasets/embeddings_charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
     )
 
     return embeddings, targets

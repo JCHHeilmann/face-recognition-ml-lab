@@ -12,7 +12,7 @@ class WebfaceDataset(Dataset):
         self.dataset_folder = dataset_folder
 
         self.image_filenames = self.read_file_paths()
-        self.labels = self.read_labels()
+        self.labels = self.read_labels()  # TODO JH fix
 
     def read_file_paths(self):
         return glob.glob(join(self.dataset_folder, "**/*.jpg"), recursive=True)
