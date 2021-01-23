@@ -52,12 +52,6 @@ def imshow(inp, title=None, denormalize=False):
         pass
 
 
-def plot_and_log_embeddings(train_loader, model, xlim=None, ylim=None):
-    train_embeddings_otl, train_labels_otl = extract_embeddings(train_loader, model)
-    plt = plot_embeddings(train_embeddings_otl, train_labels_otl, xlim, ylim)
-    return plt
-
-
 def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
     if torch.cuda.is_available():
         embeddings = embeddings.cpu()
@@ -77,6 +71,16 @@ def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
 def extract_embeddings(dataloader, model):
     with torch.no_grad():
         model.eval()
+
+        embeddings = torch.empty(0)
+        labels = np.array([])
+        for images, labels in tqdm(dataloader, total=len(dataloader)):
+            if torch.cuda.is_available():
+                images.cuda()
+            embeddings = model(images)
+
+        return embeddings.numpy(), labels
+
         embeddings = np.zeros((len(dataloader.dataset), 512))
         labels = np.zeros(len(dataloader.dataset))
         k = 0

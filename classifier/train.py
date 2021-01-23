@@ -7,7 +7,7 @@ from joblib import dump
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
-from utils.vis_utils import extract_embeddings_withoutzeros
+from utils.vis_utils import extract_embeddings
 
 # from pai4sk.svm import LinearSVC
 # from sklearn.metrics import accuracy_score
@@ -33,6 +33,7 @@ def get_data():
         train_proportion=0.8,
         val_proportion=0.1,
         test_proportion=0.1,
+        use_batch_sampler=False,
     )
 
     print("loading model...")
@@ -53,7 +54,7 @@ def get_data():
 
     print("calculating embeddings...")
 
-    embeddings, targets = extract_embeddings_withoutzeros(train_loader, model)
+    embeddings, targets = extract_embeddings(train_loader, model)
 
     print(f"took {perf_counter() - timing} seconds")
 
