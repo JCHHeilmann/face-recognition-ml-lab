@@ -5,9 +5,8 @@
 
 import os
 
-import numpy as np
-
 import faiss
+import numpy as np
 
 from .exhaustive_search import knn
 from .vecs_io import bvecs_mmap, fvecs_mmap, fvecs_read, ivecs_read

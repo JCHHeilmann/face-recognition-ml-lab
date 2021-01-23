@@ -6,6 +6,7 @@
 import faiss
 import numpy as np
 
+
 def get_invlist(invlists, l):
     """returns the inverted lists content as a pair of (list_ids, list_codes).
     The codes are reshaped to a proper size

@@ -4,11 +4,13 @@
 # LICENSE file in the root directory of this source tree.
 
 import os
-import numpy as np
-import faiss
 
-from .vecs_io import fvecs_read, ivecs_read, bvecs_mmap, fvecs_mmap
+import faiss
+import numpy as np
+
 from .exhaustive_search import knn
+from .vecs_io import bvecs_mmap, fvecs_mmap, fvecs_read, ivecs_read
+
 
 class Dataset:
     """ Generic abstract class for a test dataset """

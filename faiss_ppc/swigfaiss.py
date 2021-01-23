@@ -5,6 +5,7 @@
 # the SWIG interface file instead.
 
 from sys import version_info as _swig_python_version_info
+
 if _swig_python_version_info >= (2, 7, 0):
     def swig_import_helper():
         import importlib
@@ -18,8 +19,8 @@ if _swig_python_version_info >= (2, 7, 0):
     del swig_import_helper
 elif _swig_python_version_info >= (2, 6, 0):
     def swig_import_helper():
-        from os.path import dirname
         import imp
+        from os.path import dirname
         fp = None
         try:
             fp, pathname, description = imp.find_module('_swigfaiss', [dirname(__file__)])

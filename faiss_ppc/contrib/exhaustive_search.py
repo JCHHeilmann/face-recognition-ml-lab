@@ -6,10 +6,6 @@
 import logging
 import time
 
-import numpy as np
-
-import faiss
-
 import faiss
 import numpy as np
 
