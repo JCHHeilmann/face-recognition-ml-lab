@@ -82,7 +82,7 @@ def extract_embeddings(dataloader, model):
 
         images, labels = next(iter(dataloader))
         if torch.cuda.is_available():
-            images.cuda()
+            images = images.cuda()
         embeddings = model(images)
 
         return embeddings.numpy(), labels.numpy()
