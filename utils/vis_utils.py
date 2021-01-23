@@ -73,24 +73,16 @@ def extract_embeddings(dataloader, model):
         model.eval()
 
         embeddings = torch.empty(0)
-        labels = np.array([])
-        for images, labels in tqdm(dataloader, total=len(dataloader)):
-            if torch.cuda.is_available():
-                images.cuda()
-            embeddings = model(images)
+        labels = torch.empty(0)
 
-        return embeddings.numpy(), labels
+        print(len(dataloader))
 
-        embeddings = np.zeros((len(dataloader.dataset), 512))
-        labels = np.zeros(len(dataloader.dataset))
-        k = 0
-        for images, target in tqdm(dataloader, total=len(dataloader)):
-            if torch.cuda.is_available():
-                images = images.cuda()
-            embeddings[k : k + len(images)] = model(images).data.cpu().numpy()
-            labels[k : k + len(images)] = target.numpy()
-            k += len(images)
-    return embeddings, labels
+        images, labels = next(iter(dataloader))
+        if torch.cuda.is_available():
+            images.cuda()
+        embeddings = model(images)
+
+        return embeddings.numpy(), labels.numpy()
 
 
 def extract_embeddings_withoutzeros(dataloader, model):
