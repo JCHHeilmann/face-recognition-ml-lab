@@ -1,8 +1,9 @@
 import argparse
 from argparse import ArgumentParser
 
-import faiss_ppc
 import joblib
+
+import faiss_ppc
 
 parser = ArgumentParser(
     description="Please provide Inputs as -i EmbeddingFile -o OutputPath"

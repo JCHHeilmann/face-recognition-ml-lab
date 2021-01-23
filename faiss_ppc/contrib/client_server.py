@@ -4,8 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 
 from multiprocessing.dummy import Pool as ThreadPool
-import faiss
 from typing import List, Tuple
+
+import faiss
 
 from . import rpc
 

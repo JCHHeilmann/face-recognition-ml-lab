@@ -8,14 +8,14 @@
 # not linting this file because it imports * form swigfaiss, which
 # causes a ton of useless warnings.
 
-import numpy as np
-import sys
-import inspect
 import array
+import inspect
+import sys
+
+import numpy as np
 
 # We import * so that the symbol foo can be accessed as faiss.foo.
 from .loader import *
-
 
 __version__ = "%d.%d.%d" % (FAISS_VERSION_MAJOR,
                             FAISS_VERSION_MINOR,
