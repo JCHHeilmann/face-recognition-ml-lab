@@ -39,9 +39,7 @@ def get_data():
     print("loading model...")
 
     if torch.cuda.is_available():
-        checkpoint = torch.load(
-            "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cuda")
-        )
+        checkpoint = torch.load("checkpoints/charmed-cosmos-135_epoch_19")
     else:
         checkpoint = torch.load(
             "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cpu")
