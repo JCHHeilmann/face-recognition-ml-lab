@@ -85,7 +85,7 @@ def extract_embeddings(dataloader, model):
             images = images.cuda()
         embeddings = model(images)
 
-        return embeddings.numpy(), labels.numpy()
+        return embeddings.cpu().numpy(), labels.numpy()
 
 
 def extract_embeddings_withoutzeros(dataloader, model):
