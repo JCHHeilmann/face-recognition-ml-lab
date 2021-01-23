@@ -8,16 +8,7 @@ import torch
 import contextlib
 import inspect
 import sys
-
-import faiss
 import numpy as np
-=======
-
-import faiss
-import numpy as np
-import torch
-
->>>>>>> af580e6dc5120f85e7e5810801a15a622bfc1dbb
 
 def swig_ptr_from_UInt8Tensor(x):
     """ gets a Faiss SWIG pointer from a pytorch tensor (on CPU or GPU) """
@@ -57,10 +48,10 @@ def swig_ptr_from_IndicesTensor(x):
 
 @contextlib.contextmanager
 def using_stream(res, pytorch_stream=None):
-    """Creates a scoping object to make Faiss GPU use the same stream
-    as pytorch, based on torch.cuda.current_stream().
-    Or, a specific pytorch stream can be passed in as a second
-    argument, in which case we will use that stream.
+    """ Creates a scoping object to make Faiss GPU use the same stream
+        as pytorch, based on torch.cuda.current_stream().
+        Or, a specific pytorch stream can be passed in as a second
+        argument, in which case we will use that stream.
     """
 
     if pytorch_stream is None:

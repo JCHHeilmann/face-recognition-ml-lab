@@ -3,16 +3,16 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-import faiss
 import numpy as np
+import faiss
 
 def get_invlist(invlists, l):
-    """returns the inverted lists content as a pair of (list_ids, list_codes).
+    """ returns the inverted lists content as a pair of (list_ids, list_codes).
     The codes are reshaped to a proper size
     """
     invlists = faiss.downcast_InvertedLists(invlists)
     ls = invlists.list_size(l)
-    list_ids = np.zeros(ls, dtype="int64")
+    list_ids = np.zeros(ls, dtype='int64')
     ids = codes = None
     try:
         ids = invlists.get_ids(l)
