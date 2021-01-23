@@ -69,6 +69,9 @@ def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
 
 
 def extract_embeddings(dataloader, model):
+    if torch.cuda.is_available():
+        model = model.cuda()
+
     with torch.no_grad():
         model.eval()
 
