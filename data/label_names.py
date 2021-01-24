@@ -12,3 +12,6 @@ class LabelNames:
         folder_tag = str(int(folder_tag))
         folder_tag = folder_tag.zfill(7)
         return self.dictionary[folder_tag]
+
+    def add_name(self, name, label):
+        self.dictionary[str(label)] = name

@@ -37,7 +37,7 @@ class FaissClassifier:
         embedding = model(image_tensor).data.cpu().numpy()
         return embedding
 
-    def random_n_digits(n):
+    def random_n_digits(self, n):
         range_start = 10 ** (n - 1)
         range_end = (10 ** n) - 1
         return randint(range_start, range_end)
@@ -80,26 +80,15 @@ class FaissClassifier:
 
             return label_names, embeddings
 
-    def add_person(self, image, labels: str):
-
+    def add_person(self, image, name: str):
         image_align = self.preprocessor.make_align(image)
-        embedding_new = self.model(image_align)
+        embedding_new = self.img_to_encoding(image_align, self.model)
 
-        random_label = self.random_n_digits(7)
-        while random_label in labels:
-            random_label = self.random_n_digits(7)
-
+        random_label = self.random_n_digits(8)
         random_label_array = np.array([random_label])
 
-        # TODO: Fix loading and saving of the dictionary
-
-        # names_dictionary[str(random_label)] = label
-        # names_dictionary.update(self.dictionary)
-
         self.indexIDMap.add_with_ids(embedding_new, random_label_array)
-        faiss.write_index(self.indexIDMap, "classifier/vector.index")
-
-        return "New person is added."
+        self.dictionary.add_name(name, random_label)
 
 
 if __name__ == "__main__":
@@ -113,6 +102,13 @@ if __name__ == "__main__":
     images = [Image.open(path).convert("RGB") for path in image_paths]
 
     classifier = FaissClassifier()
+
+    new_image = Image.open("datasets/test/IMG-20140329-WA0010.jpg")
+
+    classifier.add_person(new_image, "victor")
+
+    label = classifier.classify(new_image)
+    print(label)
 
     labels, embeddings = classifier.classify_with_surroundings(images[0])
 
