@@ -25,8 +25,8 @@ embeddings, labels = joblib.load(EmbeddingFile)
 
 # define the index with dimensionality 512
 index = faiss.IndexFlatL2(512)
-indexIDMap = faiss.IndexIDMap(index)
+indexIDMap = faiss.IndexIDMap2(index)
 indexIDMap.add_with_ids(embeddings.astype("float32"), labels.astype("int"))
 
 # save the index
-faiss.write_index(indexIDMap, "vector.index")
+faiss.write_index(indexIDMap, "datasets/vector.index")

@@ -17,12 +17,15 @@ class FaissClassifier:
 
         self.threshold = 0.1
         self.to_tensor = torchvision.transforms.ToTensor()
-        self.indexIDMap = faiss.read_index("classifier/vector.index")
+        # self.indexIDMap = faiss.read_index("datasets/vector.index")
+        self.indexIDMap = faiss.read_index("datasets/vector.index")
         self.dictionary = LabelNames("data/data.p")
         self.preprocessor = FaceAlignment()
 
         self.checkpoint = torch.load(
-            "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cpu")
+            # "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cpu")
+            "checkpoints/deft-snowball-123_epoch_19",
+            map_location=torch.device("cpu"),
         )
         self.model = InceptionResnetV1()
         self.model.load_state_dict(self.checkpoint["model_state_dict"])
@@ -40,7 +43,6 @@ class FaissClassifier:
         return randint(range_start, range_end)
 
     def classify(self, image):
-
         image_aligned = self.preprocessor.make_align(image)
         if not image_aligned:
             print("No face found")
@@ -57,17 +59,26 @@ class FaissClassifier:
             return "Unknown"
 
     def classify_with_surroundings(self, image):
-
         image_aligned = self.preprocessor.make_align(image)
+        if not image_aligned:
+            print("No face found")
+            return "Unknown"
+
         embedding = self.img_to_encoding(image_aligned, self.model)
 
         k = 50
-        distance, label = self.indexIDMap.search(embedding.astype("float32"), k)
+        distances, labels, embeddings = self.indexIDMap.search_and_reconstruct(
+            embedding.astype("float32"), k
+        )
 
-        return self.dictionary.read_from_pickle(label)
+        distances = distances[0]
+        labels = labels[0]
+        embeddings = embeddings[0]
 
-        # TODO: return also embeddings
-        # return  # label_name, surrounding_embeddings
+        if distances[0] < self.threshold:
+            label_names = [self.dictionary.read_from_pickle(label) for label in labels]
+
+            return label_names, embeddings
 
     def add_person(self, image, labels: str):
 
@@ -97,10 +108,13 @@ if __name__ == "__main__":
     from PIL import Image
     from tqdm import tqdm
 
-    image_paths = glob("datasets/test/0000107/*.jpg")
+    image_paths = glob("datasets/CASIA-WebFace/0000107/*.jpg")[:12]
+    # image_paths = glob("datasets/test/0000107/*.jpg")[:12]
     images = [Image.open(path).convert("RGB") for path in image_paths]
 
     classifier = FaissClassifier()
+
+    labels, embeddings = classifier.classify_with_surroundings(images[0])
 
     results = [classifier.classify(img) for img in tqdm(images)]
 
@@ -121,5 +135,3 @@ if __name__ == "__main__":
 
     values, counts = np.unique(results, return_counts=True)
     unique_counts = list(zip(values, counts))
-
-    pass
