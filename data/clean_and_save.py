@@ -4,6 +4,7 @@ import os
 from os.path import join
 
 from PIL import Image
+
 from .face_alignment import FaceAlignment
 
 # data_folder = "../../../data/"
