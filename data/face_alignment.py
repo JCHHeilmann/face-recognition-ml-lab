@@ -15,7 +15,16 @@ class FaceAlignment:
         )
 
     def make_align(self, img):
-        img = img.convert("RGB").resize((128, 128))
+        img = img.convert("RGB")
+        height, width = img.size
+        if width <= height:
+            new_width = 128
+            new_height = new_width * height // width
+        else:
+            new_height = 128
+            new_width = new_height * width // height
+        img = img.resize((new_height, new_width))
+
         img_array = np.array(img)
 
         detections = [det.rect for det in self.detector(img_array, 1)]
