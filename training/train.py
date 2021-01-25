@@ -25,7 +25,7 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
 
         embeddings, targets = train_epoch(model, train_loader, loss_function, optimizer)
 
-        evaluate(model, val_loader, loss_function)
+        evaluate(model, embeddings, targets, val_loader)
 
         save_checkpoint(model, optimizer, epoch)
 
@@ -103,39 +103,29 @@ def train_epoch(model, train_loader, loss_function, optimizer):
     )  # return final batch embeddings for visualization
 
 
-def evaluate(model, val_loader, loss_function):
+def evaluate(model, embeddings, targets, val_loader):
+    index = create_index(embeddings, targets)
+    classifier = FaissClassifier(index)
 
-    val_loss = 0
-    val_num_triplets = 0
-
+    predicted_labels = []
+    val_labels = []
     with torch.no_grad():
         model.eval()
 
         for batch_idx, (data, target) in tqdm(
             enumerate(val_loader), total=len(val_loader), desc="processing batch: "
         ):
+            val_labels.append(target.numpy())
             if torch.cuda.is_available():
                 data = data.cuda()
                 target = target.cuda()
 
             outputs = model(data)
 
-            loss, num_triplets = loss_function(outputs, target)
+            predicted_labels.append(classifier.classify(data))
 
-            if num_triplets == 0:
-                continue
-
-            val_loss += loss.item()
-            val_num_triplets += num_triplets
-
-            if batch_idx % 10 == 0:  # 10
-                wandb.log(
-                    {
-                        "validation_loss": val_loss / (batch_idx + 1),
-                        "average_num_triplets": val_num_triplets / (batch_idx + 1),
-                    }
-                )
-
+    # in val_labels replace all labels not in input targets with "Unknown"
+    # use some scikitlearn accuracy/ f1 score
     return val_loss
 
 
