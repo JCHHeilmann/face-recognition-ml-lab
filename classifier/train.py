@@ -6,7 +6,9 @@ from joblib import dump
 
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
-from models.inception_resnet_v1 import InceptionResnetV1
+
+# from models.inception_resnet_v1 import InceptionResnetV1
+from facenet_pytorch import InceptionResnetV1
 from utils.vis_utils import extract_embeddings
 
 # from pai4sk.svm import LinearSVC
@@ -38,16 +40,18 @@ def get_data():
 
     print("loading model...")
 
-    if torch.cuda.is_available():
-        checkpoint = torch.load(
-            "checkpoints/deft-snowball-123_epoch_19", map_location=torch.device("cuda")
-        )
-    else:
-        checkpoint = torch.load(
-            "checkpoints/deft-snowball-123_epoch_19", map_location=torch.device("cpu")
-        )
-    model = InceptionResnetV1()
-    model.load_state_dict(checkpoint["model_state_dict"])
+    # if torch.cuda.is_available():
+    #     checkpoint = torch.load(
+    #         "checkpoints/deft-snowball-123_epoch_19", map_location=torch.device("cuda")
+    #     )
+    # else:
+    #     checkpoint = torch.load(
+    #         "checkpoints/deft-snowball-123_epoch_19", map_location=torch.device("cpu")
+    #     )
+    # model = InceptionResnetV1()
+    # model.load_state_dict(checkpoint["model_state_dict"])
+
+    model = InceptionResnetV1(pretrained="casia-webface").eval()
 
     if torch.cuda.is_available():
         model = model.cuda()
