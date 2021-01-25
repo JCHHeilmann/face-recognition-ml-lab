@@ -60,6 +60,7 @@ def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
     data = pd.DataFrame(
         {"dim_1": embeddings[:, 0], "dim_2": embeddings[:, 1], "targets": targets}
     )
+
     data["targets"] = data["targets"].astype(
         str
     )  # convert to string, so plotly interprets it as categorical variable
