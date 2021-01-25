@@ -12,20 +12,20 @@ from models.inception_resnet_v1 import InceptionResnetV1
 
 
 class FaissClassifier:
-    def __init__(self) -> None:
+    def __init__(self, index="datasets/vector.index") -> None:
         super().__init__()
 
         self.threshold = 0.1
         self.to_tensor = torchvision.transforms.ToTensor()
         # self.indexIDMap = faiss.read_index("datasets/vector.index")
-        self.indexIDMap = faiss.read_index("datasets/vector.index")
+        self.indexIDMap = faiss.read_index(index)
         self.dictionary = LabelNames("data/data.p")
         self.preprocessor = FaceAlignment()
 
         self.checkpoint = torch.load(
-            # "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cpu")
-            "checkpoints/deft-snowball-123_epoch_19",
-            map_location=torch.device("cpu"),
+             "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cpu"),
+            # "checkpoints/deft-snowball-123_epoch_19",
+            # map_location=torch.device("cpu"),
         )
         self.model = InceptionResnetV1()
         self.model.load_state_dict(self.checkpoint["model_state_dict"])
@@ -42,21 +42,18 @@ class FaissClassifier:
         range_end = (10 ** n) - 1
         return randint(range_start, range_end)
 
-    def classify(self, image):
-        image_aligned = self.preprocessor.make_align(image)
-        if not image_aligned:
-            print("No face found")
-            return "Unknown"
-
-        embedding = self.img_to_encoding(image_aligned, self.model)
-
+    def classify(self, embeddings):
+        
+        pred_labels = []
         k = 1
-        distance, label = self.indexIDMap.search(embedding.astype("float32"), k)
-
-        if distance < self.threshold:
-            return self.dictionary.read_from_pickle(label)
-        else:
-            return "Unknown"
+        distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
+        for indx, d in enumerate(distance):
+            if d < self.threshold:
+                pred_labels.append(label[indx])
+            else:
+                pred_labels.append(-1)
+        
+        return pred_labels
 
     def classify_with_surroundings(self, image):
         image_aligned = self.preprocessor.make_align(image)
@@ -99,8 +96,7 @@ if __name__ == "__main__":
     from PIL import Image
     from tqdm import tqdm
 
-    image_paths = glob("datasets/CASIA-WebFace/0000107/*.jpg")[:12]
-    # image_paths = glob("datasets/test/0000107/*.jpg")[:12]
+    image_paths = glob("datasets/test/0000107/*.jpg")[:12]
     images = [Image.open(path).convert("RGB") for path in image_paths]
 
     classifier = FaissClassifier()

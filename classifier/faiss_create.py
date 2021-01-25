@@ -5,28 +5,38 @@ from argparse import ArgumentParser
 import faiss
 import joblib
 
-parser = ArgumentParser(
-    description="Please provide Inputs as -i EmbeddingFile -o OutputPath"
-)
-parser.add_argument(
-    "-i",
-    dest="EmbeddingFile",
-    required=True,
-    help="Provide your embedding.joblib file here",
-    metavar="FILE",
-)
 
-args = parser.parse_args()
+def create_index(embeddings, target):
+    # define the index with dimensionality 512
+    index = faiss.IndexFlatL2(512)
+    indexIDMap = faiss.IndexIDMap2(index)
+    indexIDMap.add_with_ids(embeddings.astype("float32"), target.astype("int"))
 
-EmbeddingFile = args.EmbeddingFile
+    # save the index
+    index_path = "datasets/vector_val.index"
+    faiss.write_index(indexIDMap, index_path)
+    return index_path
 
-# load embeddings
-embeddings, labels = joblib.load(EmbeddingFile)
+if __name__ == "__main__":
+    
+    parser = ArgumentParser(
+        description="Please provide Inputs as -i EmbeddingFile"
+    )
+    parser.add_argument(
+        "-i",
+        dest="EmbeddingFile",
+        required=True,
+        help="Provide your embedding.joblib file here",
+        metavar="FILE",
+    )
 
-# define the index with dimensionality 512
-index = faiss.IndexFlatL2(512)
-indexIDMap = faiss.IndexIDMap2(index)
-indexIDMap.add_with_ids(embeddings.astype("float32"), labels.astype("int"))
+    args = parser.parse_args()
 
-# save the index
-faiss.write_index(indexIDMap, "datasets/vector.index")
+    EmbeddingFile = args.EmbeddingFile
+
+    # load embeddings
+    embeddings, labels = joblib.load(EmbeddingFile)
+
+    create_index(embeddings, labels)
+
+
