@@ -62,11 +62,11 @@ class FaissClassifier:
         image_aligned = self.preprocessor.make_align(image)
         if not image_aligned:
             print("No face found")
-            return "Unknown"
+            return ["Unknown"], None
 
         embedding = self.img_to_encoding(image_aligned, self.model)
 
-        k = 50
+        k = 100
         distances, labels, embeddings = self.indexIDMap.search_and_reconstruct(
             embedding.astype("float32"), k
         )
@@ -79,6 +79,8 @@ class FaissClassifier:
             label_names = [self.dictionary.read_from_pickle(label) for label in labels]
 
             return label_names, embeddings
+        else:
+            return ["Unknown"], None
 
     def add_person(self, image, name: str):
         image_align = self.preprocessor.make_align(image)
