@@ -26,8 +26,7 @@ def get_data_loaders(
     )  # correct rounding errors with train set size
 
     train_dataset, val_dataset, test_dataset = torch.utils.data.random_split(
-        dataset,
-        [train_size, val_size, test_size],
+        dataset, [train_size, val_size, test_size],
     )
 
     if not batch_size:
@@ -35,12 +34,12 @@ def get_data_loaders(
         balanced_sampler = BalancedBatchSampler(
             train_labels, classes_per_batch, samples_per_class
         )
+        train_loader = torch.utils.data.DataLoader(
+            train_dataset, batch_sampler=balanced_sampler
+        )
     else:
-        balanced_sampler = None
+        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size)
 
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_sampler=balanced_sampler, batch_size=batch_size
-    )
     val_loader = torch.utils.data.DataLoader(val_dataset, shuffle=False)
     test_loader = torch.utils.data.DataLoader(test_dataset, shuffle=False)
 

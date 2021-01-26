@@ -12,13 +12,16 @@ class WebfaceDataset(Dataset):
         self.dataset_folder = dataset_folder
 
         self.image_filenames = self.read_file_paths()
-        self.labels = self.read_labels()  # TODO JH fix
+        self.labels = self.get_labels()
 
     def read_file_paths(self):
-        return glob.glob(join(self.dataset_folder, "**/*.jpg"), recursive=True)
+        paths = glob.glob(join(self.dataset_folder, "*/*.png"), recursive=True)
+        if len(paths) == 0:
+            paths = glob.glob(join(self.dataset_folder, "*/*.jpg"), recursive=True)
+        return paths
 
-    def read_labels(self):
-        return [dir[0] for dir in os.walk(self.dataset_folder)]
+    def get_labels(self):
+        return [path.split("/")[2] for path in self.image_filenames]
 
     def __len__(self):
         return len(self.image_filenames)
