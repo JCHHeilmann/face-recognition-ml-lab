@@ -4,8 +4,7 @@ from time import perf_counter
 import numpy as np
 import torch
 import wandb
-from sklearn.metrics import (accuracy_score, f1_score, precision_score,
-                             recall_score)
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
 
@@ -144,7 +143,7 @@ def evaluate(model, embeddings, targets, val_loader):
             f1 += f1_score(target.numpy(), predicted, average="micro")
 
     total_accuracy = accuracy / len(val_loader)
-    total_f1 = np.array(f1) / len(val_loader)
+    total_f1 = f1 / len(val_loader)
 
     return total_accuracy, total_f1
 
@@ -215,16 +214,16 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
-    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.1,
-        val_proportion=0.1,
-        test_proportion=0.8,
+        train_proportion=0.01,
+        val_proportion=0.01,
+        test_proportion=0.89,
     )
 
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_gen)
