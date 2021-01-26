@@ -1,9 +1,11 @@
-import argparse
 from argparse import ArgumentParser
 
-# import faiss_ppc as faiss
-import faiss
 import joblib
+
+if os.uname().machine == "ppc64le":
+    import faiss_ppc as faiss
+else:
+    import faiss
 
 
 def create_index(embeddings, target):

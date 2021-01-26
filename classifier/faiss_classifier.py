@@ -1,14 +1,17 @@
+import os
 from random import randint
 
-# import faiss_ppc as faiss
-import faiss
 import numpy as np
 import torch
 import torchvision
-
 from data.face_alignment import FaceAlignment
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
+
+if os.uname().machine == "ppc64le":
+    import faiss_ppc as faiss
+else:
+    import faiss
 
 
 class FaissClassifier:
