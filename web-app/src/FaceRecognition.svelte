@@ -25,7 +25,7 @@
     <Loading />
   {:then recognitionResponse}
     {#await recognitionResponse.json() then recognitionResult}
-      <Result resultData={JSON.stringify(recognitionResult).result} />
+      <Result resultData={recognitionResult} />
     {/await}
   {:catch error}
     <p style="color: red">{error.message}</p>
