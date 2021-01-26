@@ -1,21 +1,21 @@
 from pathlib import Path
 from time import perf_counter
 
+import numpy as np
 import torch
 import wandb
-import numpy as np
-from torch.optim.lr_scheduler import MultiStepLR
-from tqdm import tqdm
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
-
+from classifier.faiss_classifier import FaissClassifier
+from classifier.faiss_create import create_index
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from torch.optim.lr_scheduler import MultiStepLR
+from tqdm import tqdm
+from utils.vis_utils import plot_embeddings
+
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
-from utils.vis_utils import plot_embeddings
-from classifier.faiss_create import create_index
-from classifier.faiss_classifier import FaissClassifier
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
@@ -29,7 +29,11 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
 
         embeddings, targets = train_epoch(model, train_loader, loss_function, optimizer)
 
-        evaluate(model, embeddings, targets, val_loader)
+        eval_timing = perf_counter()
+        total_accuracy, total_f1, total_accuracy_unknown, total_f1_unknown = evaluate(
+            model, val_loader, loss_function
+        )
+        eval_timing = perf_counter() - eval_timing
 
         save_checkpoint(model, optimizer, epoch)
 
@@ -37,12 +41,18 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
 
         embedding_visualization_timing = perf_counter()
         fig = plot_embeddings(embeddings, targets)
+
         wandb.log(
             {
                 "embedding_plot": fig,
                 "embedding_visualization_timing": (
                     perf_counter() - embedding_visualization_timing
                 ),
+                "eval_timing": eval_timing,
+                "accuracy": total_accuracy,
+                "accuracy_unknown": total_accuracy_unknown,
+                "f1": total_f1,
+                "f1_unknown": total_f1_unknown,
             }
         )
 
@@ -108,18 +118,18 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
 
 def evaluate(model, embeddings, targets, val_loader):
-    
+
     index = create_index(embeddings.data.cpu().numpy(), targets.numpy())
-    
+
     classifier = FaissClassifier(index)
-    
+
     accuracy = 0
     accuracy_unknown = 0
     f1 = []
     f1_unknown = []
     predicted_labels = []
     val_labels = []
-    
+
     with torch.no_grad():
         model.eval()
 
@@ -134,13 +144,13 @@ def evaluate(model, embeddings, targets, val_loader):
             outputs = model(data)
             predicted = classifier.classify(outputs.data.cpu().numpy())
             predicted_labels.append(classifier.classify(outputs.data.cpu().numpy()))
-            
+
             accuracy = accuracy_score(target.numpy(), predicted)
             f1 = f1_score(target.numpy(), predicted, average=None)
-            
+
             accuracy += accuracy
             f1 += f1
-            
+
             # in val_labels replace all labels not in input targets with "Unknown"
             indx = np.where(np.in1d(predicted, targets.numpy()))[0]
             if len(indx) > 0:
@@ -148,26 +158,16 @@ def evaluate(model, embeddings, targets, val_loader):
 
             accuracy_unknown = accuracy_score(target.numpy(), predicted)
             f1_unknown = f1_score(target.numpy(), predicted, average=None)
-            
+
             accuracy_unknown += accuracy_unknown
-            f1_unknown += f1_unknown            
-            
+            f1_unknown += f1_unknown
+
         total_accuracy = accuracy / (batch_idx + 1)
-        total_accuracy_unknown =  accuracy_unknown / (batch_idx + 1)
+        total_accuracy_unknown = accuracy_unknown / (batch_idx + 1)
         total_f1 = np.array(f1) / (batch_idx + 1)
         total_f1_unknown = np.array(f1_unknown) / (batch_idx + 1)
 
-        wandb.log(
-                {
-                    "accuracy": total_accuracy,
-                    "total_accuracy_unknown": total_accuracy_unknown,
-                    "total_f1": total_f1,
-                    "total_f1_unknown": total_f1_unknown,
-                }
-            )
-    
     return total_accuracy, total_f1, total_accuracy_unknown, total_f1_unknown
-
 
 
 def save_checkpoint(model, optimizer, epoch_num):
@@ -213,7 +213,7 @@ if __name__ == "__main__":
     wandb.init(
         project="face-recognition",
         entity="application-challenges-ml-lab",
-        #mode="disabled",
+        # mode="disabled",
         config={
             "epochs": EPOCHS,
             "batch_size": BATCH_SIZE,
@@ -238,6 +238,7 @@ if __name__ == "__main__":
 
     # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
     dataset = WebfaceDataset("datasets/CASIA-WebFace")
+
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
         CLASSES_PER_BATCH,

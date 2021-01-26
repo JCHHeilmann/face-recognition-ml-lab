@@ -17,13 +17,13 @@ class FaissClassifier:
 
         self.threshold = 0.1
         self.to_tensor = torchvision.transforms.ToTensor()
-        # self.indexIDMap = faiss.read_index("datasets/vector.index")
         self.indexIDMap = faiss.read_index(index)
         self.dictionary = LabelNames("data/data.p")
         self.preprocessor = FaceAlignment()
 
         self.checkpoint = torch.load(
-             "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cpu"),
+            "checkpoints/charmed-cosmos-135_epoch_19",
+            map_location=torch.device("cpu"),
             # "checkpoints/deft-snowball-123_epoch_19",
             # map_location=torch.device("cpu"),
         )
@@ -43,7 +43,7 @@ class FaissClassifier:
         return randint(range_start, range_end)
 
     def classify(self, embeddings):
-        
+
         pred_labels = []
         k = 1
         distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
@@ -52,7 +52,7 @@ class FaissClassifier:
                 pred_labels.append(label[indx])
             else:
                 pred_labels.append(-1)
-        
+
         return pred_labels
 
     def classify_with_surroundings(self, image):

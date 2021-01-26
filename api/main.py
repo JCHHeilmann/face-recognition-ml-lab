@@ -3,8 +3,9 @@ import io
 from fastapi import Depends, FastAPI, File
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
+from starlette.responses import JSONResponse
 
-from classifier.l2distance_classifier import L2DistanceClassifier
+from classifier.faiss_classifier import FaissClassifier
 
 app = FastAPI()
 
@@ -16,6 +17,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+classifier = FaissClassifier()
+
+
+def get_classifier():
+    return classifier
+
 
 @app.get("/")
 def read_root():
@@ -24,12 +31,12 @@ def read_root():
 
 @app.post("/recognize-face/")
 def recognize_face(
-    image_data: bytes = File(...), classifier: L2DistanceClassifier = Depends()
+    image_data: bytes = File(...), classifier: get_classifier = Depends()
 ):
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
-    result = classifier.classify(image)
+    labels, embeddings = classifier.classify_with_surroundings(image)
 
-    return f"{{result: {result}}}"
+    return JSONResponse({"labels": labels, "embeddings": embeddings.tolist()})
 
 
 if __name__ == "__main__":
