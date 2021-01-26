@@ -4,8 +4,7 @@ from time import perf_counter
 import numpy as np
 import torch
 import wandb
-from sklearn.metrics import (accuracy_score, f1_score, precision_score,
-                             recall_score)
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
 
@@ -115,8 +114,8 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
 
 def evaluate(model, embeddings, targets, val_loader):
-
-    index = create_index(embeddings.data.cpu().numpy(), targets.cpu().numpy())
+    targets = targets.cpu()
+    index = create_index(embeddings.data.cpu().numpy(), targets.numpy())
 
     classifier = FaissClassifier(index)
 
