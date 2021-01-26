@@ -21,8 +21,7 @@ class WebfaceDataset(Dataset):
         return paths
 
     def get_labels(self):
-        print(self.image_filenames[0].split("/"))
-        return [path.split("/")[2] for path in self.image_filenames]
+        return [path.split("/")[-2] for path in self.image_filenames]
 
     def __len__(self):
         return len(self.image_filenames)

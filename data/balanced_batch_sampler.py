@@ -21,10 +21,6 @@ class BalancedBatchSampler(BatchSampler):
         self.used_label_indices_count = {label: 0 for label in self.labels_set}
         self.count = 0
 
-        print(len(self.labels))
-        print(len(self.labels_set))
-        print(self.labels_set)
-
     def __iter__(self):
         self.count = 0
 
