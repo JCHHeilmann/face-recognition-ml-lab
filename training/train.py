@@ -211,16 +211,16 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
-    dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.01,
+        train_proportion=0.8,
         val_proportion=0.1,
-        test_proportion=0.89,
+        test_proportion=0.1,
     )
 
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_gen)
