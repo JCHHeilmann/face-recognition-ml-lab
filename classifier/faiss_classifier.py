@@ -17,14 +17,14 @@ else:
 
 
 class FaissClassifier:
-    def __init__(self, index="datasets/vector.index") -> None:
+    def __init__(self, index="datasets/vector_pre_trained.index") -> None:
         super().__init__()
 
         self.threshold = 0.1
         self.to_tensor = torchvision.transforms.ToTensor()
         self.indexIDMap = faiss.read_index(index)
         self.dictionary = LabelNames("data/data.p")
-        if os.uname().machine == "ppc64le":
+        if os.uname().machine != "ppc64le":
             self.preprocessor = FaceAlignment()
 
         self.checkpoint = torch.load(
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     from PIL import Image
     from tqdm import tqdm
 
-    image_paths = glob("datasets/test/0000107/*.jpg")[:12]
+    image_paths = glob("datasets/test/0000192/*.png")
     images = [Image.open(path).convert("RGB") for path in image_paths]
 
     classifier = FaissClassifier()
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     incorrect = 0
     unknown = 0
     for result in results:
-        if result == "Kim_Basinger":
+        if result == "Alyssa_Milano":
             correct += 1
         elif result == "Unknown":
             unknown += 1
