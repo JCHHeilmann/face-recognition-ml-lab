@@ -4,7 +4,8 @@ from time import perf_counter
 import numpy as np
 import torch
 import wandb
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
+from sklearn.metrics import (accuracy_score, f1_score, precision_score,
+                             recall_score)
 from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
 
