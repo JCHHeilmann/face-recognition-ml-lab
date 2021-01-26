@@ -47,13 +47,11 @@ class FaissClassifier:
         pred_labels = []
         k = 1
         distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
-        for indx, d in enumerate(distance):
-            if d < self.threshold:
-                pred_labels.append(label[indx])
-            else:
-                pred_labels.append(-1)
-
-        return pred_labels
+        print(distance)
+        if distance < self.threshold:
+                return int(label)
+        else:
+                return 0
 
     def classify_with_surroundings(self, image):
         image_aligned = self.preprocessor.make_align(image)
