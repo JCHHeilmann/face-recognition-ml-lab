@@ -23,7 +23,7 @@ class BalancedBatchSampler(BatchSampler):
         self.count = 0
 
         while self.count + self.batch_size < self.dataset_size:
-            print(len(self.labels_set), len(self.classes_per_batch))
+            print(len(self.labels_set), self.classes_per_batch)
             classes = np.random.choice(
                 self.labels_set, self.classes_per_batch, replace=False
             )
