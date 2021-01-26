@@ -116,7 +116,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
 def evaluate(model, embeddings, targets, val_loader):
 
-    index = create_index(embeddings.data.cpu().numpy(), targets.numpy())
+    index = create_index(embeddings.data.cpu().numpy(), targets.cpu().numpy())
 
     classifier = FaissClassifier(index)
 
