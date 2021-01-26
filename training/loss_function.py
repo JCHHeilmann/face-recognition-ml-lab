@@ -48,6 +48,6 @@ class OnlineTripletLoss(nn.Module):
         )
 
         print(
-            f"\nNumber of zeros in loss: {((losses == 0).sum(dim=0) / len(losses)) * 100} %\n"
+            f"\nNumber of zeros in loss: {((losses == 0).sum(dim=0).item() / len(losses)) * 100} %\n"
         )
         return losses.mean(), len(triplets)
