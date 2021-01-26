@@ -139,6 +139,7 @@ def evaluate(model, embeddings, targets, val_loader):
             outputs = model(data)
             predicted = classifier.classify(outputs.data.cpu().numpy())
 
+            target = target.cpu()
             accuracy += accuracy_score(target.numpy(), predicted)
             f1 += f1_score(target.numpy(), predicted, average="micro")
 
