@@ -26,7 +26,7 @@ class OnlineTripletLoss(nn.Module):
         triplets = self.triplet_selector(embeddings, targets, device, self.margin)
 
         if len(triplets) == 0:
-            return None
+            return None, 0
 
         if embeddings.is_cuda:
             triplets = triplets.cuda()
@@ -47,4 +47,5 @@ class OnlineTripletLoss(nn.Module):
             anchor_positive_distances - anchor_negative_distances + self.margin
         )
 
+        print(losses)
         return losses.mean(), len(triplets)
