@@ -110,12 +110,16 @@ if __name__ == "__main__":
 
     classifier.add_person(new_image, "victor")
 
-    label = classifier.classify(new_image)
-    print(label)
+    labels, _ = classifier.classify_with_surroundings(new_image)
+    print(labels[0])
+
+    new_image_2 = Image.open("datasets/test/IMG-20140329-WA0013.jpg")
+    labels, _ = classifier.classify_with_surroundings(new_image_2)
+    print(labels[0])
 
     labels, embeddings = classifier.classify_with_surroundings(images[0])
 
-    results = [classifier.classify(img) for img in tqdm(images)]
+    results = [classifier.classify_with_surroundings(img)[0][0] for img in tqdm(images)]
 
     correct = 0
     incorrect = 0
