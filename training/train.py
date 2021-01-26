@@ -4,18 +4,19 @@ from time import perf_counter
 import numpy as np
 import torch
 import wandb
+from sklearn.metrics import (accuracy_score, f1_score, precision_score,
+                             recall_score)
+from torch.optim.lr_scheduler import MultiStepLR
+from tqdm import tqdm
+
 from classifier.faiss_classifier import FaissClassifier
 from classifier.faiss_create import create_index
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-from torch.optim.lr_scheduler import MultiStepLR
-from tqdm import tqdm
-from utils.vis_utils import plot_embeddings
-
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
+from utils.vis_utils import plot_embeddings
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):

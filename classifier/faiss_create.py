@@ -17,11 +17,10 @@ def create_index(embeddings, target):
     faiss.write_index(indexIDMap, index_path)
     return index_path
 
+
 if __name__ == "__main__":
-    
-    parser = ArgumentParser(
-        description="Please provide Inputs as -i EmbeddingFile"
-    )
+
+    parser = ArgumentParser(description="Please provide Inputs as -i EmbeddingFile")
     parser.add_argument(
         "-i",
         dest="EmbeddingFile",
@@ -38,5 +37,3 @@ if __name__ == "__main__":
     embeddings, labels = joblib.load(EmbeddingFile)
 
     create_index(embeddings, labels)
-
-
