@@ -47,5 +47,7 @@ class OnlineTripletLoss(nn.Module):
             anchor_positive_distances - anchor_negative_distances + self.margin
         )
 
-        print(f"\n{len([loss == torch.tensor(0.0) for loss in losses])}\n")
+        print(
+            f"\n{len([loss == torch.tensor(0.0) for loss in losses]) / len(losses)}\n"
+        )
         return losses.mean(), len(triplets)
