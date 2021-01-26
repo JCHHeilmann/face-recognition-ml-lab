@@ -25,8 +25,8 @@ def get_data():
     CLASSES_PER_BATCH = 30
     SAMPLES_PER_CLASS = 40
 
-    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
-    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, _, _ = get_data_loaders(
         dataset,
@@ -57,14 +57,19 @@ def get_data():
         model = model.cuda()
 
     print("calculating embeddings...")
+    print(
+        f"Calculating embeddings for {len(train_loader) * train_loader.batch_size} images"
+    )
 
     embeddings, targets = extract_embeddings(train_loader, model)
+
+    print(f"{len(embeddings)} calculated")
 
     print(f"took {perf_counter() - timing} seconds")
 
     dump(
         (embeddings, targets),
-        f"../../data/embeddings_deft-snowball-123_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
+        f"../../data/pre_trained_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H-%M-%S')}.joblib",
         # f"datasets/embeddings_charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
     )
 
