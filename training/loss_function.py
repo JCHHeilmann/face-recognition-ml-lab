@@ -48,6 +48,6 @@ class OnlineTripletLoss(nn.Module):
         )
 
         print(
-            f"\n{len([loss == torch.tensor(0.0) for loss in losses]) / len(losses)}\n"
+            f"\n{(len([1 for loss in losses if loss == torch.tensor(0.0)]) / len(losses)) * 100} %\n"
         )
         return losses.mean(), len(triplets)
