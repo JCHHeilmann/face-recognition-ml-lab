@@ -4,8 +4,7 @@ from time import perf_counter
 import numpy as np
 import torch
 import wandb
-from sklearn.metrics import (accuracy_score, f1_score, precision_score,
-                             recall_score)
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
 
@@ -66,7 +65,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
     model.train()
 
     for batch_idx, (data, target) in tqdm(
-        enumerate(train_loader), total=len(train_loader), desc="evaluating batch: "
+        enumerate(train_loader), total=len(train_loader), desc="processing batch: "
     ):
         if torch.cuda.is_available():
             data = data.cuda()
@@ -127,7 +126,7 @@ def evaluate(model, embeddings, targets, val_loader):
         model.eval()
 
         for _, (data, target) in tqdm(
-            enumerate(val_loader), total=len(val_loader), desc="processing batch: "
+            enumerate(val_loader), total=len(val_loader), desc="evaluating batch: "
         ):
             if target not in targets:
                 continue
@@ -221,9 +220,9 @@ if __name__ == "__main__":
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.8,
+        train_proportion=0.1,
         val_proportion=0.1,
-        test_proportion=0.1,
+        test_proportion=0.8,
     )
 
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_gen)
