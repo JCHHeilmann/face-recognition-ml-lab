@@ -1,6 +1,8 @@
 import numpy as np
 from torch.utils.data.sampler import BatchSampler
 
+np.random.seed(42)
+
 
 class BalancedBatchSampler(BatchSampler):
     def __init__(self, labels, classes_per_batch, samples_per_class):
@@ -19,11 +21,12 @@ class BalancedBatchSampler(BatchSampler):
         self.used_label_indices_count = {label: 0 for label in self.labels_set}
         self.count = 0
 
+        print(len(self.labels))
+
     def __iter__(self):
         self.count = 0
 
         while self.count + self.batch_size < self.dataset_size:
-            print(len(self.labels_set), self.classes_per_batch)
             classes = np.random.choice(
                 self.labels_set, self.classes_per_batch, replace=False
             )
