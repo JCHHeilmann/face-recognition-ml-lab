@@ -82,6 +82,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         loss_timing += perf_counter() - timing
 
         if num_triplets == 0:
+            total_num_triplets += num_triplets
             continue
 
         total_loss += loss.item()
@@ -218,9 +219,9 @@ if __name__ == "__main__":
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.1,
+        train_proportion=0.8,
         val_proportion=0.1,
-        test_proportion=0.8,
+        test_proportion=0.1,
     )
 
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_gen)
