@@ -48,6 +48,6 @@ class OnlineTripletLoss(nn.Module):
         )
 
         print(
-            f"\nNumber of zeros in loss: {((len(losses) - torch.count_nonzero(losses)) / len(losses)) * 100} %\n"
+            f"\nNumber of zeros in loss: {((losses == 0).sum(dim=1) / len(losses)) * 100} %\n"
         )
         return losses.mean(), len(triplets)
