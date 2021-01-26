@@ -1,7 +1,9 @@
-__all__ = ['batch_hard_triplet_loss', 'batch_all_triplet_loss']
+__all__ = ["batch_hard_triplet_loss", "batch_all_triplet_loss"]
 
 # Cell
 import torch
+
+
 def _pairwise_distances(embeddings, squared=False):
     """Compute the 2D matrix of distances between all the embeddings.
     Args:
@@ -32,9 +34,10 @@ def _pairwise_distances(embeddings, squared=False):
         mask = distances.eq(0).float()
         distances = distances + mask * 1e-16
 
-        distances = (1.0 -mask) * torch.sqrt(distances)
+        distances = (1.0 - mask) * torch.sqrt(distances)
 
     return distances
+
 
 def _get_triplet_mask(labels):
     """Return a 3D mask where mask[a, p, n] is True iff the triplet (a, p, n) is valid.
@@ -52,7 +55,6 @@ def _get_triplet_mask(labels):
     j_not_equal_k = indices_not_equal.unsqueeze(0)
 
     distinct_indices = (i_not_equal_j & i_not_equal_k) & j_not_equal_k
-
 
     label_equal = labels.unsqueeze(0) == labels.unsqueeze(1)
     i_equal_j = label_equal.unsqueeze(2)
@@ -95,7 +97,7 @@ def _get_anchor_negative_triplet_mask(labels):
 
 
 # Cell
-def batch_hard_triplet_loss_1(labels, embeddings, margin, squared=False, device='cpu'):
+def batch_hard_triplet_loss_1(labels, embeddings, margin, squared=False, device="cpu"):
     """Build the triplet loss over a batch of embeddings.
     For each anchor, we get the hardest positive and hardest negative to form a triplet.
     Args:
@@ -126,7 +128,9 @@ def batch_hard_triplet_loss_1(labels, embeddings, margin, squared=False, device=
 
     # We add the maximum value in each row to the invalid negatives (label(a) == label(n))
     max_anchor_negative_dist, _ = pairwise_dist.max(1, keepdim=True)
-    anchor_negative_dist = pairwise_dist + max_anchor_negative_dist * (1.0 - mask_anchor_negative)
+    anchor_negative_dist = pairwise_dist + max_anchor_negative_dist * (
+        1.0 - mask_anchor_negative
+    )
 
     # shape (batch_size,)
     hardest_negative_dist, _ = anchor_negative_dist.min(1, keepdim=True)
@@ -137,6 +141,7 @@ def batch_hard_triplet_loss_1(labels, embeddings, margin, squared=False, device=
     triplet_loss = tl.mean()
 
     return triplet_loss
+
 
 # Cell
 def batch_all_triplet_loss(labels, embeddings, margin, squared=False):
@@ -163,8 +168,6 @@ def batch_all_triplet_loss(labels, embeddings, margin, squared=False):
     # and the 2nd (batch_size, 1, batch_size)
     triplet_loss = anchor_positive_dist - anchor_negative_dist + margin
 
-
-
     # Put to zero the invalid triplets
     # (where label(a) != label(p) or label(n) == label(a) or a == p)
     mask = _get_triplet_mask(labels)
@@ -178,7 +181,9 @@ def batch_all_triplet_loss(labels, embeddings, margin, squared=False):
     num_positive_triplets = valid_triplets.size(0)
     num_valid_triplets = mask.sum()
 
-    fraction_positive_triplets = num_positive_triplets / (num_valid_triplets.float() + 1e-16)
+    fraction_positive_triplets = num_positive_triplets / (
+        num_valid_triplets.float() + 1e-16
+    )
 
     # Get final mean triplet loss over the positive valid triplets
     triplet_loss = triplet_loss.sum() / (num_positive_triplets + 1e-16)
