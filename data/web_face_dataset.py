@@ -15,7 +15,7 @@ class WebfaceDataset(Dataset):
         self.labels = self.read_labels()  # TODO JH fix
 
     def read_file_paths(self):
-        return glob.glob(join(self.dataset_folder, "**/*.jpg"), recursive=True)
+        return glob.glob(join(self.dataset_folder, "**/*.png"), recursive=True)
 
     def read_labels(self):
         return [dir[0] for dir in os.walk(self.dataset_folder)]
