@@ -26,19 +26,28 @@ class OnlineTripletLoss(nn.Module):
         triplets = self.triplet_selector(embeddings, targets, device, self.margin)
 
         if len(triplets) == 0:
-            return None
+            return None, 0
 
         if embeddings.is_cuda:
             triplets = triplets.cuda()
 
         anchor_positive_distances = (
-            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 1]]).pow(2).sum(1)
+            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 1]])
+            .pow(2)
+            .sum(1)
+            .pow(0.5)
         )  # .pow(.5)
         anchor_negative_distances = (
-            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 2]]).pow(2).sum(1)
+            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 2]])
+            .pow(2)
+            .sum(1)
+            .pow(0.5)
         )  # .pow(.5)
         losses = F.relu(
             anchor_positive_distances - anchor_negative_distances + self.margin
         )
 
+        print(
+            f"\nNumber of zeros in loss: {((losses == 0).sum(dim=0).item() / len(losses)) * 100} %\n"
+        )
         return losses.mean(), len(triplets)

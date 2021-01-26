@@ -4,18 +4,18 @@ from time import perf_counter
 import numpy as np
 import torch
 import wandb
+from sklearn.metrics import accuracy_score, f1_score
+from torch.optim.lr_scheduler import MultiStepLR
+from tqdm import tqdm
+
 from classifier.faiss_classifier import FaissClassifier
 from classifier.faiss_create import create_index
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
-from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
-from torch.optim.lr_scheduler import MultiStepLR
-from tqdm import tqdm
-from utils.vis_utils import plot_embeddings
-
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
+from utils.vis_utils import plot_embeddings
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
@@ -65,7 +65,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
     model.train()
 
     for batch_idx, (data, target) in tqdm(
-        enumerate(train_loader), total=len(train_loader), desc="evaluating batch: "
+        enumerate(train_loader), total=len(train_loader), desc="processing batch: "
     ):
         if torch.cuda.is_available():
             data = data.cuda()
@@ -82,6 +82,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         loss_timing += perf_counter() - timing
 
         if num_triplets == 0:
+            total_num_triplets += num_triplets
             continue
 
         total_loss += loss.item()
@@ -107,17 +108,15 @@ def train_epoch(model, train_loader, loss_function, optimizer):
                 }
             )
 
-    return (
-        outputs.detach(),
-        target,
-    )  # return final batch embeddings for visualization
+    return outputs.detach(), target  # return final batch embeddings for visualization
 
 
 def evaluate(model, embeddings, targets, val_loader):
-
+    targets = targets.cpu()
     index = create_index(embeddings.data.cpu().numpy(), targets.numpy())
 
     classifier = FaissClassifier(index)
+    classifier.threshold = 10.0  # don't care about unknown classifications
 
     accuracy = 0
     f1 = 0
@@ -127,7 +126,7 @@ def evaluate(model, embeddings, targets, val_loader):
         model.eval()
 
         for _, (data, target) in tqdm(
-            enumerate(val_loader), total=len(val_loader), desc="processing batch: "
+            enumerate(val_loader), total=len(val_loader), desc="evaluating batch: "
         ):
             if target not in targets:
                 continue
@@ -142,10 +141,12 @@ def evaluate(model, embeddings, targets, val_loader):
             f1 += f1_score(target.numpy(), np.array([predicted]), average="micro")
             count += 1
 
+            target = target.cpu()
+            accuracy += accuracy_score(target.numpy(), predicted)
+            f1 += f1_score(target.numpy(), predicted, average="micro")
 
-    total_accuracy = accuracy / count
-    total_f1 = np.array(f1) / count
-
+    total_accuracy = accuracy / len(val_loader)
+    total_f1 = f1 / len(val_loader)
 
     return total_accuracy, total_f1
 
@@ -177,7 +178,7 @@ if __name__ == "__main__":
     SCALE_INCEPTION_C = 0.20
     MARGIN = 0.2
 
-    CLASSES_PER_BATCH = 30
+    CLASSES_PER_BATCH = 35
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 

@@ -1,6 +1,8 @@
 import numpy as np
 from torch.utils.data.sampler import BatchSampler
 
+np.random.seed(42)
+
 
 class BalancedBatchSampler(BatchSampler):
     def __init__(self, labels, classes_per_batch, samples_per_class):

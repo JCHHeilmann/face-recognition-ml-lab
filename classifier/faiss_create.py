@@ -1,9 +1,12 @@
-import argparse
+import os
 from argparse import ArgumentParser
 
-# import faiss_ppc as faiss
-import faiss
 import joblib
+
+if os.uname().machine == "ppc64le":
+    import faiss_ppc as faiss
+else:
+    import faiss
 
 
 def create_index(embeddings, target):
@@ -17,11 +20,10 @@ def create_index(embeddings, target):
     faiss.write_index(indexIDMap, index_path)
     return index_path
 
+
 if __name__ == "__main__":
-    
-    parser = ArgumentParser(
-        description="Please provide Inputs as -i EmbeddingFile"
-    )
+
+    parser = ArgumentParser(description="Please provide Inputs as -i EmbeddingFile")
     parser.add_argument(
         "-i",
         dest="EmbeddingFile",
@@ -38,5 +40,3 @@ if __name__ == "__main__":
     embeddings, labels = joblib.load(EmbeddingFile)
 
     create_index(embeddings, labels)
-
-

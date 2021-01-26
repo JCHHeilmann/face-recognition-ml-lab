@@ -1,25 +1,31 @@
+import os
 from random import randint
 
-# import faiss_ppc as faiss
-import faiss
 import numpy as np
 import torch
 import torchvision
 
-from data.face_alignment import FaceAlignment
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
 
+if os.uname().machine == "ppc64le":
+    import faiss_ppc as faiss
+else:
+    import faiss
+
+    from data.face_alignment import FaceAlignment
+
 
 class FaissClassifier:
-    def __init__(self, index="datasets/vector.index") -> None:
+    def __init__(self, index="datasets/vector_pre_trained.index") -> None:
         super().__init__()
 
         self.threshold = 0.1
         self.to_tensor = torchvision.transforms.ToTensor()
         self.indexIDMap = faiss.read_index(index)
         self.dictionary = LabelNames("data/data.p")
-        self.preprocessor = FaceAlignment()
+        if os.uname().machine != "ppc64le":
+            self.preprocessor = FaceAlignment()
 
         self.checkpoint = torch.load(
             "checkpoints/charmed-cosmos-135_epoch_19",
@@ -43,7 +49,6 @@ class FaissClassifier:
         return randint(range_start, range_end)
 
     def classify(self, embeddings):
-
         pred_labels = []
         k = 1
         distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
@@ -94,7 +99,7 @@ if __name__ == "__main__":
     from PIL import Image
     from tqdm import tqdm
 
-    image_paths = glob("datasets/test/0000107/*.jpg")[:12]
+    image_paths = glob("datasets/test/0000192/*.png")
     images = [Image.open(path).convert("RGB") for path in image_paths]
 
     classifier = FaissClassifier()
@@ -103,18 +108,22 @@ if __name__ == "__main__":
 
     classifier.add_person(new_image, "victor")
 
-    label = classifier.classify(new_image)
-    print(label)
+    labels, _ = classifier.classify_with_surroundings(new_image)
+    print(labels[0])
+
+    new_image_2 = Image.open("datasets/test/IMG-20140329-WA0013.jpg")
+    labels, _ = classifier.classify_with_surroundings(new_image_2)
+    print(labels[0])
 
     labels, embeddings = classifier.classify_with_surroundings(images[0])
 
-    results = [classifier.classify(img) for img in tqdm(images)]
+    results = [classifier.classify_with_surroundings(img)[0][0] for img in tqdm(images)]
 
     correct = 0
     incorrect = 0
     unknown = 0
     for result in results:
-        if result == "Kim_Basinger":
+        if result == "Alyssa_Milano":
             correct += 1
         elif result == "Unknown":
             unknown += 1
