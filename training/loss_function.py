@@ -32,10 +32,10 @@ class OnlineTripletLoss(nn.Module):
             triplets = triplets.cuda()
 
         anchor_positive_distances = (
-            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 1]]).pow(2).sum(1)
+            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 1]]).pow(0.5).sum(1)
         )  # .pow(.5)
         anchor_negative_distances = (
-            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 2]]).pow(2).sum(1)
+            (embeddings[triplets[:, 0]] - embeddings[triplets[:, 2]]).pow(0.5).sum(1)
         )  # .pow(.5)
         losses = F.relu(
             anchor_positive_distances - anchor_negative_distances + self.margin
