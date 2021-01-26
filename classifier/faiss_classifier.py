@@ -4,8 +4,6 @@ from random import randint
 import numpy as np
 import torch
 import torchvision
-
-from data.face_alignment import FaceAlignment
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
 
@@ -13,6 +11,7 @@ if os.uname().machine == "ppc64le":
     import faiss_ppc as faiss
 else:
     import faiss
+    from data.face_alignment import FaceAlignment
 
 
 class FaissClassifier:
@@ -23,7 +22,8 @@ class FaissClassifier:
         self.to_tensor = torchvision.transforms.ToTensor()
         self.indexIDMap = faiss.read_index(index)
         self.dictionary = LabelNames("data/data.p")
-        self.preprocessor = FaceAlignment()
+        if os.uname().machine == "ppc64le":
+            self.preprocessor = FaceAlignment()
 
         self.checkpoint = torch.load(
             "checkpoints/charmed-cosmos-135_epoch_19",
@@ -47,7 +47,6 @@ class FaissClassifier:
         return randint(range_start, range_end)
 
     def classify(self, embeddings):
-
         pred_labels = []
         k = 1
         distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
