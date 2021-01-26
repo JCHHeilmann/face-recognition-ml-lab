@@ -116,6 +116,7 @@ def evaluate(model, embeddings, targets, val_loader):
     index = create_index(embeddings.data.cpu().numpy(), targets.numpy())
 
     classifier = FaissClassifier(index)
+    classifier.threshold = 10.0  # don't care about unknown classifications
 
     accuracy = 0
     f1 = 0
