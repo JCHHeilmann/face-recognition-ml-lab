@@ -79,7 +79,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         model_forward_timing += perf_counter() - timing
 
         timing = perf_counter()
-        loss = batch_hard_triplet_loss_1(target, outputs, margin=0.2, device="cuda")
+        loss = batch_hard_triplet_loss(target, outputs, margin=0.2, device="cuda")
         num_triplets = 1  # placeholder
         # loss, num_triplets = batch_hard_triplet_loss(outputs, target)
         loss_timing += perf_counter() - timing
