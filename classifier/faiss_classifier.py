@@ -4,6 +4,7 @@ from random import randint
 import numpy as np
 import torch
 import torchvision
+
 from data.face_alignment import FaceAlignment
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
