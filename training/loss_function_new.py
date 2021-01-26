@@ -97,7 +97,7 @@ def _get_anchor_negative_triplet_mask(labels):
 
 
 # Cell
-def batch_hard_triplet_loss_1(labels, embeddings, margin, squared=False, device="cpu"):
+def batch_hard_triplet_loss(labels, embeddings, margin, squared=False, device="cpu"):
     """Build the triplet loss over a batch of embeddings.
     For each anchor, we get the hardest positive and hardest negative to form a triplet.
     Args:
