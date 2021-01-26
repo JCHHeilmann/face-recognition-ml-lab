@@ -112,10 +112,11 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
 
 def evaluate(model, embeddings, targets, val_loader):
-
+    targets = targets.cpu()
     index = create_index(embeddings.data.cpu().numpy(), targets.numpy())
 
     classifier = FaissClassifier(index)
+    classifier.threshold = 10.0  # don't care about unknown classifications
 
     accuracy = 0
     f1 = 0
@@ -125,7 +126,7 @@ def evaluate(model, embeddings, targets, val_loader):
         model.eval()
 
         for _, (data, target) in tqdm(
-            enumerate(val_loader), total=len(val_loader), desc="processing batch: "
+            enumerate(val_loader), total=len(val_loader), desc="evaluating batch: "
         ):
             if target not in targets:
                 continue
@@ -136,6 +137,8 @@ def evaluate(model, embeddings, targets, val_loader):
 
             outputs = model(data)
             predicted = classifier.classify(outputs.data.cpu().numpy())
+            
+            target = target.cpu()
             accuracy += accuracy_score(target.numpy(), np.array([predicted]))
             f1 += f1_score(target.numpy(), np.array([predicted]), average="micro")
             count += 1
