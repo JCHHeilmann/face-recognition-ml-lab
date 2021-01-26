@@ -52,7 +52,6 @@ class FaissClassifier:
         pred_labels = []
         k = 1
         distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
-        print(distance)
         if distance < self.threshold:
                 return int(label)
         else:
