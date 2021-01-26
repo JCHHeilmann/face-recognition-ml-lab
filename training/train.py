@@ -15,8 +15,8 @@ from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
-from utils.vis_utils import plot_embeddings
 from training.loss_function_new import batch_hard_triplet_loss
+from utils.vis_utils import plot_embeddings
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
@@ -80,8 +80,8 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
         timing = perf_counter()
         loss = batch_hard_triplet_loss_1(target, outputs, margin=0.2, device="cuda")
-        num_triplets = 1 #placeholder
-        #loss, num_triplets = batch_hard_triplet_loss(outputs, target)
+        num_triplets = 1  # placeholder
+        # loss, num_triplets = batch_hard_triplet_loss(outputs, target)
         loss_timing += perf_counter() - timing
 
         if num_triplets == 0:
