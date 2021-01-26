@@ -30,9 +30,7 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
         embeddings, targets = train_epoch(model, train_loader, loss_function, optimizer)
 
         eval_timing = perf_counter()
-        total_accuracy, total_f1, total_accuracy_unknown, total_f1_unknown = evaluate(
-            model, val_loader, loss_function
-        )
+        total_accuracy, total_f1 = evaluate(model, embeddings, targets, val_loader)
         eval_timing = perf_counter() - eval_timing
 
         save_checkpoint(model, optimizer, epoch)
@@ -50,9 +48,7 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
                 ),
                 "eval_timing": eval_timing,
                 "accuracy": total_accuracy,
-                "accuracy_unknown": total_accuracy_unknown,
                 "f1": total_f1,
-                "f1_unknown": total_f1_unknown,
             }
         )
 
@@ -69,7 +65,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
     model.train()
 
     for batch_idx, (data, target) in tqdm(
-        enumerate(train_loader), total=len(train_loader), desc="processing batch: "
+        enumerate(train_loader), total=len(train_loader), desc="evaluating batch: "
     ):
         if torch.cuda.is_available():
             data = data.cuda()
@@ -124,50 +120,31 @@ def evaluate(model, embeddings, targets, val_loader):
     classifier = FaissClassifier(index)
 
     accuracy = 0
-    accuracy_unknown = 0
-    f1 = []
-    f1_unknown = []
-    predicted_labels = []
-    val_labels = []
+    f1 = 0
 
     with torch.no_grad():
         model.eval()
 
-        for batch_idx, (data, target) in tqdm(
+        for _, (data, target) in tqdm(
             enumerate(val_loader), total=len(val_loader), desc="processing batch: "
         ):
-            val_labels.append(target.numpy())
+            if target not in targets:
+                continue
+
             if torch.cuda.is_available():
                 data = data.cuda()
                 target = target.cuda()
 
             outputs = model(data)
             predicted = classifier.classify(outputs.data.cpu().numpy())
-            predicted_labels.append(classifier.classify(outputs.data.cpu().numpy()))
 
-            accuracy = accuracy_score(target.numpy(), predicted)
-            f1 = f1_score(target.numpy(), predicted, average=None)
+            accuracy += accuracy_score(target.numpy(), predicted)
+            f1 += f1_score(target.numpy(), predicted, average="micro")
 
-            accuracy += accuracy
-            f1 += f1
+    total_accuracy = accuracy / len(val_loader)
+    total_f1 = np.array(f1) / len(val_loader)
 
-            # in val_labels replace all labels not in input targets with "Unknown"
-            indx = np.where(np.in1d(predicted, targets.numpy()))[0]
-            if len(indx) > 0:
-                predicted[~np.array(indx)] = -1
-
-            accuracy_unknown = accuracy_score(target.numpy(), predicted)
-            f1_unknown = f1_score(target.numpy(), predicted, average=None)
-
-            accuracy_unknown += accuracy_unknown
-            f1_unknown += f1_unknown
-
-        total_accuracy = accuracy / (batch_idx + 1)
-        total_accuracy_unknown = accuracy_unknown / (batch_idx + 1)
-        total_f1 = np.array(f1) / (batch_idx + 1)
-        total_f1_unknown = np.array(f1_unknown) / (batch_idx + 1)
-
-    return total_accuracy, total_f1, total_accuracy_unknown, total_f1_unknown
+    return total_accuracy, total_f1
 
 
 def save_checkpoint(model, optimizer, epoch_num):
@@ -236,8 +213,8 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
-    dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
