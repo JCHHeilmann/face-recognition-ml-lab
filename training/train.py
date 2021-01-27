@@ -7,7 +7,10 @@ import wandb
 from sklearn.metrics import accuracy_score, f1_score
 from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
+import os
+from PIL import Image
 
+from classifier.l2distance_classifier import L2DistanceClassifier
 from classifier.faiss_classifier import FaissClassifier
 from classifier.faiss_create import create_index
 from data.data_loaders import get_data_loaders
@@ -16,7 +19,6 @@ from models.inception_resnet_v1 import InceptionResnetV1
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
 from utils.vis_utils import plot_embeddings
-
 
 def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
     for epoch in range(epochs):
@@ -31,6 +33,7 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
 
         eval_timing = perf_counter()
         total_accuracy, total_f1 = evaluate(model, embeddings, targets, val_loader)
+        total_accuracy_l2_distance = evaluate_l2d(model)
         eval_timing = perf_counter() - eval_timing
 
         save_checkpoint(model, optimizer, epoch)
@@ -48,6 +51,7 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
                 ),
                 "eval_timing": eval_timing,
                 "accuracy": total_accuracy,
+                "accuracy_l2_distance": total_accuracy_l2_distance,
                 "f1": total_f1,
             }
         )
@@ -112,6 +116,8 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
 
 def evaluate(model, embeddings, targets, val_loader):
+    #dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+
     targets = targets.cpu()
     index = create_index(embeddings.data.cpu().numpy(), targets.numpy())
 
@@ -148,6 +154,17 @@ def evaluate(model, embeddings, targets, val_loader):
 
     return total_accuracy, total_f1
 
+
+def evaluate_l2d(model):
+    number_of_persons = 20
+    number_of_pictures_pp = 30
+    classifier = L2DistanceClassifier(model, number_of_persons, number_of_pictures_pp)
+    total_accuracy = classifier.get_accuracy()
+    return total_accuracy
+
+
+def listdir_nohidden(path):
+    return [f for f in os.listdir(path) if not f.startswith(".")]
 
 def save_checkpoint(model, optimizer, epoch_num):
     checkpoint_folder = Path("checkpoints/")

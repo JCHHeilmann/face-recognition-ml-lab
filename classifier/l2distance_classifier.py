@@ -7,40 +7,64 @@ import numpy as np
 import torch
 import torchvision
 from PIL import Image
+from sklearn.metrics import accuracy_score
 
 from models.inception_resnet_v1 import InceptionResnetV1
+from data.label_names import LabelNames
 
 
 class L2DistanceClassifier:
-    def __init__(self) -> None:
+    def __init__(self, model, number_persons, number_pictures) -> None:
         super().__init__()
         self.face_database = {}
         self.to_tensor = torchvision.transforms.ToTensor()
         self.threshold = 0.2
-
-        self.checkpoint = torch.load(
-            "checkpoints/charmed-cosmos-135_epoch_19", map_location=torch.device("cpu")
-        )
-        self.model = InceptionResnetV1()
-        self.model.load_state_dict(self.checkpoint["model_state_dict"])
+        self.number_persons = number_persons
+        self.number_pictures_pp = number_pictures
+        self.model = model
         self.model.eval()
 
-        print("Starting initaliziation")
+        #TODO - edit FilePath
+        self.datapath = "../datasets/data/"
+        self.labeler = LabelNames("../data/data.p")
+
+        print("Starting initaliziation for " + str(self.number_persons) + " Persons with " + str(self.number_pictures_pp) + " Images each")
         self.initalize()
-        print("Ended initaliziation")
+        print("Finished initaliziation")
+        print(" ")
 
     def initalize(self):
-        self.listdir_nohidden("classifier/PeopleKnown")
-        PathKnownPersons = "classifier/PeopleKnown"
-        for name in self.listdir_nohidden(PathKnownPersons):
-            # i=0
-            for image in self.listdir_nohidden(os.path.join(PathKnownPersons, name)):
-                identity = os.path.splitext(os.path.basename(image))[0]
-                # identity = name + "_" + str(i)
-                self.face_database[identity] = self.img_path_to_encoding(
-                    os.path.join(PathKnownPersons, name, image), self.model
-                )
-                # i = i+1
+        folders = self.listdir_nohidden(self.datapath)
+        for i in range(0, min(self.number_persons, len(folders))):
+            label = self.labeler.read_from_pickle(folders[i])
+            pictures = self.listdir_nohidden(os.path.join(self.datapath, folders[i]))
+            if len(pictures)<(self.number_pictures_pp+10):
+                print("-- Skipped ", label)
+                pass
+            else:
+                for j in range(0, min(self.number_pictures_pp, round(len(pictures)))):
+                    image = Image.open(self.datapath + folders[i] + "/" + pictures[j])
+                    self.initalize_persons_by_img(image, label)
+                print("-- Initalized ", label)
+
+    def get_accuracy(self, threshold):
+        y_true = []
+        y_pred = []
+        self.threshold = threshold
+        folders = self.listdir_nohidden(self.datapath)
+        for i in range(0, min(self.number_persons, len(folders))):
+            label_true = self.labeler.read_from_pickle(folders[i])
+            pictures = self.listdir_nohidden(os.path.join(self.datapath, folders[i]))
+            for j in range(self.number_pictures_pp, min(self.number_pictures_pp+10, round(len(pictures)+10))):
+                if len(pictures) < (self.number_pictures_pp + 10):
+                    pass
+                else:
+                    image = Image.open(self.datapath + folders[i] + "/" + pictures[j])
+                    label, distance = self.classify_by_img(image)
+                    y_true.append(label_true)
+                    y_pred.append(label)
+        accuracy = accuracy_score(y_true, y_pred)
+        return accuracy
 
     def listdir_nohidden(self, path):
         return [f for f in os.listdir(path) if not f.startswith(".")]
@@ -48,8 +72,6 @@ class L2DistanceClassifier:
     def img_path_to_encoding(self, image_path, model):
         img = cv2.imread(image_path, 1)
         return self.img_to_encoding(img, model)
-
-        # Calculate the Embeddings from one Image
 
     def img_to_encoding(self, image, model):
         image_tensor = self.to_tensor(image)
@@ -60,14 +82,14 @@ class L2DistanceClassifier:
     def get_min_dist(self, encoding, face_database):
         min_dist = 100
         for (name, encoded_image_name) in face_database.items():
-            dist = np.linalg.norm(encoding.detach() - encoded_image_name.detach())
+            dist = torch.dist(encoding, encoded_image_name)
             if dist < min_dist:
                 min_dist = dist
                 identity = name
         if min_dist < self.threshold:
             return identity, min_dist
         else:
-            return "No Match", min_dist
+            return "Unknown", min_dist
 
     def make_aligned(self, inputName):
         detector = dlib.get_frontal_face_detector()
@@ -103,11 +125,20 @@ class L2DistanceClassifier:
         self.face_database[identity] = self.img_to_encoding(image_aligned, self.model)
         return "Added Person"
 
+    def initalize_persons_by_img(self, image, label: str):
+        identity = label
+        self.face_database[identity] = self.img_to_encoding(image, self.model)
+
     def classify(self, image_path):
-        # makes them aligned
-        # image_aligned = self.make_aligned(image_path)
         image_aligned = image_path
         identity, min_distance = self.get_min_dist(
             self.img_to_encoding(image_aligned, self.model), self.face_database
         )
         return identity, min_distance
+
+    def classify_by_img(self, image):
+        identity, min_distance = self.get_min_dist(
+            self.img_to_encoding(image, self.model), self.face_database
+        )
+        return identity, min_distance
+
