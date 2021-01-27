@@ -120,6 +120,7 @@ def evaluate(model, embeddings, targets, val_loader):
 
     accuracy = 0
     f1 = 0
+    count = 0
 
     with torch.no_grad():
         model.eval()
@@ -136,13 +137,14 @@ def evaluate(model, embeddings, targets, val_loader):
 
             outputs = model(data)
             predicted = classifier.classify(outputs.data.cpu().numpy())
-
+            
             target = target.cpu()
-            accuracy += accuracy_score(target.numpy(), predicted)
-            f1 += f1_score(target.numpy(), predicted, average="micro")
+            accuracy += accuracy_score(target.numpy(), np.array([predicted]))
+            f1 += f1_score(target.numpy(), np.array([predicted]), average="micro")
+            count += 1
 
-    total_accuracy = accuracy / len(val_loader)
-    total_f1 = f1 / len(val_loader)
+    total_accuracy = accuracy / count
+    total_f1 = np.array(f1) / count
 
     return total_accuracy, total_f1
 
