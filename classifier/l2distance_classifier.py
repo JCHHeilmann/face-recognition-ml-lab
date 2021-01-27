@@ -24,11 +24,17 @@ class L2DistanceClassifier:
         self.model = model
         self.model.eval()
 
-        #TODO - edit FilePath
-        self.datapath =  "../../data/Aligned_CASIA_WebFace"
-        self.labeler = LabelNames("../../data/data.p")
+        # TODO - edit FilePath
+        self.datapath = "../../data/Aligned_CASIA_WebFace"
+        self.labeler = LabelNames("data/data.p")
 
-        print("Starting initaliziation for " + str(self.number_persons) + " Persons with " + str(self.number_pictures_pp) + " Images each")
+        print(
+            "Starting initaliziation for "
+            + str(self.number_persons)
+            + " Persons with "
+            + str(self.number_pictures_pp)
+            + " Images each"
+        )
         self.initalize()
         print("Finished initaliziation")
         print(" ")
@@ -38,7 +44,7 @@ class L2DistanceClassifier:
         for i in range(0, min(self.number_persons, len(folders))):
             label = self.labeler.read_from_pickle(folders[i])
             pictures = self.listdir_nohidden(os.path.join(self.datapath, folders[i]))
-            if len(pictures)<(self.number_pictures_pp+10):
+            if len(pictures) < (self.number_pictures_pp + 10):
                 print("-- Skipped ", label)
                 pass
             else:
@@ -55,7 +61,10 @@ class L2DistanceClassifier:
         for i in range(0, min(self.number_persons, len(folders))):
             label_true = self.labeler.read_from_pickle(folders[i])
             pictures = self.listdir_nohidden(os.path.join(self.datapath, folders[i]))
-            for j in range(self.number_pictures_pp, min(self.number_pictures_pp+10, round(len(pictures)+10))):
+            for j in range(
+                self.number_pictures_pp,
+                min(self.number_pictures_pp + 10, round(len(pictures) + 10)),
+            ):
                 if len(pictures) < (self.number_pictures_pp + 10):
                     pass
                 else:
@@ -141,4 +150,3 @@ class L2DistanceClassifier:
             self.img_to_encoding(image, self.model), self.face_database
         )
         return identity, min_distance
-
