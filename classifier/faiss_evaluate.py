@@ -59,7 +59,8 @@ if __name__ == "__main__":
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
-    dataset = WebfaceDataset("datasets/Aligned_CASIA_WebFace")
+    # dataset = WebfaceDataset("datasets/Aligned_CASIA_WebFace")
+    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
     CLASSES_PER_BATCH = 35
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
