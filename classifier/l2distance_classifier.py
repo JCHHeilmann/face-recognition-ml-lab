@@ -125,7 +125,7 @@ class L2DistanceClassifier:
         if not os.path.exists(path):
             os.makedirs(path)
         output = Path(image_path).stem
-        image_aligned = self.make_aligned(image_path)
+        image_aligned = image_path #self.make_aligned(image_path)
         outputName = "classifier/PeopleKnown/" + label + "/" + output + ".jpeg"
         image_aligned.save(
             outputName, "JPEG", quality=80, optimize=True, progressive=True
