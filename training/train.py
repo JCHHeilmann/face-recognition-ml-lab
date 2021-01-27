@@ -156,8 +156,8 @@ def evaluate(model, embeddings, targets, val_loader):
 
 
 def evaluate_l2d(model):
-    number_of_persons = 20
-    number_of_pictures_pp = 30
+    number_of_persons = 50
+    number_of_pictures_pp = 40
     classifier = L2DistanceClassifier(model, number_of_persons, number_of_pictures_pp)
     total_accuracy = classifier.get_accuracy()
     return total_accuracy
