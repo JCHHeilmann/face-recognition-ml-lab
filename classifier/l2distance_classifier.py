@@ -25,8 +25,8 @@ class L2DistanceClassifier:
         self.model.eval()
 
         #TODO - edit FilePath
-        self.datapath = "../datasets/data/"
-        self.labeler = LabelNames("../data/data.p")
+        self.datapath =  "../../data/Aligned_CASIA_WebFace"
+        self.labeler = LabelNames("../../data/data.p")
 
         print("Starting initaliziation for " + str(self.number_persons) + " Persons with " + str(self.number_pictures_pp) + " Images each")
         self.initalize()
