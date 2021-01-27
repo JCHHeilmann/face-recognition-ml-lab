@@ -33,7 +33,7 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
 
         eval_timing = perf_counter()
         total_accuracy, total_f1 = 1, 1 #evaluate(model, embeddings, targets, val_loader)
-        total_accuracy_l2_distance = evaluate_l2d(model)
+        total_accuracy_l2_1, total_accuracy_l2_2 = evaluate_l2d(model)
         eval_timing = perf_counter() - eval_timing
 
         save_checkpoint(model, optimizer, epoch)
@@ -51,7 +51,8 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
                 ),
                 "eval_timing": eval_timing,
                 "accuracy": total_accuracy,
-                "accuracy_l2_distance": total_accuracy_l2_distance,
+                "accuracy_l2_1": total_accuracy_l2_1,
+                "accuracy_l2_2": total_accuracy_l2_2,
                 "f1": total_f1,
             }
         )
@@ -159,8 +160,9 @@ def evaluate_l2d(model):
     number_of_persons = 50
     number_of_pictures_pp = 40
     classifier = L2DistanceClassifier(model, number_of_persons, number_of_pictures_pp)
-    total_accuracy = classifier.get_accuracy()
-    return total_accuracy
+    total_accuracy_1 = classifier.get_accuracy(0.5)
+    total_accuracy_2 = classifier.get_accuracy(0.6)
+    return total_accuracy_1, total_accuracy_2
 
 
 def listdir_nohidden(path):
