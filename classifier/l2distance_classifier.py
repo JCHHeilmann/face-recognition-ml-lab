@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-import cv2
+#import cv2
 import dlib
 import numpy as np
 import torch
@@ -79,7 +79,7 @@ class L2DistanceClassifier:
         return [f for f in os.listdir(path) if not f.startswith(".")]
 
     def img_path_to_encoding(self, image_path, model):
-        img = cv2.imread(image_path, 1)
+        #img = cv2.imread(image_path, 1)
         return self.img_to_encoding(img, model)
 
     def img_to_encoding(self, image, model):
