@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 #import cv2
-import dlib
+#import dlib
 import numpy as np
 import torch
 import torchvision
@@ -80,7 +80,8 @@ class L2DistanceClassifier:
 
     def img_path_to_encoding(self, image_path, model):
         #img = cv2.imread(image_path, 1)
-        return self.img_to_encoding(img, model)
+        pass
+        #return self.img_to_encoding(img, model)
 
     def img_to_encoding(self, image, model):
         image_tensor = self.to_tensor(image)
@@ -100,24 +101,24 @@ class L2DistanceClassifier:
         else:
             return "Unknown", min_dist
 
-    def make_aligned(self, inputName):
-        detector = dlib.get_frontal_face_detector()
+    #def make_aligned(self, inputName):
+        #detector = dlib.get_frontal_face_detector()
         # detector = dlib.cnn_face_detection_model_v1("mmod_human_face_detector.dat")
-        predictor = dlib.shape_predictor("data/shape_predictor_5_face_landmarks.dat")
+        #predictor = dlib.shape_predictor("data/shape_predictor_5_face_landmarks.dat")
         # img = dlib.load_rgb_image(inputName)
-        img = np.array(inputName)
-        dets = detector(img, 1)
-        num_faces = len(dets)
-        if num_faces == 0:
-            print("Sorry, there were no faces found")
-            exit()
-        faces = dlib.full_object_detections()
-        for detection in dets:
-            faces.append(predictor(img, detection))
-        image = dlib.get_face_chip(img, faces[0])
-        img = Image.fromarray(image)
+        #img = np.array(inputName)
+        #dets = detector(img, 1)
+        #num_faces = len(dets)
+        #if num_faces == 0:
+            #print("Sorry, there were no faces found")
+            #exit()
+        #faces = dlib.full_object_detections()
+        #for detection in dets:
+            #faces.append(predictor(img, detection))
+        #image = dlib.get_face_chip(img, faces[0])
+        #img = Image.fromarray(image)
         # img.save(inputName, "JPEG", quality=80, optimize=True, progressive=True)
-        return img
+        #return img
 
     def add_person(self, image_path, label: str):
         path = "classifier/PeopleKnown/" + label
