@@ -40,11 +40,11 @@ def get_data():
 
     if torch.cuda.is_available():
         checkpoint = torch.load(
-            "checkpoints/deft-snowball-123_epoch_19", map_location=torch.device("cuda")
+            "checkpoints/major-cloud-212_epoch_19", map_location=torch.device("cuda")
         )
     else:
         checkpoint = torch.load(
-            "checkpoints/deft-snowball-123_epoch_19", map_location=torch.device("cpu")
+            "checkpoints/ major-cloud-212_epoch_19", map_location=torch.device("cpu")
         )
     model = InceptionResnetV1()
     model.load_state_dict(checkpoint["model_state_dict"])
@@ -60,7 +60,7 @@ def get_data():
 
     dump(
         (embeddings, targets),
-        f"../../data/embeddings_deft-snowball-123_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
+        f"../../data/embeddings_major-cloud-212_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
         # f"datasets/embeddings_charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
     )
 
