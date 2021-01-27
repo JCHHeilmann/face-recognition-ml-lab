@@ -25,7 +25,7 @@ class L2DistanceClassifier:
         self.model.eval()
 
         # TODO - edit FilePath
-        self.datapath = "../../data/CASIA_WebFace/"
+        self.datapath = "../../data/CASIA-WebFace/"
         self.labeler = LabelNames("data/data.p")
 
         print(
