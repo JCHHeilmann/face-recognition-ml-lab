@@ -15,9 +15,11 @@ def evaluate(model, val_loader, train_loader):
     classifier = FaissClassifier(index = "datasets/vector_pre_trained.index")
     classifier.threshold = 0.02 
 
-
     true = []
     pred = []
+
+    if torch.cuda.is_available():
+        model.cuda()
 
     with torch.no_grad():
         model.eval()
