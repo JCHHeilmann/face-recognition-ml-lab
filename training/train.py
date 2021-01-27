@@ -118,9 +118,8 @@ def evaluate(model, embeddings, targets, val_loader):
     classifier = FaissClassifier(index)
     classifier.threshold = 10.0  # don't care about unknown classifications
 
-    accuracy = 0
-    f1 = 0
-    count = 0
+    true = []
+    pred = []
 
     with torch.no_grad():
         model.eval()
@@ -139,13 +138,15 @@ def evaluate(model, embeddings, targets, val_loader):
             predicted = classifier.classify(outputs.data.cpu().numpy())
             
             target = target.cpu()
-            accuracy += accuracy_score(target.numpy(), np.array([predicted]))
-            f1 += f1_score(target.numpy(), np.array([predicted]), average="micro")
-            count += 1
+            # decided to put this one in list so that F1 score can be calculated
+            true.append(int(target.numpy()))
+            pred.append(predicted)
+            
 
-    total_accuracy = accuracy / count
-    total_f1 = np.array(f1) / count
+    total_accuracy = accuracy_score(np.array(true), np.array(pred))
+    total_f1 = f1_score(np.array(true), np.array(pred), average="weighted")
 
+    print(total_accuracy)
     return total_accuracy, total_f1
 
 
@@ -215,7 +216,7 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace_JPG")
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
