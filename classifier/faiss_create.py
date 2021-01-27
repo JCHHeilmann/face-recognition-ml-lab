@@ -9,14 +9,13 @@ else:
     import faiss
 
 
-def create_index(embeddings, target):
+def create_index(embeddings, target, index_path = "datasets/vector_val.index"):
     # define the index with dimensionality 512
     index = faiss.IndexFlatL2(512)
     indexIDMap = faiss.IndexIDMap2(index)
     indexIDMap.add_with_ids(embeddings.astype("float32"), target.astype("int"))
 
     # save the index
-    index_path = "datasets/vector_val.index"
     faiss.write_index(indexIDMap, index_path)
     return index_path
 
@@ -39,4 +38,4 @@ if __name__ == "__main__":
     # load embeddings
     embeddings, labels = joblib.load(EmbeddingFile)
 
-    create_index(embeddings, labels)
+    create_index(embeddings, labels, index_path="vector_pre_trained.index")
