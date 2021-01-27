@@ -32,7 +32,7 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
         embeddings, targets = train_epoch(model, train_loader, loss_function, optimizer)
 
         eval_timing = perf_counter()
-        total_accuracy, total_f1 = 1, 1 #evaluate(model, embeddings, targets, val_loader)
+        #total_accuracy, total_f1 = 1, 1 #evaluate(model, embeddings, targets, val_loader)
         total_accuracy_l2_1, total_accuracy_l2_2 = evaluate_l2d(model)
         eval_timing = perf_counter() - eval_timing
 
@@ -46,14 +46,8 @@ def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, 
         wandb.log(
             {
                 "embedding_plot": fig,
-                "embedding_visualization_timing": (
-                    perf_counter() - embedding_visualization_timing
-                ),
-                "eval_timing": eval_timing,
-                "accuracy": total_accuracy,
                 "accuracy_l2_1": total_accuracy_l2_1,
                 "accuracy_l2_2": total_accuracy_l2_2,
-                "f1": total_f1,
             }
         )
 
