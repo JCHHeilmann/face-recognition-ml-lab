@@ -87,7 +87,7 @@ class L2DistanceClassifier:
         image_tensor = self.to_tensor(image)
         image_tensor = image_tensor.unsqueeze(0)
         if torch.cuda.is_available():
-                data = image_tensor.cuda()
+                image_tensor = image_tensor.cuda()
         embedding = model(image_tensor)
         return embedding
 
