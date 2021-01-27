@@ -38,4 +38,4 @@ if __name__ == "__main__":
     # load embeddings
     embeddings, labels = joblib.load(EmbeddingFile)
 
-    create_index(embeddings, labels, index_path="vector_pre_trained.index")
+    create_index(embeddings, labels, index_path="datasets/vector_pre_trained.index")
