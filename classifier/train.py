@@ -23,7 +23,7 @@ def get_data():
     CLASSES_PER_BATCH = 30
     SAMPLES_PER_CLASS = 40
 
-    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace_JPG")
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, _, _ = get_data_loaders(
