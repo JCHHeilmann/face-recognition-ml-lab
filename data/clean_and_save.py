@@ -7,9 +7,9 @@ from PIL import Image
 
 from .face_alignment import FaceAlignment
 
-# data_folder = "../../../data/"
-data_folder = "datasets/"
-not_detected_file_path = join(data_folder, "not_detected.csv")
+data_folder = "../../../data/"
+# data_folder = "datasets/"
+not_detected_file_path = join(data_folder, "not_detected_jan.csv")
 
 
 class CleanAndSave:
@@ -30,14 +30,14 @@ class CleanAndSave:
         # Upon face detection, saving the cleaned image in PNG format
         else:
             target_split = target_file_path.split("/")
-            crnt_img = target_split[-1].split(".")[0] + ".png"
+            crnt_img = target_split[-1].split(".")[0] + ".jpg"
             aln_obj.save(join(cln_name, crnt_img))
 
     def process_folder(self, target_folder):
         self.face_align_object = FaceAlignment()
 
         split_path = target_folder.split("/")
-        cln_name = join(data_folder, "Aligned_CASIA_WebFace", split_path[-1])
+        cln_name = join(data_folder, "Aligned_CASIA_WebFace_JPG_Jan", split_path[-1])
         os.makedirs(cln_name)
 
         image_glob = join(data_folder, "CASIA-WebFace", split_path[-1], "*.jpg")

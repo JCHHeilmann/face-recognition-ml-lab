@@ -20,7 +20,7 @@ class FaissClassifier:
     def __init__(self, index="datasets/vector2.index") -> None:
         super().__init__()
 
-        self.threshold = 0.1
+        self.threshold = 0.001
         self.to_tensor = torchvision.transforms.ToTensor()
         self.indexIDMap = faiss.read_index(index)
         self.dictionary = LabelNames("data/data.p")
@@ -30,6 +30,8 @@ class FaissClassifier:
         self.checkpoint = torch.load(
             "checkpoints/major-cloud-212_epoch_19",
             map_location=torch.device("cpu"),
+            # "checkpoints/stilted-vortex-227_epoch_19",
+            # map_location=torch.device("cpu"),
             # "checkpoints/charmed-cosmos-135_epoch_19",
             # map_location=torch.device("cpu"),
             # "checkpoints/deft-snowball-123_epoch_19",
@@ -64,6 +66,9 @@ class FaissClassifier:
         if not image_aligned:
             print("No face found")
             return ["Unknown"], None
+        
+        #image_aligned = image_aligned.resize((128, 128))
+        #print(image_aligned.size)
 
         embedding = self.img_to_encoding(image_aligned, self.model)
 
@@ -75,7 +80,10 @@ class FaissClassifier:
         distances = distances[0]
         labels = labels[0]
         embeddings = embeddings[0]
-
+        print(labels[0])
+        if labels[0] != 2838320:
+            print(distances[0])
+            image_aligned.save("datasets/BarackMiss/" + str(labels[0]) + ".png")
 
         if distances[0] < self.threshold:
             label_names = [self.dictionary.read_from_pickle(label) for label in labels]
@@ -104,12 +112,14 @@ if __name__ == "__main__":
     # image_paths = glob("datasets/CASIA-WebFace/0000192/*.png")
     # images = [Image.open(path).convert("RGB") for path in image_paths]
 
-    image_paths = glob("datasets/0000045_a/*.jpg")
-    images = [Image.open(path).convert("RGB").resize((128,128)) for path in image_paths]
-
-    # im = Image.open("datasets/0000045_a/008.jpg").convert("RGB").resize((128,128))
+    image_paths = glob("datasets/CASIA-WebFace_PNG/2838320/*.png")
+    images = [Image.open(path).convert("RGB") for path in image_paths]
 
     classifier = FaissClassifier(index = "datasets/vector_pre_trained.index")
+    # images = [Image.open("datasets/Donald_Trump_0001.jpg").convert("RGB")]
+    # im = Image.open("datasets/0000045_a/008.jpg").convert("RGB").resize((128,128))
+
+    # classifier = FaissClassifier(index = "datasets/vector_pre_trained_2021-01-28_15:22:37.index")
 
     # new_image = Image.open("datasets/test/IMG-20140329-WA0010.jpg")
 
@@ -131,7 +141,7 @@ if __name__ == "__main__":
     incorrect = 0
     unknown = 0
     for result in results:
-        if result == "Alyssa_Milano":
+        if result == "Morgan_Saylor":
             correct += 1
         elif result == "Unknown":
             unknown += 1
