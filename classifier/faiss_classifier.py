@@ -17,7 +17,7 @@ else:
 
 
 class FaissClassifier:
-    def __init__(self, index="datasets/vector2.index") -> None:
+    def __init__(self, index="datasets/vector_pre_trained.index", model=None) -> None:
         super().__init__()
 
         self.threshold = 0.001
@@ -27,18 +27,22 @@ class FaissClassifier:
         if os.uname().machine != "ppc64le":
             self.preprocessor = FaceAlignment()
 
-        self.checkpoint = torch.load(
-            "checkpoints/major-cloud-212_epoch_19",
-            map_location=torch.device("cpu"),
-            # "checkpoints/stilted-vortex-227_epoch_19",
-            # map_location=torch.device("cpu"),
-            # "checkpoints/charmed-cosmos-135_epoch_19",
-            # map_location=torch.device("cpu"),
-            # "checkpoints/deft-snowball-123_epoch_19",
-            # map_location=torch.device("cpu"),
-        )
-        self.model = InceptionResnetV1()
-        self.model.load_state_dict(self.checkpoint["model_state_dict"])
+        if not model:
+            self.checkpoint = torch.load(
+                "checkpoints/major-cloud-212_epoch_19",
+                map_location=torch.device("cpu"),
+                # "checkpoints/stilted-vortex-227_epoch_19",
+                # map_location=torch.device("cpu"),
+                # "checkpoints/charmed-cosmos-135_epoch_19",
+                # map_location=torch.device("cpu"),
+                # "checkpoints/deft-snowball-123_epoch_19",
+                # map_location=torch.device("cpu"),
+            )
+            self.model = InceptionResnetV1()
+            self.model.load_state_dict(self.checkpoint["model_state_dict"])
+        else:
+            self.model = model
+        
         self.model.eval()
 
     def img_to_encoding(self, image, model):
