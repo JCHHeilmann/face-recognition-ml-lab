@@ -11,7 +11,7 @@ else:
     import faiss
 
 
-def create_index(embeddings, target, index_path = "datasets/vector_val.index"):
+def create_index(embeddings, target, index_path="datasets/vector_val.index"):
     # define the index with dimensionality 512
     index = faiss.IndexFlatL2(512)
     indexIDMap = faiss.IndexIDMap2(index)
@@ -32,7 +32,6 @@ if __name__ == "__main__":
         help="Provide your embedding.joblib file here",
         metavar="FILE",
     )
-    
 
     args = parser.parse_args()
 
@@ -41,4 +40,8 @@ if __name__ == "__main__":
     # load embeddings
     embeddings, labels = joblib.load(EmbeddingFile)
 
-    create_index(embeddings, labels, index_path=f"datasets/vector_pre_trained_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.index")
+    create_index(
+        embeddings,
+        labels,
+        index_path=f"datasets/vector_pre_trained_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.index",
+    )

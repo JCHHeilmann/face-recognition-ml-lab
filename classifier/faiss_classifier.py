@@ -42,7 +42,7 @@ class FaissClassifier:
             self.model.load_state_dict(self.checkpoint["model_state_dict"])
         else:
             self.model = model
-        
+
         self.model.eval()
 
     def img_to_encoding(self, image, model):
@@ -61,18 +61,18 @@ class FaissClassifier:
         k = 1
         distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
         if distance < self.threshold:
-                return int(label)
+            return int(label)
         else:
-                return 0
+            return 0
 
     def classify_with_surroundings(self, image):
         image_aligned = self.preprocessor.make_align(image)
         if not image_aligned:
             print("No face found")
             return ["Unknown"], None
-        
-        #image_aligned = image_aligned.resize((128, 128))
-        #print(image_aligned.size)
+
+        # image_aligned = image_aligned.resize((128, 128))
+        # print(image_aligned.size)
 
         embedding = self.img_to_encoding(image_aligned, self.model)
 
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     image_paths = glob("datasets/CASIA-WebFace_PNG/2838320/*.png")
     images = [Image.open(path).convert("RGB") for path in image_paths]
 
-    classifier = FaissClassifier(index = "datasets/vector_pre_trained.index")
+    classifier = FaissClassifier(index="datasets/vector_pre_trained.index")
     # images = [Image.open("datasets/Donald_Trump_0001.jpg").convert("RGB")]
     # im = Image.open("datasets/0000045_a/008.jpg").convert("RGB").resize((128,128))
 

@@ -136,12 +136,11 @@ def evaluate(model, embeddings, targets, val_loader):
 
             outputs = model(data)
             predicted = classifier.classify(outputs.data.cpu().numpy())
-            
+
             target = target.cpu()
             # decided to put this one in list so that F1 score can be calculated
             true.append(int(target.numpy()))
             pred.append(predicted)
-            
 
     total_accuracy = accuracy_score(np.array(true), np.array(pred))
     total_f1 = f1_score(np.array(true), np.array(pred), average="weighted")
