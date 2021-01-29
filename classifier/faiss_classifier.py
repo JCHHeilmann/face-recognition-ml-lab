@@ -17,24 +17,32 @@ else:
 
 
 class FaissClassifier:
-    def __init__(self, index="datasets/vector_pre_trained.index") -> None:
+    def __init__(self, index="datasets/vector_pre_trained.index", model=None) -> None:
         super().__init__()
 
-        self.threshold = 0.1
+        self.threshold = 0.001
         self.to_tensor = torchvision.transforms.ToTensor()
         self.indexIDMap = faiss.read_index(index)
         self.dictionary = LabelNames("data/data.p")
         if os.uname().machine != "ppc64le":
             self.preprocessor = FaceAlignment()
 
-        self.checkpoint = torch.load(
-            "checkpoints/charmed-cosmos-135_epoch_19",
-            map_location=torch.device("cpu"),
-            # "checkpoints/deft-snowball-123_epoch_19",
-            # map_location=torch.device("cpu"),
-        )
-        self.model = InceptionResnetV1()
-        self.model.load_state_dict(self.checkpoint["model_state_dict"])
+        if not model:
+            self.checkpoint = torch.load(
+                "checkpoints/major-cloud-212_epoch_19",
+                map_location=torch.device("cpu"),
+                # "checkpoints/stilted-vortex-227_epoch_19",
+                # map_location=torch.device("cpu"),
+                # "checkpoints/charmed-cosmos-135_epoch_19",
+                # map_location=torch.device("cpu"),
+                # "checkpoints/deft-snowball-123_epoch_19",
+                # map_location=torch.device("cpu"),
+            )
+            self.model = InceptionResnetV1()
+            self.model.load_state_dict(self.checkpoint["model_state_dict"])
+        else:
+            self.model = model
+
         self.model.eval()
 
     def img_to_encoding(self, image, model):
@@ -52,19 +60,19 @@ class FaissClassifier:
         pred_labels = []
         k = 1
         distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
-        for indx, d in enumerate(distance):
-            if d < self.threshold:
-                pred_labels.append(label[indx])
-            else:
-                pred_labels.append(-1)
-
-        return pred_labels
+        if distance < self.threshold:
+            return int(label)
+        else:
+            return 0
 
     def classify_with_surroundings(self, image):
         image_aligned = self.preprocessor.make_align(image)
         if not image_aligned:
             print("No face found")
             return ["Unknown"], None
+
+        # image_aligned = image_aligned.resize((128, 128))
+        # print(image_aligned.size)
 
         embedding = self.img_to_encoding(image_aligned, self.model)
 
@@ -76,6 +84,10 @@ class FaissClassifier:
         distances = distances[0]
         labels = labels[0]
         embeddings = embeddings[0]
+        print(labels[0])
+        if labels[0] != 2838320:
+            print(distances[0])
+            image_aligned.save("datasets/BarackMiss/" + str(labels[0]) + ".png")
 
         if distances[0] < self.threshold:
             label_names = [self.dictionary.read_from_pickle(label) for label in labels]
@@ -101,23 +113,31 @@ if __name__ == "__main__":
     from PIL import Image
     from tqdm import tqdm
 
-    image_paths = glob("datasets/test/0000192/*.png")
+    # image_paths = glob("datasets/CASIA-WebFace/0000192/*.png")
+    # images = [Image.open(path).convert("RGB") for path in image_paths]
+
+    image_paths = glob("datasets/CASIA-WebFace_PNG/2838320/*.png")
     images = [Image.open(path).convert("RGB") for path in image_paths]
 
-    classifier = FaissClassifier()
+    classifier = FaissClassifier(index="datasets/vector_pre_trained.index")
+    # images = [Image.open("datasets/Donald_Trump_0001.jpg").convert("RGB")]
+    # im = Image.open("datasets/0000045_a/008.jpg").convert("RGB").resize((128,128))
 
-    new_image = Image.open("datasets/test/IMG-20140329-WA0010.jpg")
+    # classifier = FaissClassifier(index = "datasets/vector_pre_trained_2021-01-28_15:22:37.index")
 
-    classifier.add_person(new_image, "victor")
+    # new_image = Image.open("datasets/test/IMG-20140329-WA0010.jpg")
 
-    labels, _ = classifier.classify_with_surroundings(new_image)
-    print(labels[0])
+    # classifier.add_person(new_image, "victor")
 
-    new_image_2 = Image.open("datasets/test/IMG-20140329-WA0013.jpg")
-    labels, _ = classifier.classify_with_surroundings(new_image_2)
-    print(labels[0])
+    # labels, _ = classifier.classify_with_surroundings(new_image)
+    # print(labels[0])
 
-    labels, embeddings = classifier.classify_with_surroundings(images[0])
+    # new_image_2 = Image.open("datasets/test/IMG-20140329-WA0013.jpg")
+    # labels, _ = classifier.classify_with_surroundings(new_image_2)
+    # print(labels[0])
+
+    # labels = classifier.classify_with_surroundings(im)[0][0]
+    # print("Labels:",labels)
 
     results = [classifier.classify_with_surroundings(img)[0][0] for img in tqdm(images)]
 
@@ -125,15 +145,17 @@ if __name__ == "__main__":
     incorrect = 0
     unknown = 0
     for result in results:
-        if result == "Alyssa_Milano":
+        if result == "Morgan_Saylor":
             correct += 1
         elif result == "Unknown":
             unknown += 1
         else:
             incorrect += 1
 
+    accuracy = correct / len(results)
+
     print(
-        f"Results:\ncorrect: {correct},\nincorrect: {incorrect},\nunknown: {unknown} (includes images in which no face was found)\n"
+        f"Results:\ncorrect: {correct},\nincorrect: {incorrect},\nunknown: {unknown} (includes images in which no face was found),\nAccuracy: {accuracy}"
     )
 
     values, counts = np.unique(results, return_counts=True)

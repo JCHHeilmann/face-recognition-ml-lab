@@ -115,11 +115,11 @@ def evaluate(model, embeddings, targets, val_loader):
     targets = targets.cpu()
     index = create_index(embeddings.data.cpu().numpy(), targets.numpy())
 
-    classifier = FaissClassifier(index)
+    classifier = FaissClassifier(index, model=model)
     classifier.threshold = 10.0  # don't care about unknown classifications
 
-    accuracy = 0
-    f1 = 0
+    true = []
+    pred = []
 
     with torch.no_grad():
         model.eval()
@@ -138,12 +138,14 @@ def evaluate(model, embeddings, targets, val_loader):
             predicted = classifier.classify(outputs.data.cpu().numpy())
 
             target = target.cpu()
-            accuracy += accuracy_score(target.numpy(), predicted)
-            f1 += f1_score(target.numpy(), predicted, average="micro")
+            # decided to put this one in list so that F1 score can be calculated
+            true.append(int(target.numpy()))
+            pred.append(predicted)
 
-    total_accuracy = accuracy / len(val_loader)
-    total_f1 = f1 / len(val_loader)
+    total_accuracy = accuracy_score(np.array(true), np.array(pred))
+    total_f1 = f1_score(np.array(true), np.array(pred), average="weighted")
 
+    print(total_accuracy)
     return total_accuracy, total_f1
 
 
