@@ -169,7 +169,7 @@ def save_checkpoint(model, optimizer, epoch_num):
 if __name__ == "__main__":
     torch.manual_seed(42)
 
-    EPOCHS = 20
+    EPOCHS = 100
     LEARNING_RATE = 0.05
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
@@ -216,7 +216,8 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace_JPG")
+    dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
+    # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
