@@ -212,10 +212,10 @@ if __name__ == "__main__":
         model = model.cuda()
 
     wandb.watch(model)
-    
+
     dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
-    #dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
-    #dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,
