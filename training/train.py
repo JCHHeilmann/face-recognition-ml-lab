@@ -168,7 +168,7 @@ def save_checkpoint(model, optimizer, epoch_num):
 if __name__ == "__main__":
     torch.manual_seed(42)
 
-    EPOCHS = 100
+    EPOCHS = 200
     LEARNING_RATE = 0.05
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
