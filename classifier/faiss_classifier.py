@@ -49,7 +49,7 @@ class FaissClassifier:
         image_tensor = image_tensor.unsqueeze(0)
         embedding = model(image_tensor)
         return embedding
-    
+
     def img_to_encoding(self, image, model):
         image_tensor = self.to_tensor(image)
         image_tensor = image_tensor.unsqueeze(0)
