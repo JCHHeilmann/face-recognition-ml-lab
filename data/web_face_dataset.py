@@ -3,9 +3,9 @@ import os
 from os.path import join
 
 import torchvision.transforms
+from facenet_pytorch import fixed_image_standardization
 from PIL import Image
 from torch.utils.data import Dataset
-from facenet_pytorch import fixed_image_standardization
 
 
 class WebfaceDataset(Dataset):
@@ -14,13 +14,11 @@ class WebfaceDataset(Dataset):
         self.to_tensor = torchvision.transforms.ToTensor()
         self.image_filenames = self.read_file_paths()
         self.labels = self.get_labels()
-        
+
         ###Test with fixed_image_standardization
-        self.transform = transforms.Compose([
-            np.float32,
-            torchvision.transforms.ToTensor(),
-            fixed_image_standardization
-        ])
+        self.transform = transforms.Compose(
+            [np.float32, torchvision.transforms.ToTensor(), fixed_image_standardization]
+        )
 
     def read_file_paths(self):
         paths = glob.glob(join(self.dataset_folder, "*/*.png"), recursive=True)
@@ -36,12 +34,12 @@ class WebfaceDataset(Dataset):
 
     def __getitem__(self, idx):
         image = Image.open(self.image_filenames[idx]).convert("RGB")
-        
+
         # image = image.resize((160, 160))
         split_path = self.image_filenames[idx].split(os.sep)
         label = split_path[-2]
 
         image_tensor = self.to_tensor(image)
-        #image_tensor = self.transform(image)
+        # image_tensor = self.transform(image)
 
         return image_tensor, int(label)
