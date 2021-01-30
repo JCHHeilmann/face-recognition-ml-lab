@@ -21,7 +21,7 @@ class WebfaceDataset(Dataset):
             [np.float32, torchvision.transforms.ToTensor(), fixed_image_standardization]
         )
 
-        ###Test with other Preprocessing
+        ###Test with more transforms
         self.transform_new = torchvision.transforms.Compose(
             [
                 torchvision.transforms.RandomRotation(15),
@@ -53,7 +53,7 @@ class WebfaceDataset(Dataset):
         label = split_path[-2]
 
         # image_tensor = self.to_tensor(image)
-        image_tensor = self.transform_new(image)
-        # image_tensor = self.transform(image)
+        #image_tensor = self.transform_new(image)
+        image_tensor = self.transform(image)
 
         return image_tensor, int(label)
