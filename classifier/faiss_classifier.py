@@ -25,7 +25,7 @@ class FaissClassifier:
         self.to_tensor = torchvision.transforms.ToTensor()
         self.indexIDMap = faiss.read_index(index)
         self.dictionary = LabelNames("data/data.p")
-        #TODO 
+        # TODO
         if os.uname().machine != "ppc64le":
             self.preprocessor = FaceAlignment()
 
@@ -73,12 +73,12 @@ class FaissClassifier:
             return 0
 
     def classify_with_surroundings(self, image):
-        #TODO 
+        # TODO
         image_aligned = self.preprocessor.make_align(image)
         if not image_aligned:
             print("No face found")
             return ["Unknown"], None
-        #TODO 
+        # TODO
         embedding = self.img_to_encoding(image_aligned, self.model)
 
         k = 100
@@ -98,9 +98,9 @@ class FaissClassifier:
             return ["Unknown"], None
 
     def add_person(self, image, name: str):
-        #TODO 
+        # TODO
         image_align = self.preprocessor.make_align(image)
-        #TODO 
+        # TODO
         embedding_new = self.img_to_encoding(image_align, self.model)
 
         random_label = self.random_n_digits(8)
