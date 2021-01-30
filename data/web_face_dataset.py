@@ -10,6 +10,7 @@ from torch.utils.data import Dataset
 class WebfaceDataset(Dataset):
     def __init__(self, dataset_folder):
         self.dataset_folder = dataset_folder
+        self.to_tensor = torchvision.transforms.ToTensor()
 
         self.image_filenames = self.read_file_paths()
         self.labels = self.get_labels()
@@ -28,11 +29,10 @@ class WebfaceDataset(Dataset):
 
     def __getitem__(self, idx):
         image = Image.open(self.image_filenames[idx]).convert("RGB")
-        image = image.resize((160, 160))
+        #image = image.resize((160, 160))
         split_path = self.image_filenames[idx].split(os.sep)
         label = split_path[-2]
-        to_tensor = torchvision.transforms.ToTensor()
 
-        image_tensor = to_tensor(image)
+        image_tensor = self.to_tensor(image)
 
         return image_tensor, int(label)
