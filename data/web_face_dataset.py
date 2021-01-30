@@ -53,7 +53,7 @@ class WebfaceDataset(Dataset):
         label = split_path[-2]
 
         # image_tensor = self.to_tensor(image)
-        #image_tensor = self.transform_new(image)
+        # image_tensor = self.transform_new(image)
         image_tensor = self.transform(image)
 
         return image_tensor, int(label)
