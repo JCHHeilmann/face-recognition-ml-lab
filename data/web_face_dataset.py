@@ -6,7 +6,7 @@ import torchvision.transforms
 from facenet_pytorch import fixed_image_standardization
 from PIL import Image
 from torch.utils.data import Dataset
-
+import numpy as np
 
 class WebfaceDataset(Dataset):
     def __init__(self, dataset_folder):
