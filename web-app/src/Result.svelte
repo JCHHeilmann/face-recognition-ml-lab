@@ -2,6 +2,7 @@
   import Chart from 'chart.js';
   import 'chartjs-plugin-colorschemes';
   import { onMount } from 'svelte';
+  import AddLabel from './AddLabel.svelte';
 
   export let resultData;
 
@@ -48,40 +49,46 @@
   }
 
   onMount(() => {
-    scatterChart = new Chart(ctx, {
-      type: 'scatter',
-      data: {
-        datasets: [],
-      },
-      options: {
-        elements: {
-          point: {
-            pointStyle: (ctx) => (ctx.dataset.label === recognizedPerson ? 'circle' : 'star'),
-            radius: (ctx) => (ctx.dataset.label === recognizedPerson ? 30 : 2),
-            borderWidth: (ctx) => (ctx.dataset.label === recognizedPerson ? 10 : 1),
-          },
+    if (recognizedPerson != 'Unknown') {
+      scatterChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+          datasets: [],
         },
-        legend: { display: false },
-        maintainAspectRatio: false,
-      },
-    });
+        options: {
+          elements: {
+            point: {
+              pointStyle: (ctx) => (ctx.dataset.label === recognizedPerson ? 'circle' : 'star'),
+              radius: (ctx) => (ctx.dataset.label === recognizedPerson ? 30 : 2),
+              borderWidth: (ctx) => (ctx.dataset.label === recognizedPerson ? 10 : 1),
+            },
+          },
+          legend: { display: false },
+          maintainAspectRatio: false,
+        },
+      });
+    }
   });
 </script>
 
-<h2>Result: {recognizedPerson}</h2>
-<div class="row justify-content-center w-100" bind:clientWidth>
-  <div style="width: {canvasSize}px; height: {canvasSize}px">
-    <canvas id="myChart" />
+{#if recognizedPerson != 'Unknown'}
+  <h2>Result: {recognizedPerson}</h2>
+  <div class="row justify-content-center w-100" bind:clientWidth>
+    <div style="width: {canvasSize}px; height: {canvasSize}px">
+      <canvas id="myChart" />
+    </div>
   </div>
-</div>
-<label for="dimensionRange" class="form-label">Select dimensions</label>
-<input
-  type="range"
-  class="form-range"
-  min="0"
-  max={resultData.embeddings[0].length - 2}
-  id="dimensionRange"
-  bind:value={selectedDimension}
-/>
+  <label for="dimensionRange" class="form-label">Select dimensions</label>
+  <input
+    type="range"
+    class="form-range"
+    min="0"
+    max={resultData.embeddings[0].length - 2}
+    id="dimensionRange"
+    bind:value={selectedDimension}
+  />
+{:else}
+  <AddLabel />
+{/if}
 
 <svelte:window bind:innerHeight={windowHeight} />

@@ -1,6 +1,6 @@
 import io
 
-from fastapi import Depends, FastAPI, File
+from fastapi import Depends, FastAPI, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from starlette.responses import JSONResponse
@@ -36,7 +36,20 @@ def recognize_face(
     image = Image.open(io.BytesIO(image_data)).convert("RGB")
     labels, embeddings = classifier.classify_with_surroundings(image)
 
-    return JSONResponse({"labels": labels, "embeddings": embeddings.tolist()})
+    if embeddings is not None:
+        return JSONResponse({"labels": labels, "embeddings": embeddings.tolist()})
+    else:
+        return JSONResponse({"labels": labels, "embeddings": []})
+
+
+@app.post("/add-label/")
+def recognize_face(
+    image_data: bytes = File(...),
+    label: str = Form(...),
+    classifier: get_classifier = Depends(),
+):
+    image = Image.open(io.BytesIO(image_data)).convert("RGB")
+    classifier.add_person(image, label)
 
 
 if __name__ == "__main__":

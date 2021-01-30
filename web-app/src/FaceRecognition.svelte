@@ -2,11 +2,15 @@
   import ImageUpload from './ImageUpload.svelte';
   import Loading from './Loading.svelte';
   import Result from './Result.svelte';
+  import { imageStore } from './stores.js';
 
   let recognitionPromise;
 
   async function handleUpload(event) {
     const file = event.detail.file;
+
+    imageStore.set(file);
+
     const formData = new FormData();
     formData.append('image_data', file, file.name);
 
