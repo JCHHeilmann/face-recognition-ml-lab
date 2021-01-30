@@ -20,15 +20,18 @@ class WebfaceDataset(Dataset):
         self.transform = torchvision.transforms.Compose(
             [np.float32, torchvision.transforms.ToTensor(), fixed_image_standardization]
         )
-        
+
         ###Test with other Preprocessing
         self.transform_new = torchvision.transforms.Compose(
-            [torchvision.transforms.RandomRotation(15),
-            torchvision.transforms.RandomResizedCrop(160),
-            torchvision.transforms.RandomHorizontalFlip(),
-            torchvision.transforms.ToTensor(),
-            torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                                 std=[0.229, 0.224, 0.225])]
+            [
+                torchvision.transforms.RandomRotation(15),
+                torchvision.transforms.RandomResizedCrop(160),
+                torchvision.transforms.RandomHorizontalFlip(),
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Normalize(
+                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                ),
+            ]
         )
 
     def read_file_paths(self):
