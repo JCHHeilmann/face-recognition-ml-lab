@@ -54,6 +54,6 @@ class WebfaceDataset(Dataset):
 
         image_tensor = self.to_tensor(image)
         # image_tensor = self.transform_new(image)
-        #image_tensor = self.transform(image)
+        # image_tensor = self.transform(image)
 
         return image_tensor, int(label)
