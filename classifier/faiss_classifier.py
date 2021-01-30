@@ -4,10 +4,10 @@ from random import randint
 import numpy as np
 import torch
 import torchvision
+from facenet_pytorch import MTCNN
 
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
-from facenet_pytorch import MTCNN
 
 if os.uname().machine == "ppc64le":
     import faiss_ppc as faiss
@@ -20,9 +20,7 @@ else:
 class FaissClassifier:
     def __init__(self, index="datasets/vector_pre_trained.index", model=None) -> None:
         super().__init__()
-        self.mtcnn = MTCNN(
-            image_size=160, margin=0, selection_method="probability"
-        )
+        self.mtcnn = MTCNN(image_size=160, margin=0, selection_method="probability")
         self.threshold = 0.001
         self.to_tensor = torchvision.transforms.ToTensor()
         self.indexIDMap = faiss.read_index(index)
@@ -58,12 +56,12 @@ class FaissClassifier:
         image_tensor = image_tensor.unsqueeze(0)
         embedding = model(image_tensor).data.cpu().numpy()
         return embedding
-    
+
     def random_n_digits(self, n):
         range_start = 10 ** (n - 1)
         range_end = (10 ** n) - 1
         return randint(range_start, range_end)
-    
+
     def classify(self, embeddings):
         pred_labels = []
         k = 1
@@ -106,7 +104,7 @@ class FaissClassifier:
 
         self.indexIDMap.add_with_ids(embedding_new, random_label_array)
         self.dictionary.add_name(name, random_label)
-        
+
     def make_aligned_mtcnn(self, image):
         try:
             face = self.mtcnn(image)
@@ -114,6 +112,7 @@ class FaissClassifier:
         except:
             print("No Face")
             return None
+
 
 if __name__ == "__main__":
     from glob import glob
