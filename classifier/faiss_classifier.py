@@ -25,9 +25,9 @@ class FaissClassifier:
         self.to_tensor = torchvision.transforms.ToTensor()
         self.indexIDMap = faiss.read_index(index)
         self.dictionary = LabelNames("data/data.p")
-        # TODO
-        if os.uname().machine != "ppc64le":
-            self.preprocessor = FaceAlignment()
+
+        #if os.uname().machine != "ppc64le":
+            #self.preprocessor = FaceAlignment()
 
         if not model:
             self.checkpoint = torch.load(
@@ -73,13 +73,13 @@ class FaissClassifier:
             return 0
 
     def classify_with_surroundings(self, image):
-        # TODO
-        image_aligned = self.preprocessor.make_align(image)
+        #image_aligned = self.preprocessor.make_align(image) -- edited
+        image_aligned = self.make_aligned_mtcnn(image)
         if not image_aligned:
             print("No face found")
             return ["Unknown"], None
-        # TODO
-        embedding = self.img_to_encoding(image_aligned, self.model)
+        #embedding = self.img_to_encoding(image_aligned, self.model) -- edited
+        embedding = self.img_tensor_to_encoding(image_aligned, self.model)
 
         k = 100
         distances, labels, embeddings = self.indexIDMap.search_and_reconstruct(
@@ -98,10 +98,10 @@ class FaissClassifier:
             return ["Unknown"], None
 
     def add_person(self, image, name: str):
-        # TODO
-        image_align = self.preprocessor.make_align(image)
-        # TODO
-        embedding_new = self.img_to_encoding(image_align, self.model)
+        #image_align = self.preprocessor.make_align(image) -- edited
+        image_align = self.make_aligned_mtcnn(image)
+        #embedding_new = self.img_to_encoding(image_align, self.model) -- edited
+        embedding_new = self.img_tensor_to_encoding(image_align, self.model)
 
         random_label = self.random_n_digits(8)
         random_label_array = np.array([random_label])
