@@ -29,7 +29,7 @@ class WebfaceDataset(Dataset):
 
     def __getitem__(self, idx):
         image = Image.open(self.image_filenames[idx]).convert("RGB")
-        #image = image.resize((160, 160))
+        # image = image.resize((160, 160))
         split_path = self.image_filenames[idx].split(os.sep)
         label = split_path[-2]
 
