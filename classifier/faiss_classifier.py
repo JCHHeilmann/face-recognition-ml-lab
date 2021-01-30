@@ -81,7 +81,7 @@ class FaissClassifier:
         distances = distances[0]
         labels = labels[0]
         embeddings = embeddings[0]
-        
+
         if distances[0] < self.threshold:
             label_names = [self.dictionary.read_from_pickle(label) for label in labels]
 
