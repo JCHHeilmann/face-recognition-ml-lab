@@ -16,7 +16,7 @@ class WebfaceDataset(Dataset):
         self.labels = self.get_labels()
 
         ###Test with fixed_image_standardization
-        self.transform = transforms.Compose(
+        self.transform = torchvision.transforms.Compose(
             [np.float32, torchvision.transforms.ToTensor(), fixed_image_standardization]
         )
 
