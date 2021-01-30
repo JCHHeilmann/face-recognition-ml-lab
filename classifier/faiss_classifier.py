@@ -71,9 +71,6 @@ class FaissClassifier:
             print("No face found")
             return ["Unknown"], None
 
-        # image_aligned = image_aligned.resize((128, 128))
-        # print(image_aligned.size)
-
         embedding = self.img_to_encoding(image_aligned, self.model)
 
         k = 100
@@ -84,11 +81,7 @@ class FaissClassifier:
         distances = distances[0]
         labels = labels[0]
         embeddings = embeddings[0]
-        print(labels[0])
-        if labels[0] != 2838320:
-            print(distances[0])
-            image_aligned.save("datasets/BarackMiss/" + str(labels[0]) + ".png")
-
+        
         if distances[0] < self.threshold:
             label_names = [self.dictionary.read_from_pickle(label) for label in labels]
 
