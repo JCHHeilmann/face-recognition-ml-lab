@@ -23,12 +23,13 @@ class WebfaceDataset(Dataset):
 
         ###Test with other Preprocessing
         self.transform_new = torchvision.transforms.Compose(
-            [torchvision.transforms.RandomRotation(15),
-             torchvision.transforms.RandomResizedCrop(160),
-             torchvision.transforms.RandomHorizontalFlip(),
-             np.float32,
-             torchvision.transforms.ToTensor(),
-             fixed_image_standardization,
+            [
+                torchvision.transforms.RandomRotation(15),
+                torchvision.transforms.RandomResizedCrop(160),
+                torchvision.transforms.RandomHorizontalFlip(),
+                np.float32,
+                torchvision.transforms.ToTensor(),
+                fixed_image_standardization,
             ]
         )
 
@@ -53,6 +54,6 @@ class WebfaceDataset(Dataset):
 
         # image_tensor = self.to_tensor(image)
         image_tensor = self.transform_new(image)
-        #image_tensor = self.transform(image)
+        # image_tensor = self.transform(image)
 
         return image_tensor, int(label)
