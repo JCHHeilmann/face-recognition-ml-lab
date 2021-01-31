@@ -169,12 +169,12 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     EPOCHS = 200
-    LEARNING_RATE = 0.1
+    LEARNING_RATE = 0.01
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
     SCALE_INCEPTION_C = 0.20
-    MARGIN = 0.5
+    MARGIN = 0.2
 
     CLASSES_PER_BATCH = 25
     SAMPLES_PER_CLASS = 30
@@ -184,8 +184,8 @@ if __name__ == "__main__":
         DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
     )
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
-    scheduler = MultiStepLR(optimizer, milestones=[10, 50], gamma=0.1)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
+    scheduler = MultiStepLR(optimizer, milestones=[50, 100], gamma=0.1)
 
     triplet_gen = triplet_generator.get_hardest
 
