@@ -81,8 +81,6 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         loss, num_triplets = loss_function(outputs, target)
         loss_timing += perf_counter() - timing
 
-        # optimizer.zero_grad()
-
         if num_triplets == 0:
             total_num_triplets += num_triplets
             continue
@@ -171,7 +169,7 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     EPOCHS = 200
-    LEARNING_RATE = 0.01
+    LEARNING_RATE = 0.005
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
@@ -189,8 +187,7 @@ if __name__ == "__main__":
     if torch.cuda.is_available():
         model = model.cuda()
 
-    # optimizer = torch.optim.Adagrad(model.parameters(), lr=LEARNING_RATE)
-    optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
     scheduler = MultiStepLR(optimizer, milestones=[50, 100], gamma=0.1)
 
     triplet_gen = triplet_generator.get_semihard
@@ -226,9 +223,9 @@ if __name__ == "__main__":
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.4,
+        train_proportion=0.899,
         val_proportion=0.1,
-        test_proportion=0.5,
+        test_proportion=0.001,
     )
 
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_gen)
