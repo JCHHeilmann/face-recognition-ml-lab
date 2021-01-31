@@ -69,9 +69,9 @@ def train_epoch(model, train_loader, loss_function, optimizer):
     for batch_idx, (data, target) in tqdm(
         enumerate(train_loader), total=len(train_loader), desc="processing batch: "
     ):
-        # if torch.cuda.is_available():
-        # data = data.cuda()
-        # target = target.cuda()
+        if torch.cuda.is_available():
+            data = data.cuda()
+            target = target.cuda()
 
         optimizer.zero_grad()
 
