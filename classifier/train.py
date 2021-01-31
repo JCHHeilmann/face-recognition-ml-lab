@@ -52,15 +52,15 @@ def get_data():
 
     if torch.cuda.is_available():
         checkpoint = torch.load(
-            "checkpoints/leafy-shadow-245_epoch_16", 
-            # "checkpoints/stilted-vortex-227_epoch_19", 
-            map_location=torch.device("cuda")
+            "checkpoints/leafy-shadow-245_epoch_16",
+            # "checkpoints/stilted-vortex-227_epoch_19",
+            map_location=torch.device("cuda"),
         )
     else:
         checkpoint = torch.load(
             "checkpoints/leafy-shadow-245_epoch_16",
-            # "checkpoints/stilted-vortex-227_epoch_19", 
-            map_location=torch.device("cpu")
+            # "checkpoints/stilted-vortex-227_epoch_19",
+            map_location=torch.device("cpu"),
         )
     model = InceptionResnetV1()
     model.load_state_dict(checkpoint["model_state_dict"])
