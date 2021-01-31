@@ -179,7 +179,7 @@ if __name__ == "__main__":
 
     CLASSES_PER_BATCH = 750
     SAMPLES_PER_CLASS = 5
-    BATCH_SIZE = 210
+    BATCH_SIZE = 250
 
     model = InceptionResnetV1(
         DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
