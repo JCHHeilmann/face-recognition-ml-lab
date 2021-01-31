@@ -70,7 +70,9 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         if torch.cuda.is_available():
             data = data.cuda()
             target = target.cuda()
-
+        
+        optimizer.zero_grad()
+        
         timing = perf_counter()
         outputs = model(data)
         model_forward_timing += perf_counter() - timing
@@ -184,7 +186,7 @@ if __name__ == "__main__":
         DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
     )
 
-    optimizer = torch.optim.AdamW(model.parameters(), lr=LEARNING_RATE)
+    optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
     scheduler = MultiStepLR(optimizer, milestones=[50, 100], gamma=0.1)
 
     triplet_gen = triplet_generator.get_semihard
