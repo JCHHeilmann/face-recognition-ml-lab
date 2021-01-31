@@ -177,8 +177,8 @@ if __name__ == "__main__":
     MARGIN = 0.2
     WEIGHT_DECAY = 5e-4
 
-    CLASSES_PER_BATCH = 500
-    SAMPLES_PER_CLASS = 5
+    CLASSES_PER_BATCH = 180
+    SAMPLES_PER_CLASS = 4
     BATCH_SIZE = 200
 
     model = InceptionResnetV1(
