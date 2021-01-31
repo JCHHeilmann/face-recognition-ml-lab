@@ -188,7 +188,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(
         model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY
     )
-    scheduler = MultiStepLR(optimizer, milestones=[10, 30], gamma=0.1)
+    scheduler = MultiStepLR(optimizer, milestones=[20, 50], gamma=0.1)
 
     triplet_gen = triplet_generator.get_semihard
 
