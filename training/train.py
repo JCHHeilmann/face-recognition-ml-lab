@@ -5,6 +5,7 @@ import numpy as np
 import torch
 import wandb
 from facenet_pytorch import InceptionResnetV1 as IR1
+from online_triplet_loss.losses import *
 from sklearn.metrics import accuracy_score, f1_score
 from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
@@ -17,7 +18,7 @@ from models.inception_resnet_v1 import InceptionResnetV1
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
 from utils.vis_utils import plot_embeddings
-from online_triplet_loss.losses import *
+
 
 def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
     for epoch in range(epochs):
