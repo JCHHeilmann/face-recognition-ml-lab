@@ -174,7 +174,7 @@ if __name__ == "__main__":
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
     SCALE_INCEPTION_C = 0.20
-    MARGIN = 0.2
+    MARGIN = 0.5
 
     CLASSES_PER_BATCH = 25
     SAMPLES_PER_CLASS = 30
