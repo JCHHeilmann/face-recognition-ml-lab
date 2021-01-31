@@ -71,7 +71,6 @@ def train_epoch(model, train_loader, loss_function, optimizer):
             data = data.cuda()
             target = target.cuda()
 
-        optimizer.zero_grad()
 
         timing = perf_counter()
         outputs = model(data)
@@ -80,6 +79,8 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         timing = perf_counter()
         loss, num_triplets = loss_function(outputs, target)
         loss_timing += perf_counter() - timing
+        
+        optimizer.zero_grad()
 
         if num_triplets == 0:
             total_num_triplets += num_triplets
