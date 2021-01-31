@@ -22,8 +22,8 @@ def get_data():
 
     # CLASSES_PER_BATCH = 30
     # SAMPLES_PER_CLASS = 40
-    CLASSES_PER_BATCH = 25
-    SAMPLES_PER_CLASS = 30
+    CLASSES_PER_BATCH = 75
+    SAMPLES_PER_CLASS = 10
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
