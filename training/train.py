@@ -176,10 +176,10 @@ if __name__ == "__main__":
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
     SCALE_INCEPTION_C = 0.20
-    MARGIN = 0.3
+    MARGIN = 0.2
 
-    CLASSES_PER_BATCH = 35
-    SAMPLES_PER_CLASS = 21
+    CLASSES_PER_BATCH = 30
+    SAMPLES_PER_CLASS = 25
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     model = InceptionResnetV1(
@@ -189,8 +189,8 @@ if __name__ == "__main__":
     if torch.cuda.is_available():
         model = model.cuda()
 
-    optimizer = torch.optim.Adagrad(model.parameters(), lr=LEARNING_RATE)
-    # optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
+    #optimizer = torch.optim.Adagrad(model.parameters(), lr=LEARNING_RATE)
+    optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
     scheduler = MultiStepLR(optimizer, milestones=[50, 100], gamma=0.1)
 
     triplet_gen = triplet_generator.get_semihard
