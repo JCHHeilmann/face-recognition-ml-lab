@@ -168,17 +168,16 @@ def save_checkpoint(model, optimizer, epoch_num):
 if __name__ == "__main__":
     torch.manual_seed(42)
 
-    EPOCHS = 500
-    LEARNING_RATE = 0.05
-    DROPOUT_PROB = 0.6
+    EPOCHS = 200
+    LEARNING_RATE = 0.02
+    DROPOUT_PROB = 0.4
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
     SCALE_INCEPTION_C = 0.20
     MARGIN = 0.2
-    WEIGHT_DECAY = 5e-4
 
-    CLASSES_PER_BATCH = 180
-    SAMPLES_PER_CLASS = 4
+    CLASSES_PER_BATCH = 75
+    SAMPLES_PER_CLASS = 10
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     model = InceptionResnetV1(
@@ -186,7 +185,7 @@ if __name__ == "__main__":
     )
 
     optimizer = torch.optim.Adam(
-        model.parameters(), lr=LEARNING_RATE, weight_decay=WEIGHT_DECAY
+        model.parameters(), lr=LEARNING_RATE
     )
     scheduler = MultiStepLR(optimizer, milestones=[20, 50], gamma=0.1)
 
