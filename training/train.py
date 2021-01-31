@@ -79,7 +79,8 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         model_forward_timing += perf_counter() - timing
 
         timing = perf_counter()
-        loss, num_triplets = loss_function(outputs, target)
+        loss = batch_hard_triplet_loss(target, outputs, margin=0.2)
+        #loss, num_triplets = loss_function(outputs, target)
         loss_timing += perf_counter() - timing
 
         if num_triplets == 0:
@@ -181,13 +182,13 @@ if __name__ == "__main__":
     SAMPLES_PER_CLASS = 10
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
-    model = InceptionResnetV1(
-        DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
-    )
+    #model = InceptionResnetV1(
+    #    DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
+    #)
 
     model_test = IR1()
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = torch.optim.Adam(model_test.parameters(), lr=LEARNING_RATE)
     scheduler = MultiStepLR(optimizer, milestones=[20, 50], gamma=0.1)
 
     triplet_gen = triplet_generator.get_semihard
@@ -214,9 +215,9 @@ if __name__ == "__main__":
     )
 
     if torch.cuda.is_available():
-        model = model.cuda()
+        model_test = model_test.cuda()
 
-    wandb.watch(model)
+    wandb.watch(model_test)
 
     dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
     # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
@@ -233,7 +234,7 @@ if __name__ == "__main__":
 
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_gen)
     train(
-        model,
+        model_test,
         train_loader,
         val_loader,
         triplet_loss,
