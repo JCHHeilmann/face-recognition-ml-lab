@@ -4,6 +4,7 @@ from time import perf_counter
 import numpy as np
 import torch
 import wandb
+from facenet_pytorch import InceptionResnetV1 as IR1
 from sklearn.metrics import accuracy_score, f1_score
 from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
@@ -16,7 +17,6 @@ from models.inception_resnet_v1 import InceptionResnetV1
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
 from utils.vis_utils import plot_embeddings
-from facenet_pytorch import InceptionResnetV1 as IR1
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     model = InceptionResnetV1(
         DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
     )
-    
+
     model_test = IR1()
 
     optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
