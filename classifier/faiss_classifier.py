@@ -31,8 +31,8 @@ class FaissClassifier:
 
         if not model:
             self.checkpoint = torch.load(
-                 "checkpoints/major-cloud-212_epoch_19",
-                #"checkpoints/leafy-shadow-245_epoch_16",
+                "checkpoints/major-cloud-212_epoch_19",
+                # "checkpoints/leafy-shadow-245_epoch_16",
                 map_location=torch.device("cpu"),
                 # "checkpoints/stilted-vortex-227_epoch_19",
                 # map_location=torch.device("cpu"),
@@ -74,13 +74,13 @@ class FaissClassifier:
             return 0
 
     def classify_with_surroundings(self, image):
-        image_aligned = self.preprocessor.make_align(image)                 # Dlib aligment
-        #image_aligned = self.make_aligned_mtcnn(image)                     # MTCNN aligment
+        image_aligned = self.preprocessor.make_align(image)  # Dlib aligment
+        # image_aligned = self.make_aligned_mtcnn(image)                     # MTCNN aligment
         if not image_aligned:
             print("No face found")
             return ["Unknown"], None
-        embedding = self.img_to_encoding(image_aligned, self.model)         # Dlib aligment
-        #embedding = self.img_tensor_to_encoding(image_aligned, self.model) # MTCNN aligment
+        embedding = self.img_to_encoding(image_aligned, self.model)  # Dlib aligment
+        # embedding = self.img_tensor_to_encoding(image_aligned, self.model) # MTCNN aligment
 
         k = 100
         distances, labels, embeddings = self.indexIDMap.search_and_reconstruct(
@@ -91,7 +91,6 @@ class FaissClassifier:
         labels = labels[0]
         embeddings = embeddings[0]
 
-
         if distances[0] < self.threshold:
             label_names = [self.dictionary.read_from_pickle(label) for label in labels]
 
@@ -100,9 +99,9 @@ class FaissClassifier:
             return ["Unknown"], None
 
     def add_person(self, image, name: str):
-        image_align = self.preprocessor.make_align(image) 
+        image_align = self.preprocessor.make_align(image)
         # image_align = self.make_aligned_mtcnn(image)
-        embedding_new = self.img_to_encoding(image_align, self.model) 
+        embedding_new = self.img_to_encoding(image_align, self.model)
         # embedding_new = self.img_tensor_to_encoding(image_align, self.model)
 
         random_label = self.random_n_digits(8)
@@ -124,8 +123,8 @@ if __name__ == "__main__":
     from glob import glob
 
     from PIL import Image
-    from tqdm import tqdm
     from torchvision import datasets, transforms
+    from tqdm import tqdm
 
     image_paths = glob("datasets/CASIA-WebFace_PNG/3196368/*.png")
     images = [Image.open(path).convert("RGB") for path in image_paths]
@@ -135,7 +134,9 @@ if __name__ == "__main__":
     # data_dir = 'datasets/CASIA-test'
     # images = datasets.ImageFolder(data_dir, transform=transforms.Resize((512, 512)))
 
-    classifier = FaissClassifier(index="datasets/vector_pre_trained_2021-01-31_17:15:19.index")
+    classifier = FaissClassifier(
+        index="datasets/vector_pre_trained_2021-01-31_17:15:19.index"
+    )
     # images = [Image.open("datasets/Donald_Trump_0001.jpg").convert("RGB")]
     # im = Image.open("datasets/0000045_a/008.jpg").convert("RGB").resize((128,128))
 
