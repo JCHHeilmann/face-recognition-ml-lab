@@ -169,15 +169,15 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     EPOCHS = 200
-    LEARNING_RATE = 0.005
+    LEARNING_RATE = 0.01
     DROPOUT_PROB = 0.6
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
     SCALE_INCEPTION_C = 0.20
     MARGIN = 0.5
 
-    CLASSES_PER_BATCH = 25
-    SAMPLES_PER_CLASS = 30
+    CLASSES_PER_BATCH = 75
+    SAMPLES_PER_CLASS = 10
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     model = InceptionResnetV1(
