@@ -178,14 +178,15 @@ if __name__ == "__main__":
     SCALE_INCEPTION_C = 0.20
     MARGIN = 0.3
 
-    CLASSES_PER_BATCH = 30
-    SAMPLES_PER_CLASS = 25
+    CLASSES_PER_BATCH = 35
+    SAMPLES_PER_CLASS = 21
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     model = InceptionResnetV1(
         DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
     )
-
+    
+    #optimizer = torch.optim.Adagrad(model.parameters(), lr=LEARNING_RATE)
     optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
     scheduler = MultiStepLR(optimizer, milestones=[50, 100], gamma=0.1)
 
