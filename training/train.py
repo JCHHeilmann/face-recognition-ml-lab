@@ -70,9 +70,9 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         if torch.cuda.is_available():
             data = data.cuda()
             target = target.cuda()
-        
+
         optimizer.zero_grad()
-        
+
         timing = perf_counter()
         outputs = model(data)
         model_forward_timing += perf_counter() - timing
