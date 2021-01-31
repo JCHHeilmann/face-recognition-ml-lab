@@ -189,10 +189,10 @@ if __name__ == "__main__":
     model = InceptionResnetV1(
         DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
     )
-    
+
     if torch.cuda.is_available():
         model = model.cuda()
-        
+
     optimizer = torch.optim.Adagrad(model.parameters(), lr=LEARNING_RATE)
     # optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
     scheduler = MultiStepLR(optimizer, milestones=[50, 100], gamma=0.1)
@@ -219,8 +219,6 @@ if __name__ == "__main__":
             "margin": MARGIN,
         },
     )
-
-   
 
     wandb.watch(model)
 
