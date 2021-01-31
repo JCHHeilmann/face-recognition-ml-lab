@@ -187,7 +187,7 @@ if __name__ == "__main__":
     )
 
     optimizer = torch.optim.Adagrad(model.parameters(), lr=LEARNING_RATE)
-    #optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
+    # optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
     scheduler = MultiStepLR(optimizer, milestones=[50, 100], gamma=0.1)
 
     triplet_gen = triplet_generator.get_semihard
