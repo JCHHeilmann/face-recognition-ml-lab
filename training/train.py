@@ -17,7 +17,7 @@ from models.inception_resnet_v1 import InceptionResnetV1
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
 from utils.vis_utils import plot_embeddings
-
+from online_triplet_loss.losses import *
 
 def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
     for epoch in range(epochs):
