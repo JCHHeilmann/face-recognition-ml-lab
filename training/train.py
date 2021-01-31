@@ -69,9 +69,9 @@ def train_epoch(model, train_loader, loss_function, optimizer):
     for batch_idx, (data, target) in tqdm(
         enumerate(train_loader), total=len(train_loader), desc="processing batch: "
     ):
-        #if torch.cuda.is_available():
-            #data = data.cuda()
-            #target = target.cuda()
+        # if torch.cuda.is_available():
+        # data = data.cuda()
+        # target = target.cuda()
 
         optimizer.zero_grad()
 
@@ -83,9 +83,9 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         #####
         target = target.cpu()
         outputs = outputs.cpu()
-        loss = batch_hard_triplet_loss(target, outputs, margin=0.2, device='cpu')
+        loss = batch_hard_triplet_loss(target, outputs, margin=0.2, device="cpu")
         #####
-        #loss, num_triplets = loss_function(outputs, target)
+        # loss, num_triplets = loss_function(outputs, target)
         loss_timing += perf_counter() - timing
         num_triplets = 0
         if num_triplets == 0:
