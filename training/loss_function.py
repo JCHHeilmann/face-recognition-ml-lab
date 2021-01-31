@@ -47,7 +47,7 @@ class OnlineTripletLoss(nn.Module):
             anchor_positive_distances - anchor_negative_distances + self.margin
         )
 
-        print(
-            f"\nNumber of zeros in loss: {((losses == 0).sum(dim=0).item() / len(losses)) * 100} %\n"
-        )
+        #print(
+        #    f"\nNumber of zeros in loss: {((losses == 0).sum(dim=0).item() / len(losses)) * 100} %\n"
+        #)
         return losses.mean(), len(triplets)
