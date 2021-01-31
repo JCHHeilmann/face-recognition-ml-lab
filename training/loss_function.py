@@ -23,7 +23,7 @@ class OnlineTripletLoss(nn.Module):
         else:
             device = torch.device("cpu")
 
-        triplets = self.triplet_selector(embeddings, targets, device, 0.001)
+        triplets = self.triplet_selector(embeddings, targets, device, 0.5)
 
         if len(triplets) == 0:
             return None, 0
