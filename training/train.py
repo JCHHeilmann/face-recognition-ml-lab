@@ -223,9 +223,9 @@ if __name__ == "__main__":
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.8,
+        train_proportion=0.4,
         val_proportion=0.1,
-        test_proportion=0.1,
+        test_proportion=0.5,
     )
 
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_gen)
