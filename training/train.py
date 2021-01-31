@@ -184,7 +184,7 @@ if __name__ == "__main__":
     MARGIN = 0.2
 
     CLASSES_PER_BATCH = 30
-    SAMPLES_PER_CLASS = 25
+    SAMPLES_PER_CLASS = 20
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     # model = InceptionResnetV1(
