@@ -184,9 +184,7 @@ if __name__ == "__main__":
         DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
     )
 
-    optimizer = torch.optim.Adam(
-        model.parameters(), lr=LEARNING_RATE
-    )
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     scheduler = MultiStepLR(optimizer, milestones=[20, 50], gamma=0.1)
 
     triplet_gen = triplet_generator.get_semihard
