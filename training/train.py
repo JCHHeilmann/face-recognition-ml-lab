@@ -4,8 +4,6 @@ from time import perf_counter
 import numpy as np
 import torch
 import wandb
-from facenet_pytorch import InceptionResnetV1 as IR1
-from online_triplet_loss.losses import *
 from sklearn.metrics import accuracy_score, f1_score
 from torch.optim.lr_scheduler import MultiStepLR
 from tqdm import tqdm
@@ -80,14 +78,9 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         model_forward_timing += perf_counter() - timing
 
         timing = perf_counter()
-        #####
-        target = target.cpu()
-        outputs = outputs.cpu()
-        loss = batch_hard_triplet_loss(target, outputs, margin=0.2, device="cpu")
-        #####
-        # loss, num_triplets = loss_function(outputs, target)
+        loss, num_triplets = loss_function(outputs, target)
         loss_timing += perf_counter() - timing
-        num_triplets = 0
+
         if num_triplets == 0:
             total_num_triplets += num_triplets
             continue
@@ -176,24 +169,23 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     EPOCHS = 200
-    LEARNING_RATE = 0.02
-    DROPOUT_PROB = 0.4
+    LEARNING_RATE = 0.05
+    DROPOUT_PROB = 0.5
     SCALE_INCEPTION_A = 0.17
     SCALE_INCEPTION_B = 0.10
     SCALE_INCEPTION_C = 0.20
     MARGIN = 0.2
 
-    CLASSES_PER_BATCH = 25
-    SAMPLES_PER_CLASS = 10
+    CLASSES_PER_BATCH = 50
+    SAMPLES_PER_CLASS = 15
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
-    # model = InceptionResnetV1(
-    #    DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
-    # )
+    model = InceptionResnetV1(
+        DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
+    )
 
-    model_test = IR1()
 
-    optimizer = torch.optim.Adam(model_test.parameters(), lr=LEARNING_RATE)
+    optimizer = torch.optim.Adam(model.parameters(), lr=LEARNING_RATE)
     scheduler = MultiStepLR(optimizer, milestones=[20, 50], gamma=0.1)
 
     triplet_gen = triplet_generator.get_semihard
@@ -220,9 +212,9 @@ if __name__ == "__main__":
     )
 
     if torch.cuda.is_available():
-        model_test = model_test.cuda()
+        model = model.cuda()
 
-    wandb.watch(model_test)
+    wandb.watch(model)
 
     dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
     # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
@@ -239,7 +231,7 @@ if __name__ == "__main__":
 
     triplet_loss = OnlineTripletLoss(MARGIN, triplet_gen)
     train(
-        model_test,
+        model,
         train_loader,
         val_loader,
         triplet_loss,
