@@ -189,7 +189,7 @@ if __name__ == "__main__":
     if torch.cuda.is_available():
         model = model.cuda()
 
-    #optimizer = torch.optim.Adagrad(model.parameters(), lr=LEARNING_RATE)
+    # optimizer = torch.optim.Adagrad(model.parameters(), lr=LEARNING_RATE)
     optimizer = torch.optim.SGD(model.parameters(), lr=LEARNING_RATE, momentum=0.9)
     scheduler = MultiStepLR(optimizer, milestones=[50, 100], gamma=0.1)
 
