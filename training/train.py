@@ -81,7 +81,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         loss, num_triplets = loss_function(outputs, target)
         loss_timing += perf_counter() - timing
 
-        #optimizer.zero_grad()
+        # optimizer.zero_grad()
 
         if num_triplets == 0:
             total_num_triplets += num_triplets
