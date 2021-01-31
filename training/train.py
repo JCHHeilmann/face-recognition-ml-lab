@@ -75,7 +75,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
         timing = perf_counter()
         outputs = model(data)
-        outputs = outputs.cuda() ###
+        outputs = outputs.cuda()  ###
         model_forward_timing += perf_counter() - timing
 
         timing = perf_counter()
