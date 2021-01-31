@@ -93,11 +93,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
         timing = perf_counter()
         loss.backward()
         loss_backward_timing += perf_counter() - timing
-
-        print(data.device)
-        print(target.device)
-        print(outputs.device)
-
+        
         timing = perf_counter()
         optimizer.step()
         optimizer_step_timing += perf_counter() - timing
