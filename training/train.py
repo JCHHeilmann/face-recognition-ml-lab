@@ -80,7 +80,7 @@ def train_epoch(model, train_loader, loss_function, optimizer):
 
         timing = perf_counter()
         loss = batch_hard_triplet_loss(target, outputs, margin=0.2)
-        #loss, num_triplets = loss_function(outputs, target)
+        # loss, num_triplets = loss_function(outputs, target)
         loss_timing += perf_counter() - timing
 
         if num_triplets == 0:
@@ -182,9 +182,9 @@ if __name__ == "__main__":
     SAMPLES_PER_CLASS = 10
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
-    #model = InceptionResnetV1(
+    # model = InceptionResnetV1(
     #    DROPOUT_PROB, SCALE_INCEPTION_A, SCALE_INCEPTION_B, SCALE_INCEPTION_C
-    #)
+    # )
 
     model_test = IR1()
 
