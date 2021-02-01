@@ -41,9 +41,10 @@ def evaluate(model, val_loader, train_labels):
             # if aligned_data == None:
             #     continue
 
-            # if torch.cuda.is_available():
-            #     aligned_data = aligned_data.cuda()
-            #     target = target.cuda()
+            if torch.cuda.is_available():
+                # aligned_data = aligned_data.cuda()
+                target = target.cuda()
+                data = data.cuda()
 
             outputs = model(data)
             predicted = classifier.classify(outputs.cpu().numpy())
