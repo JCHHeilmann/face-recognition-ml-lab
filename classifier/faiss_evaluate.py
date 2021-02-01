@@ -80,7 +80,7 @@ if __name__ == "__main__":
     model.eval()
 
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
-    dataset = WebfaceDataset("../../data/CASIA_WebFace")
+    dataset = WebfaceDataset("../../data/CASIA-WebFace")
     CLASSES_PER_BATCH = 35
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
