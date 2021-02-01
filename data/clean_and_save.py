@@ -8,7 +8,7 @@ from PIL import Image
 from .face_alignment import FaceAlignmentMTCNN
 
 data_folder = "../../../data/"
-#data_folder = "datasets/"
+# data_folder = "datasets/"
 not_detected_file_path = join(data_folder, "not_detected_jan.csv")
 
 
@@ -32,7 +32,7 @@ class CleanAndSave:
             target_split = target_file_path.split("/")
             crnt_img = target_split[-1].split(".")[0] + ".pt"
             torch.save(face, join(cln_name, crnt_img))
-            #aln_obj.save(join(cln_name, crnt_img))
+            # aln_obj.save(join(cln_name, crnt_img))
 
     def process_folder(self, target_folder):
         self.face_align_object = FaceAlignmentMTCNN()
