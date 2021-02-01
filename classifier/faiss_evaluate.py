@@ -12,9 +12,11 @@ from tqdm import tqdm
 from classifier.faiss_classifier import FaissClassifier
 
 
-def evaluate(model, val_loader, train_labels):
+def evaluate(model, val_indices, train_labels):
     to_pil = torchvision.transforms.ToPILImage()
     preprocessor = FaceAlignmentMTCNN()
+
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     classifier = FaissClassifier(
         index="datasets/vector_major-cloud-212_epoch_19_2021-01-27_09-28-13.joblib.index"
@@ -30,29 +32,28 @@ def evaluate(model, val_loader, train_labels):
     with torch.no_grad():
         model.eval()
 
-        for _, (data, target) in tqdm(
-            enumerate(val_loader), total=len(val_loader), desc="evaluating batch: "
+        for _, index in tqdm(
+            enumerate(val_indices), total=len(val_indices), desc="evaluating batch: "
         ):
+            image, target = dataset.get_file(index)
+
             if target not in list(train_labels):
                 continue
 
-            image = to_pil(data.squeeze(0))
             aligned_data = preprocessor.make_align(image)
             if aligned_data == None:
                 continue
 
             if torch.cuda.is_available():
                 aligned_data = aligned_data.cuda()
-                target = target.cuda()
 
             outputs = model(aligned_data.unsqueeze(0))
             predicted = classifier.classify(outputs.cpu().numpy())
 
-            target = target.cpu()
-            print("target:", target.numpy(), "Predicted:", np.array([predicted]))
+            print("target:", target, "Predicted:", np.array([predicted]))
 
             # decided to put this one in list so that F1 score can be calculated
-            true.append(int(target.numpy()))
+            true.append(int(target))
             pred.append(predicted)
 
     total_accuracy = accuracy_score(np.array(true), np.array(pred))
@@ -95,6 +96,8 @@ if __name__ == "__main__":
     )
     print("Dataset loaded")
 
-    total_accuracy, total_f1 = evaluate(model, val_loader, train_labels)
+    val_indices = val_loader.dataset.indices
+
+    total_accuracy, total_f1 = evaluate(model, val_indices, train_labels)
     print("Accuracy:", total_accuracy)
     print("F1 score:", total_f1)
