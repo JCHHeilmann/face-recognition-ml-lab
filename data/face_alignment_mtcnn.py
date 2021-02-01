@@ -16,4 +16,4 @@ class FaceAlignmentMTCNN:
             return face_tensor
         except:
             # print("No Face")
-            return self.to_tensor(img)
+            return None
