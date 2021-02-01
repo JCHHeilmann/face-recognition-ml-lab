@@ -6,7 +6,7 @@ from os.path import join
 import torch
 from PIL import Image
 
-from .face_alignment import FaceAlignmentMTCNN
+from .face_alignment_mtcnn import FaceAlignmentMTCNN
 
 data_folder = "../../../data/"
 # data_folder = "datasets/"
