@@ -15,6 +15,6 @@ class FaceAlignmentMTCNN:
       try:
         face = self.mtcnn(img)
         return face_tensor
-       except:
+      except:
         #print("No Face")
         return self.to_tensor(img)
