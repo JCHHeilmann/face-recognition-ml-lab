@@ -45,7 +45,7 @@ def evaluate(model, val_loader, train_labels):
             #     aligned_data = aligned_data.cuda()
             #     target = target.cuda()
 
-            outputs = model(aligned_data)
+            outputs = model(data)
             predicted = classifier.classify(outputs.cpu().numpy())
 
             target = target.cpu()
