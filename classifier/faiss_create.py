@@ -43,5 +43,5 @@ if __name__ == "__main__":
     create_index(
         embeddings,
         labels,
-        index_path=f"datasets/vector_pre_trained_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.index",
+        index_path=f"datasets/vector_pre_trained_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H-%M-%S')}.index",
     )

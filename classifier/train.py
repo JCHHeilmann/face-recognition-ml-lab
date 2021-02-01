@@ -20,45 +20,36 @@ def get_data():
     print("getting data...")
     timing = perf_counter()
 
-    # CLASSES_PER_BATCH = 30
-    # SAMPLES_PER_CLASS = 40
-    CLASSES_PER_BATCH = 75
-    SAMPLES_PER_CLASS = 10
+    CLASSES_PER_BATCH = 30
+    SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
-    # train_loader, _, _ = get_data_loaders(
-    #     dataset,
-    #     CLASSES_PER_BATCH,
-    #     SAMPLES_PER_CLASS,
-    #     train_proportion=0.8,
-    #     val_proportion=0.1,
-    #     test_proportion=0.1,
-    #     batch_size=2000,
-    # )
-
-    train_loader, val_loader, _ = get_data_loaders(
+    train_loader, _, _ = get_data_loaders(
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
         train_proportion=0.8,
         val_proportion=0.1,
         test_proportion=0.1,
+        batch_size=2000,
     )
 
     print("loading model...")
 
     if torch.cuda.is_available():
         checkpoint = torch.load(
-            "checkpoints/leafy-shadow-245_epoch_16",
+            "checkpoints/generous-jazz-275_epoch_19",
+            # "checkpoints/leafy-shadow-245_epoch_16",
             # "checkpoints/stilted-vortex-227_epoch_19",
             map_location=torch.device("cuda"),
         )
     else:
         checkpoint = torch.load(
-            "checkpoints/leafy-shadow-245_epoch_16",
+            "checkpoints/generous-jazz-275_epoch_19",
+            # "checkpoints/leafy-shadow-245_epoch_16",
             # "checkpoints/stilted-vortex-227_epoch_19",
             map_location=torch.device("cpu"),
         )
@@ -76,7 +67,8 @@ def get_data():
 
     dump(
         (embeddings, targets),
-        f"../../data/embeddings_leafy-shadow-245_epoch_16_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
+        f"../../data/generous-jazz-275_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H-%M-%S')}.joblib",
+        # f"../../data/embeddings_leafy-shadow-245_epoch_16_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
         # f"../../data/embeddings_deft-snowball-123_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
         # f"datasets/embeddings_charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
     )
