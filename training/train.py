@@ -176,8 +176,8 @@ if __name__ == "__main__":
     SCALE_INCEPTION_C = 0.20
     MARGIN = 0.2
 
-    CLASSES_PER_BATCH = 30
-    SAMPLES_PER_CLASS = 25
+    CLASSES_PER_BATCH = 45
+    SAMPLES_PER_CLASS = 15
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     model = InceptionResnetV1(
