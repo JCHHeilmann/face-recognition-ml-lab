@@ -36,17 +36,16 @@ def evaluate(model, val_loader, train_labels):
             if target not in list(train_labels):
                 continue
 
-            # image = to_pil(data.squeeze(0))
-            # aligned_data = preprocessor.make_align(image)
-            # if aligned_data == None:
-            #     continue
+            image = to_pil(data.squeeze(0))
+            aligned_data = preprocessor.make_align(image)
+            if aligned_data == None:
+                continue
 
             if torch.cuda.is_available():
-                # aligned_data = aligned_data.cuda()
+                aligned_data = aligned_data.cuda()
                 target = target.cuda()
-                data = data.cuda()
 
-            outputs = model(data)
+            outputs = model(aligned_data.unsqueeze(0))
             predicted = classifier.classify(outputs.cpu().numpy())
 
             target = target.cpu()
@@ -81,7 +80,7 @@ if __name__ == "__main__":
     model.eval()
 
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
-    dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
+    dataset = WebfaceDataset("../../data/CASIA-WebFace")
     CLASSES_PER_BATCH = 35
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
