@@ -3,6 +3,7 @@ import os
 from os.path import join
 
 import numpy as np
+import torch
 import torchvision.transforms
 from facenet_pytorch import fixed_image_standardization
 from PIL import Image
@@ -37,6 +38,8 @@ class WebfaceDataset(Dataset):
         paths = glob.glob(join(self.dataset_folder, "*/*.png"), recursive=True)
         if len(paths) == 0:
             paths = glob.glob(join(self.dataset_folder, "*/*.jpg"), recursive=True)
+        elif len(paths) == 0:
+            paths = glob.glob(join(self.dataset_folder, "*/*.pt"), recursive=True)
         return paths
 
     def get_labels(self):
@@ -51,15 +54,25 @@ class WebfaceDataset(Dataset):
         label = split_path[-2]
         return image, int(label)
 
+    # def __getitem__(self, idx):
+    #     image = Image.open(self.image_filenames[idx]).convert("RGB")
+
+    #     # image = image.resize((160, 160))
+    #     split_path = self.image_filenames[idx].split(os.sep)
+    #     label = split_path[-2]
+
+    #     image_tensor = self.to_tensor(image)
+    #     # image_tensor = self.transform_new(image)
+    #     # image_tensor = self.transform(image)
+
+    #     return image_tensor, int(label)
+
     def __getitem__(self, idx):
-        image = Image.open(self.image_filenames[idx]).convert("RGB")
+        # image = Image.open(self.image_filenames[idx]).convert("RGB")
+        image_tensor = torch.load(self.image_filenames[idx])
 
         # image = image.resize((160, 160))
         split_path = self.image_filenames[idx].split(os.sep)
         label = split_path[-2]
-
-        image_tensor = self.to_tensor(image)
-        # image_tensor = self.transform_new(image)
-        # image_tensor = self.transform(image)
 
         return image_tensor, int(label)
