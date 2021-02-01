@@ -1,15 +1,15 @@
+import joblib
 import numpy as np
 import torch
 import torchvision
-from data.data_loaders import get_data_loaders
-from data.face_alignment_mtcnn import FaceAlignmentMTCNN
-from data.web_face_dataset import WebfaceDataset
-from models.inception_resnet_v1 import InceptionResnetV1
-import joblib
 from sklearn.metrics import accuracy_score, f1_score
 from tqdm import tqdm
 
 from classifier.faiss_classifier import FaissClassifier
+from data.data_loaders import get_data_loaders
+from data.face_alignment_mtcnn import FaceAlignmentMTCNN
+from data.web_face_dataset import WebfaceDataset
+from models.inception_resnet_v1 import InceptionResnetV1
 
 
 def evaluate(model, val_loader, train_labels):
