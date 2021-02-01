@@ -16,7 +16,7 @@ def evaluate(model, val_indices, train_labels):
     to_pil = torchvision.transforms.ToPILImage()
     preprocessor = FaceAlignmentMTCNN()
 
-    dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    #dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     classifier = FaissClassifier(
         index="datasets/vector_pre_trained_2021-02-01_14-42-55.index"
