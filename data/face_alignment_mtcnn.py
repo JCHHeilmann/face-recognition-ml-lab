@@ -13,7 +13,7 @@ class FaceAlignmentMTCNN:
 
         try:
             face = self.mtcnn(img)
-            return face_tensor
+            return face
         except:
             # print("No Face")
             return None

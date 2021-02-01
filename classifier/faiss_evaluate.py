@@ -1,19 +1,25 @@
 import numpy as np
 import torch
 import torchvision
+from data.data_loaders import get_data_loaders
+from data.face_alignment_mtcnn import FaceAlignmentMTCNN
+from data.web_face_dataset import WebfaceDataset
+from models.inception_resnet_v1 import InceptionResnetV1
+import joblib
 from sklearn.metrics import accuracy_score, f1_score
 from tqdm import tqdm
 
 from classifier.faiss_classifier import FaissClassifier
-from data.data_loaders import get_data_loaders
-from data.web_face_dataset import WebfaceDataset
-from models.inception_resnet_v1 import InceptionResnetV1
 
 
-def evaluate(model, val_loader, train_loader):
+def evaluate(model, val_loader, train_labels):
+    to_pil = torchvision.transforms.ToPILImage()
+    preprocessor = FaceAlignmentMTCNN()
 
-    classifier = FaissClassifier(index="datasets/vector_pre_trained.index")
-    classifier.threshold = 0.02
+    classifier = FaissClassifier(
+        index="datasets/vector_major-cloud-212_epoch_19_2021-01-27_09-28-13.joblib.index"
+    )
+    classifier.threshold = 100.0
 
     true = []
     pred = []
@@ -27,13 +33,20 @@ def evaluate(model, val_loader, train_loader):
         for _, (data, target) in tqdm(
             enumerate(val_loader), total=len(val_loader), desc="evaluating batch: "
         ):
+            if target not in list(train_labels):
+                continue
+
+            image = to_pil(data.squeeze(0))
+            aligned_data = preprocessor.make_align(image)
+            if aligned_data == None:
+                continue
 
             if torch.cuda.is_available():
-                data = data.cuda()
+                aligned_data = aligned_data.cuda()
                 target = target.cuda()
 
-            outputs = model(data)
-            predicted = classifier.classify(outputs.data.cpu().numpy())
+            outputs = model(aligned_data.unsqueeze(0))
+            predicted = classifier.classify(outputs.cpu().numpy())
 
             target = target.cpu()
             print("target:", target.numpy(), "Predicted:", np.array([predicted]))
@@ -50,8 +63,12 @@ def evaluate(model, val_loader, train_loader):
 
 
 if __name__ == "__main__":
-
     torch.manual_seed(42)
+
+    _, train_labels = joblib.load(
+        "datasets/embeddings_major-cloud-212_epoch_19_2021-01-27_09-28-13.joblib"
+    )
+
     checkpoint = torch.load(
         # "checkpoints/charmed-cosmos-135_epoch_19",
         "checkpoints/major-cloud-212_epoch_19",
@@ -61,8 +78,8 @@ if __name__ == "__main__":
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
-    # dataset = WebfaceDataset("datasets/Aligned_CASIA_WebFace")
-    dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    # dataset = WebfaceDataset("../../data/CASIA_WebFace")
     CLASSES_PER_BATCH = 35
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
@@ -74,9 +91,10 @@ if __name__ == "__main__":
         train_proportion=0.8,
         val_proportion=0.1,
         test_proportion=0.1,
+        batch_size=2000,
     )
     print("Dataset loaded")
 
-    total_accuracy, total_f1 = evaluate(model, val_loader, train_loader)
+    total_accuracy, total_f1 = evaluate(model, val_loader, train_labels)
     print("Accuracy:", total_accuracy)
     print("F1 score:", total_f1)
