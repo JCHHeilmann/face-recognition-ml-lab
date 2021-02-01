@@ -6,9 +6,9 @@ import torch
 import torchvision
 from facenet_pytorch import MTCNN
 
+from data.face_alignment import FaceAlignmentMTCNN
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
-from data.face_alignment import FaceAlignmentMTCNN
 
 if os.uname().machine == "ppc64le":
     import faiss_ppc as faiss
@@ -75,13 +75,15 @@ class FaissClassifier:
             return 0
 
     def classify_with_surroundings(self, image):
-        image_aligned_tensor = self.preprocessor.make_align(image)   # MTCNN aligment
-        
+        image_aligned_tensor = self.preprocessor.make_align(image)  # MTCNN aligment
+
         if not image_aligned:
             print("No face found")
             return ["Unknown"], None
-        
-        embedding = self.img_tensor_to_encoding(image_aligned_tensor, self.model) # MTCNN aligment
+
+        embedding = self.img_tensor_to_encoding(
+            image_aligned_tensor, self.model
+        )  # MTCNN aligment
 
         k = 100
         distances, labels, embeddings = self.indexIDMap.search_and_reconstruct(
