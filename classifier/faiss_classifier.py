@@ -8,6 +8,7 @@ from facenet_pytorch import MTCNN
 
 from data.label_names import LabelNames
 from models.inception_resnet_v1 import InceptionResnetV1
+from data.face_alignment import FaceAlignmentMTCNN
 
 if os.uname().machine == "ppc64le":
     import faiss_ppc as faiss
@@ -27,7 +28,7 @@ class FaissClassifier:
         self.dictionary = LabelNames("data/data.p")
 
         if os.uname().machine != "ppc64le":
-            self.preprocessor = FaceAlignment()
+            self.preprocessor = FaceAlignmentMTCNN()
 
         if not model:
             self.checkpoint = torch.load(
@@ -74,13 +75,13 @@ class FaissClassifier:
             return 0
 
     def classify_with_surroundings(self, image):
-        image_aligned = self.preprocessor.make_align(image)  # Dlib aligment
-        # image_aligned = self.make_aligned_mtcnn(image)                     # MTCNN aligment
+        image_aligned_tensor = self.preprocessor.make_align(image)   # MTCNN aligment
+        
         if not image_aligned:
             print("No face found")
             return ["Unknown"], None
-        embedding = self.img_to_encoding(image_aligned, self.model)  # Dlib aligment
-        # embedding = self.img_tensor_to_encoding(image_aligned, self.model) # MTCNN aligment
+        
+        embedding = self.img_tensor_to_encoding(image_aligned_tensor, self.model) # MTCNN aligment
 
         k = 100
         distances, labels, embeddings = self.indexIDMap.search_and_reconstruct(
@@ -99,24 +100,15 @@ class FaissClassifier:
             return ["Unknown"], None
 
     def add_person(self, image, name: str):
-        image_align = self.preprocessor.make_align(image)
-        # image_align = self.make_aligned_mtcnn(image)
-        embedding_new = self.img_to_encoding(image_align, self.model)
-        # embedding_new = self.img_tensor_to_encoding(image_align, self.model)
+        image_align_tensor = self.preprocessor.make_align(image)
+
+        embedding_new = self.img_tensor_to_encoding(image_align_tensor, self.model)
 
         random_label = self.random_n_digits(8)
         random_label_array = np.array([random_label])
 
         self.indexIDMap.add_with_ids(embedding_new, random_label_array)
         self.dictionary.add_name(name, random_label)
-
-    def make_aligned_mtcnn(self, image):
-        try:
-            face = self.mtcnn(image)
-            return face
-        except:
-            print("No Face")
-            return None
 
 
 if __name__ == "__main__":
