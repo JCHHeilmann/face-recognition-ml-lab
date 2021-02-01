@@ -17,7 +17,7 @@ def evaluate(model, val_loader, train_labels):
     preprocessor = FaceAlignmentMTCNN()
 
     classifier = FaissClassifier(
-        index="datasets/vector_major-cloud-212_epoch_19_2021-01-27_09-28-13.joblib.index"
+        index="datasets/vector_pre_trained_2021-02-01_14-42-55.index"
     )
     classifier.threshold = 100.0
 
@@ -66,20 +66,21 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     _, train_labels = joblib.load(
-        "datasets/embeddings_major-cloud-212_epoch_19_2021-01-27_09-28-13.joblib"
+        "../../data/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
     )
 
     checkpoint = torch.load(
         # "checkpoints/charmed-cosmos-135_epoch_19",
-        "checkpoints/major-cloud-212_epoch_19",
+        # "checkpoints/major-cloud-212_epoch_19",
+        "checkpoints/generous-jazz-275_epoch_19",
         map_location=torch.device("cpu"),
     )
     model = InceptionResnetV1()
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
-    dataset = WebfaceDataset("datasets/CASIA-WebFace")
-    # dataset = WebfaceDataset("../../data/CASIA_WebFace")
+    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("../../data/CASIA_WebFace")
     CLASSES_PER_BATCH = 35
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
