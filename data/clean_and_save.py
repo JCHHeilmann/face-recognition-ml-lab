@@ -3,6 +3,7 @@ import multiprocessing as mp
 import os
 from os.path import join
 
+import torch
 from PIL import Image
 
 from .face_alignment import FaceAlignmentMTCNN
