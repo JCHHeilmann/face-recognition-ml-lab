@@ -6,10 +6,10 @@ from os.path import join
 import torch
 from PIL import Image
 
-from .face_alignment_mtcnn import FaceAlignmentMTCNN
+from data.face_alignment_mtcnn import FaceAlignmentMTCNN
 
-data_folder = "../../../data/"
-# data_folder = "datasets/"
+# data_folder = "../../../data/"
+data_folder = "datasets/"
 not_detected_file_path = join(data_folder, "not_detected_jan.csv")
 
 
@@ -19,7 +19,7 @@ class CleanAndSave:
 
     def process_file(self, target_file_path, cln_name):
 
-        img = Image.open(target_file_path)
+        img = Image.open(target_file_path).convert("RGB")
         # aln_obj will be an image if face is detected, otherwise None.
         aln_obj = self.face_align_object.make_align(img)
 
@@ -32,7 +32,7 @@ class CleanAndSave:
         else:
             target_split = target_file_path.split("/")
             crnt_img = target_split[-1].split(".")[0] + ".pt"
-            torch.save(face, join(cln_name, crnt_img))
+            torch.save(aln_obj, join(cln_name, crnt_img))
             # aln_obj.save(join(cln_name, crnt_img))
 
     def process_folder(self, target_folder):
@@ -59,5 +59,5 @@ if __name__ == "__main__":
     target_folders = glob.glob(join(data_folder, "CASIA-WebFace", "*"))
     clean_and_save = CleanAndSave()
 
-    with mp.Pool(processes=45) as pool:
+    with mp.Pool(processes=19) as pool:
         pool.map(clean_and_save.process_folder, [folder for folder in target_folders])
