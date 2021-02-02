@@ -19,7 +19,7 @@ def evaluate(model, val_indices, train_labels):
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     classifier = FaissClassifier(
-        index="datasets/vector_pre_trained_2021-02-01_14-42-55.index"
+        index="datasets/vector_generous_jazz_2021-02-02_11-53-36.index"
     )
     classifier.threshold = 100.0
 
@@ -68,6 +68,7 @@ if __name__ == "__main__":
 
     _, train_labels = joblib.load(
         "../../data/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
+        # "datasets/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
     )
 
     checkpoint = torch.load(
