@@ -117,9 +117,16 @@ class FaissClassifier:
                 self.dictionary.read_from_pickle(label) for label in labels[0]
             ]
 
-            return label_names, embeddings[0]
+            label_names = [label_names[0] + " "] + label_names
+            embeddings = embeddings[0].tolist()
+            embeddings = embedding.tolist() + embeddings
+
+            return label_names, embeddings
         else:
             return ["Unknown"], None
+        labels = labels[0]
+        distances = distances[0]
+        embeddings = embeddings[0]
 
         distance_mask = [d < self.threshold for d in distances]
         valid_labels = labels[distance_mask]
@@ -133,7 +140,7 @@ class FaissClassifier:
             result_index = np.min(candidates)
             result = valid_labels[result_index]
 
-            result_index = np.where(labels == result)
+            result_index = np.where(labels == result)[0]
             temp = labels[0]
             labels[0] = labels[result_index]
             labels[result_index] = temp
@@ -143,12 +150,10 @@ class FaissClassifier:
             embeddings[result_index] = temp
 
             label_names = [self.dictionary.read_from_pickle(label) for label in labels]
-            return label_names, embeddings
-        else:
-            return ["Unknown"], None
 
-        if distances[0] < self.threshold:
-            label_names = [self.dictionary.read_from_pickle(label) for label in labels]
+            label_names = [label_names[0] + " "] + label_names
+            embeddings = embeddings.tolist()
+            embeddings = embedding.tolist() + embeddings
 
             return label_names, embeddings
         else:
