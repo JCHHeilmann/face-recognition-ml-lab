@@ -124,9 +124,13 @@ def evaluate(model, embeddings, targets, val_loader):
     with torch.no_grad():
         model.eval()
 
-        for _, (data, target) in tqdm(
+        for _, batch in tqdm(
             enumerate(val_loader), total=len(val_loader), desc="evaluating batch: "
         ):
+            if len(batch) == 0:
+                continue
+            (data, target) = batch
+
             if target not in targets:
                 continue
 
@@ -215,7 +219,7 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
+    dataset = WebfaceDataset("../../data/CASIA-WebFace")
     # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 

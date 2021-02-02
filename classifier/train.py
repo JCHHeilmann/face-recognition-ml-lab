@@ -24,15 +24,15 @@ def get_data():
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
-    dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
-    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    # dataset = WebfaceDataset("../../data/CASIA-WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, _, _ = get_data_loaders(
         dataset,
         CLASSES_PER_BATCH,
         SAMPLES_PER_CLASS,
-        train_proportion=0.8,
-        val_proportion=0.1,
+        train_proportion=0.01,
+        val_proportion=0.89,
         test_proportion=0.1,
         batch_size=2000,
     )
@@ -41,14 +41,14 @@ def get_data():
 
     if torch.cuda.is_available():
         checkpoint = torch.load(
-            "checkpoints/generous-jazz-275_epoch_19",
+            "checkpoints/charmed-cosmos-135_epoch_19",
             # "checkpoints/leafy-shadow-245_epoch_16",
             # "checkpoints/stilted-vortex-227_epoch_19",
             map_location=torch.device("cuda"),
         )
     else:
         checkpoint = torch.load(
-            "checkpoints/generous-jazz-275_epoch_19",
+            "checkpoints/charmed-cosmos-135_epoch_19",
             # "checkpoints/leafy-shadow-245_epoch_16",
             # "checkpoints/stilted-vortex-227_epoch_19",
             map_location=torch.device("cpu"),
@@ -67,10 +67,10 @@ def get_data():
 
     dump(
         (embeddings, targets),
-        f"../../data/generous-jazz-275_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H-%M-%S')}.joblib",
+        # f"../../data/charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H-%M-%S')}.joblib",
         # f"../../data/embeddings_leafy-shadow-245_epoch_16_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
         # f"../../data/embeddings_deft-snowball-123_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
-        # f"datasets/embeddings_charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H:%M:%S')}.joblib",
+        f"datasets/charmed-cosmos-135_epoch_19_{datetime.fromtimestamp(time()).strftime('%Y-%m-%d_%H-%M-%S')}.joblib",
     )
 
     return embeddings, targets

@@ -7,6 +7,7 @@ import torchvision.transforms
 from facenet_pytorch import fixed_image_standardization
 from PIL import Image
 from torch.utils.data import Dataset
+from data.face_alignment_mtcnn import FaceAlignmentMTCNN
 
 
 class WebfaceDataset(Dataset):
@@ -15,6 +16,8 @@ class WebfaceDataset(Dataset):
         self.to_tensor = torchvision.transforms.ToTensor()
         self.image_filenames = self.read_file_paths()
         self.labels = self.get_labels()
+
+        self.preprocessor = FaceAlignmentMTCNN()
 
         ###Test with fixed_image_standardization
         self.transform = torchvision.transforms.Compose(
@@ -54,12 +57,9 @@ class WebfaceDataset(Dataset):
     def __getitem__(self, idx):
         image = Image.open(self.image_filenames[idx]).convert("RGB")
 
-        # image = image.resize((160, 160))
+        image_tensor = self.preprocessor.make_align(image)
+
         split_path = self.image_filenames[idx].split(os.sep)
         label = split_path[-2]
-
-        image_tensor = self.to_tensor(image)
-        # image_tensor = self.transform_new(image)
-        # image_tensor = self.transform(image)
 
         return image_tensor, int(label)

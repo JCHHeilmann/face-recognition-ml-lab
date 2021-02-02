@@ -6,6 +6,13 @@ from data.balanced_batch_sampler import BalancedBatchSampler
 torch.manual_seed(42)
 
 
+def collate_fn(batch):
+    batch = list(filter(lambda x: x[0] is not None, batch))
+    if len(batch) == 0:
+        return batch
+    return torch.utils.data.dataloader.default_collate(batch)
+
+
 def get_data_loaders(
     dataset,
     classes_per_batch,
@@ -26,8 +33,7 @@ def get_data_loaders(
     )  # correct rounding errors with train set size
 
     train_dataset, val_dataset, test_dataset = torch.utils.data.random_split(
-        dataset,
-        [train_size, val_size, test_size],
+        dataset, [train_size, val_size, test_size],
     )
 
     if not batch_size:
@@ -36,12 +42,18 @@ def get_data_loaders(
             train_labels, classes_per_batch, samples_per_class
         )
         train_loader = torch.utils.data.DataLoader(
-            train_dataset, batch_sampler=balanced_sampler
+            train_dataset, batch_sampler=balanced_sampler, collate_fn=collate_fn
         )
     else:
-        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size)
+        train_loader = torch.utils.data.DataLoader(
+            train_dataset, batch_size=batch_size, collate_fn=collate_fn
+        )
 
-    val_loader = torch.utils.data.DataLoader(val_dataset, shuffle=False)
-    test_loader = torch.utils.data.DataLoader(test_dataset, shuffle=False)
+    val_loader = torch.utils.data.DataLoader(
+        val_dataset, shuffle=False, collate_fn=collate_fn
+    )
+    test_loader = torch.utils.data.DataLoader(
+        test_dataset, shuffle=False, collate_fn=collate_fn
+    )
 
     return train_loader, val_loader, test_loader
