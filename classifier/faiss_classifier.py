@@ -2,6 +2,7 @@ import os
 from random import randint
 
 import numpy as np
+from numpy.lib.twodim_base import mask_indices
 import torch
 import torchvision
 from facenet_pytorch import MTCNN
@@ -67,10 +68,21 @@ class FaissClassifier:
 
     def classify(self, embeddings):
         pred_labels = []
-        k = 1
-        distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
-        if distance < self.threshold:
-            return int(label)
+        k = 10
+        distances, labels = self.indexIDMap.search(embeddings.astype("float32"), k)
+
+        distance_mask = np.array([d < self.threshold for d in distances])
+        valid_labels = labels[distance_mask]
+
+        if len(valid_labels) > 0:
+            _, indices, counts = np.unique(
+                valid_labels, return_counts=True, return_index=True
+            )
+
+            maximums = np.argwhere(counts == np.max(counts))
+            candidates = indices[maximums]
+            result_index = np.min(candidates)
+            return int(valid_labels[result_index])
         else:
             return 0
 
@@ -90,9 +102,31 @@ class FaissClassifier:
             embedding.astype("float32"), k
         )
 
-        distances = distances[0]
-        labels = labels[0]
-        embeddings = embeddings[0]
+        distance_mask = [d < self.threshold for d in distances]
+        valid_labels = labels[distance_mask]
+
+        if len(valid_labels) > 0:
+            _, indices, counts = np.unique(
+                valid_labels, return_counts=True, return_index=True
+            )
+            maximums = np.argwhere(counts == np.max(counts))
+            candidates = indices[maximums]
+            result_index = np.min(candidates)
+            result = valid_labels[result_index]
+
+            result_index = np.where(labels == result)
+            temp = labels[0]
+            labels[0] = labels[result_index]
+            labels[result_index] = temp
+
+            temp = embeddings[0]
+            embeddings[0] = embeddings[result_index]
+            embeddings[result_index] = temp
+
+            label_names = [self.dictionary.read_from_pickle(label) for label in labels]
+            return label_names, embeddings
+        else:
+            return ["Unknown"], None
 
         if distances[0] < self.threshold:
             label_names = [self.dictionary.read_from_pickle(label) for label in labels]

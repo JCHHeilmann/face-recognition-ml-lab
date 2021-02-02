@@ -1,6 +1,6 @@
 from pathlib import Path
 from time import perf_counter
-
+import os
 import numpy as np
 import torch
 import wandb
@@ -196,6 +196,8 @@ if __name__ == "__main__":
 
     triplet_gen = triplet_generator.get_semihard
 
+    os.environ["WANDB_RESUME"] = "must"
+    os.environ["WANDB_RUN_ID"] = "qpilunyg"
     wandb.init(
         project="face-recognition",
         entity="application-challenges-ml-lab",
@@ -216,6 +218,16 @@ if __name__ == "__main__":
             "margin": MARGIN,
         },
     )
+
+    if wandb.run.resumed:
+        checkpoint = torch.load(
+            "checkpoints/generous-jazz-275_epoch_19", map_location=torch.device("cpu")
+        )
+        model.load_state_dict(checkpoint["model_state_dict"])
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        scheduler = MultiStepLR(
+            optimizer, milestones=[50, 100], gamma=0.1, last_epoch=checkpoint["epoch"]
+        )
 
     wandb.watch(model)
 
