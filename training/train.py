@@ -182,7 +182,7 @@ if __name__ == "__main__":
     MARGIN = 0.2
 
     CLASSES_PER_BATCH = 35
-    SAMPLES_PER_CLASS = 15
+    SAMPLES_PER_CLASS = 20
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
 
     model = InceptionResnetV1(
@@ -232,7 +232,7 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("../../data/CASIA-WebFace")
+    dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
     # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
