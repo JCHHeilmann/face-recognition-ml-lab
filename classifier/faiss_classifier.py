@@ -67,7 +67,13 @@ class FaissClassifier:
         return randint(range_start, range_end)
 
     def classify(self, embeddings):
-        pred_labels = []
+        k = 1
+        distance, label = self.indexIDMap.search(embeddings.astype("float32"), k)
+        if distance < self.threshold:
+            return int(label)
+        else:
+            return 0
+
         k = 10
         distances, labels = self.indexIDMap.search(embeddings.astype("float32"), k)
 
