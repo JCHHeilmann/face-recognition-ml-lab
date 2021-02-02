@@ -18,7 +18,7 @@ class WebfaceDataset(Dataset):
         self.image_filenames = self.read_file_paths()
         self.labels = self.get_labels()
 
-        self.preprocessor = FaceAlignmentMTCNN()
+        # self.preprocessor = FaceAlignmentMTCNN()
 
         ###Test with fixed_image_standardization
         self.transform = torchvision.transforms.Compose(
