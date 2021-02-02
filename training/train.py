@@ -1,6 +1,7 @@
+import os
 from pathlib import Path
 from time import perf_counter
-import os
+
 import numpy as np
 import torch
 import wandb

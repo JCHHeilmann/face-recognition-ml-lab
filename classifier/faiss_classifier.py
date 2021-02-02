@@ -2,10 +2,10 @@ import os
 from random import randint
 
 import numpy as np
-from numpy.lib.twodim_base import mask_indices
 import torch
 import torchvision
 from facenet_pytorch import MTCNN
+from numpy.lib.twodim_base import mask_indices
 
 from data.face_alignment_mtcnn import FaceAlignmentMTCNN
 from data.label_names import LabelNames
