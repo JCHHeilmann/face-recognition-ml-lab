@@ -33,7 +33,7 @@ class FaissClassifier:
 
         if not model:
             self.checkpoint = torch.load(
-                "checkpoints/major-cloud-212_epoch_19",
+                "checkpoints/generous-jazz-275_epoch_19",
                 # "checkpoints/leafy-shadow-245_epoch_16",
                 map_location=torch.device("cpu"),
                 # "checkpoints/stilted-vortex-227_epoch_19",

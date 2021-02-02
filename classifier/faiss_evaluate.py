@@ -20,9 +20,9 @@ def evaluate(model, val_indices, train_labels):
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     classifier = FaissClassifier(
-        index="datasets/vector_generous_jazz_2021-02-02_11-53-36.index"
+        index="datasets/vector_generous-jazz-275_d_2021-02-02_16-34-23.index"
     )
-    classifier.threshold = 100.0
+    classifier.threshold = 0.00525
 
     true = []
     pred = []
@@ -38,10 +38,13 @@ def evaluate(model, val_indices, train_labels):
         ):
             image, target = dataset.get_file(index)
 
-            if target not in list(train_labels):
-                continue
+            if int(target) not in list(train_labels):
+                target = 0
+                print("###################################################")
+                # continue
 
             aligned_data = preprocessor.make_align(image)
+            # aligned_data = torchvision.transforms.ToTensor()(image)
             if aligned_data == None:
                 continue
 
@@ -68,22 +71,31 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     _, train_labels = joblib.load(
-        "../../data/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
-        # "datasets/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
+        # "../../data/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
+        "datasets/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
     )
 
-    checkpoint = torch.load(
-        # "checkpoints/charmed-cosmos-135_epoch_19",
-        # "checkpoints/major-cloud-212_epoch_19",
-        "checkpoints/generous-jazz-275_epoch_19",
-        map_location=torch.device("cpu"),
-    )
+    if torch.cuda.is_available():
+        checkpoint = torch.load(
+            # "checkpoints/charmed-cosmos-135_epoch_19",
+            # "checkpoints/major-cloud-212_epoch_19",
+            "checkpoints/generous-jazz-275_epoch_19",
+            map_location=torch.device("cuda"),
+        )
+    else:
+        checkpoint = torch.load(
+            # "checkpoints/charmed-cosmos-135_epoch_19",
+            # "checkpoints/major-cloud-212_epoch_19",
+            "checkpoints/generous-jazz-275_epoch_19",
+            map_location=torch.device("cpu"),
+        )
     model = InceptionResnetV1()
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
+    dataset = WebfaceDataset("../CASIA-WebFace")
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
-    dataset = WebfaceDataset("../../data/CASIA-WebFace")
+    # dataset = WebfaceDataset("../../data/CASIA-WebFace")
     CLASSES_PER_BATCH = 35
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS

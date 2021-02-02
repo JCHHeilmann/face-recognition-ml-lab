@@ -18,7 +18,7 @@ class WebfaceDataset(Dataset):
         self.image_filenames = self.read_file_paths()
         self.labels = self.get_labels()
 
-        # self.preprocessor = FaceAlignmentMTCNN()
+        self.preprocessor = FaceAlignmentMTCNN()
 
         ###Test with fixed_image_standardization
         self.transform = torchvision.transforms.Compose(
@@ -58,8 +58,8 @@ class WebfaceDataset(Dataset):
     def __getitem__(self, idx):
         image = Image.open(self.image_filenames[idx]).convert("RGB")
 
-        # image_tensor = self.preprocessor.make_align(image)
-        image_tensor = self.to_tensor(image)
+        image_tensor = self.preprocessor.make_align(image)
+        # image_tensor = self.to_tensor(image)
 
         split_path = self.image_filenames[idx].split(os.sep)
         label = split_path[-2]
