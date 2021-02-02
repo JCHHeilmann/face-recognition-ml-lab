@@ -13,7 +13,8 @@ from models.inception_resnet_v1 import InceptionResnetV1
 
 
 def evaluate(model, val_indices, train_labels):
-    to_pil = torchvision.transforms.ToPILImage()
+    val_indices = val_indices[:100]
+
     preprocessor = FaceAlignmentMTCNN()
 
     # dataset = WebfaceDataset("datasets/CASIA-WebFace")
@@ -21,7 +22,7 @@ def evaluate(model, val_indices, train_labels):
     classifier = FaissClassifier(
         index="datasets/vector_generous_jazz_2021-02-02_11-53-36.index"
     )
-    classifier.threshold = 0.02
+    classifier.threshold = 100.0
 
     true = []
     pred = []
