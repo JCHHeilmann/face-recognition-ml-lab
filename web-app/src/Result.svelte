@@ -59,8 +59,16 @@
           elements: {
             point: {
               pointStyle: (ctx) => (ctx.dataset.label === recognizedPerson ? 'circle' : 'star'),
-              radius: (ctx) => (ctx.dataset.label === recognizedPerson ? 30 : 2),
-              borderWidth: (ctx) => (ctx.dataset.label === recognizedPerson ? 10 : 1),
+              radius: (ctx) => (ctx.dataset.label === recognizedPerson ? 6 : 3),
+              borderWidth: (ctx) => (ctx.dataset.label === recognizedPerson ? 6 : 3),
+            },
+          },
+
+          tooltips: {
+            callbacks: {
+              label: (tooltipItem, data) => {
+                return data.datasets[tooltipItem.datasetIndex].label;
+              },
             },
           },
           legend: { display: false },

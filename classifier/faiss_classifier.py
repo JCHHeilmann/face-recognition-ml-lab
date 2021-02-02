@@ -20,7 +20,11 @@ else:
 
 
 class FaissClassifier:
-    def __init__(self, index="datasets/vector_pre_trained.index", model=None) -> None:
+    def __init__(
+        self,
+        index="datasets/vector_generous_jazz_2021-02-02_11-53-36.index",
+        model=None,
+    ) -> None:
         super().__init__()
         self.mtcnn = MTCNN(image_size=160, margin=0, selection_method="probability")
         self.threshold = 0.001
@@ -95,7 +99,7 @@ class FaissClassifier:
     def classify_with_surroundings(self, image):
         image_aligned_tensor = self.preprocessor.make_align(image)  # MTCNN aligment
 
-        if not image_aligned_tensor:
+        if image_aligned_tensor == None:
             print("No face found")
             return ["Unknown"], None
 
@@ -107,6 +111,15 @@ class FaissClassifier:
         distances, labels, embeddings = self.indexIDMap.search_and_reconstruct(
             embedding.astype("float32"), k
         )
+
+        if distances[0][0] < self.threshold:
+            label_names = [
+                self.dictionary.read_from_pickle(label) for label in labels[0]
+            ]
+
+            return label_names, embeddings[0]
+        else:
+            return ["Unknown"], None
 
         distance_mask = [d < self.threshold for d in distances]
         valid_labels = labels[distance_mask]
@@ -169,7 +182,7 @@ if __name__ == "__main__":
     # images = datasets.ImageFolder(data_dir, transform=transforms.Resize((512, 512)))
 
     classifier = FaissClassifier(
-        index="datasets/vector_pre_trained_2021-01-31_17:15:19.index"
+        index="datasets/vector_generous_jazz_2021-02-02_11-53-36.index"
     )
     # images = [Image.open("datasets/Donald_Trump_0001.jpg").convert("RGB")]
     # im = Image.open("datasets/0000045_a/008.jpg").convert("RGB").resize((128,128))
