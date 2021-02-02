@@ -67,8 +67,8 @@ if __name__ == "__main__":
     torch.manual_seed(42)
 
     _, train_labels = joblib.load(
-        # "../../data/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
-        "datasets/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
+        "../../data/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
+        # "datasets/generous-jazz-275_epoch_19_2021-02-01_14-41-10.joblib"
     )
 
     checkpoint = torch.load(
@@ -81,8 +81,8 @@ if __name__ == "__main__":
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
-    dataset = WebfaceDataset("datasets/CASIA-WebFace")
-    # dataset = WebfaceDataset("../../data/CASIA-WebFace")
+    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("../../data/CASIA-WebFace")
     CLASSES_PER_BATCH = 35
     SAMPLES_PER_CLASS = 40
     BATCH_SIZE = CLASSES_PER_BATCH * SAMPLES_PER_CLASS
