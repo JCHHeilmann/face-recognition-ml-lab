@@ -22,7 +22,7 @@ else:
 class FaissClassifier:
     def __init__(
         self,
-        index="datasets/vector_generous_jazz_2021-02-02_11-53-36.index",
+        index="datasets/vector_major-cloud-212_epoch_19_2021-01-27_09-28-13.joblib.index",
         model=None,
     ) -> None:
         super().__init__()
@@ -33,11 +33,11 @@ class FaissClassifier:
         self.dictionary = LabelNames("data/data.p")
 
         if os.uname().machine != "ppc64le":
-            self.preprocessor = FaceAlignmentMTCNN()
+            self.preprocessor = FaceAlignment()
 
         if not model:
             self.checkpoint = torch.load(
-                "checkpoints/generous-jazz-275_epoch_19",
+                "checkpoints/major-cloud-212_epoch_19",
                 # "checkpoints/leafy-shadow-245_epoch_16",
                 map_location=torch.device("cpu"),
                 # "checkpoints/stilted-vortex-227_epoch_19",
@@ -97,6 +97,31 @@ class FaissClassifier:
             return 0
 
     def classify_with_surroundings(self, image):
+        image_aligned = self.preprocessor.make_align(image)  # Dlib aligment
+        # image_aligned = self.make_aligned_mtcnn(image)                     # MTCNN aligment
+        if not image_aligned:
+            print("No face found")
+            return ["Unknown"], None
+        embedding = self.img_to_encoding(image_aligned, self.model)  # Dlib aligment
+        # embedding = self.img_tensor_to_encoding(image_aligned, self.model) # MTCNN aligment
+
+        k = 100
+        distances, labels, embeddings = self.indexIDMap.search_and_reconstruct(
+            embedding.astype("float32"), k
+        )
+
+        distances = distances[0]
+        labels = labels[0]
+        embeddings = embeddings[0]
+
+        print(distances[0])
+        if distances[0] < self.threshold:
+            label_names = [self.dictionary.read_from_pickle(label) for label in labels]
+
+            return label_names, embeddings
+        else:
+            return ["Unknown"], None
+
         image_aligned_tensor = self.preprocessor.make_align(image)  # MTCNN aligment
 
         if image_aligned_tensor == None:
@@ -160,9 +185,10 @@ class FaissClassifier:
             return ["Unknown"], None
 
     def add_person(self, image, name: str):
-        image_align_tensor = self.preprocessor.make_align(image)
-
-        embedding_new = self.img_tensor_to_encoding(image_align_tensor, self.model)
+        image_align = self.preprocessor.make_align(image)
+        # image_align = self.make_aligned_mtcnn(image)
+        embedding_new = self.img_to_encoding(image_align, self.model)
+        # embedding_new = self.img_tensor_to_encoding(image_align, self.model)
 
         random_label = self.random_n_digits(8)
         random_label_array = np.array([random_label])

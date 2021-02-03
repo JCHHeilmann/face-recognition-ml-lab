@@ -18,9 +18,9 @@ app.add_middleware(
 )
 
 classifier = FaissClassifier(
-    index="datasets/vector_generous_jazz_2021-02-02_11-53-36.index"
+    index="datasets/vector_major-cloud-212_epoch_19_2021-01-27_09-28-13.joblib.index"
 )
-classifier.threshold = 0.005
+classifier.threshold = 0.00047
 
 
 def get_classifier():
