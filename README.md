@@ -4,6 +4,7 @@
 
 * Create conda environment and install dependencies from environment.yml file:
 `conda env create -f environment.yml`
+* For the web-app, navigate to `cd web-app` and install dependencies with `npm install`
 
 ## Adding dependencies
 
@@ -25,6 +26,13 @@ Note: Please commit any changes before starting, so that W&B can associate the c
 To calculate evaluation scores run from the project root: `python -m classifier.faiss_evaluate`.
 
 The evaluation depends on the dataset, a pre-computed FAISS index and a model checkpoint. Please check in the script if paths are set accordingly.
+
+### Prerequisites
+
+Evaluation depends on a pre-calculated FAISS index, which in turn requires a set of pre-computed embeddings for it's creation.
+
+* To calculate embeddings from the dataset run `python -m classifier.pre_compute_embeddings`
+* To pre-compute the index see `python classifier/faiss_create.py`
 
 ## Application
 
