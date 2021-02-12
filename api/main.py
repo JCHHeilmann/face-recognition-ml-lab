@@ -40,7 +40,7 @@ def recognize_face(
     labels, embeddings = classifier.classify_with_surroundings(image)
 
     if embeddings is not None:
-        return JSONResponse({"labels": labels, "embeddings": embeddings.tolist()})
+        return JSONResponse({"labels": labels, "embeddings": embeddings})
     else:
         return JSONResponse({"labels": labels, "embeddings": []})
 

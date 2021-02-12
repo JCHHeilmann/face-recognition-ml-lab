@@ -4,19 +4,16 @@ from random import randint
 import numpy as np
 import torch
 import torchvision
-from facenet_pytorch import MTCNN
-from numpy.lib.twodim_base import mask_indices
-
 from data.face_alignment_mtcnn import FaceAlignmentMTCNN
 from data.label_names import LabelNames
+from facenet_pytorch import MTCNN
 from models.inception_resnet_v1 import InceptionResnetV1
+from numpy.lib.twodim_base import mask_indices
 
 if os.uname().machine == "ppc64le":
     import faiss_ppc as faiss
 else:
     import faiss
-
-    from data.face_alignment import FaceAlignment
 
 
 class FaissClassifier:
@@ -38,14 +35,7 @@ class FaissClassifier:
         if not model:
             self.checkpoint = torch.load(
                 "checkpoints/generous-jazz-275_epoch_19",
-                # "checkpoints/leafy-shadow-245_epoch_16",
                 map_location=torch.device("cpu"),
-                # "checkpoints/stilted-vortex-227_epoch_19",
-                # map_location=torch.device("cpu"),
-                # "checkpoints/charmed-cosmos-135_epoch_19",
-                # map_location=torch.device("cpu"),
-                # "checkpoints/deft-snowball-123_epoch_19",
-                # map_location=torch.device("cpu"),
             )
             self.model = InceptionResnetV1()
             self.model.load_state_dict(self.checkpoint["model_state_dict"])
@@ -78,6 +68,7 @@ class FaissClassifier:
         else:
             return 0
 
+        # alternative: use a vote of the closest 10 to determine the classification result
         k = 10
         distances, labels = self.indexIDMap.search(embeddings.astype("float32"), k)
 
@@ -124,6 +115,8 @@ class FaissClassifier:
             return label_names, embeddings
         else:
             return ["Unknown"], None
+
+        # alternative: use a vote of the closest 10 to determine the classification result
         labels = labels[0]
         distances = distances[0]
         embeddings = embeddings[0]
@@ -170,62 +163,3 @@ class FaissClassifier:
         self.indexIDMap.add_with_ids(embedding_new, random_label_array)
         self.dictionary.add_name(name, random_label)
 
-
-if __name__ == "__main__":
-    from glob import glob
-
-    from PIL import Image
-    from torchvision import datasets, transforms
-    from tqdm import tqdm
-
-    image_paths = glob("datasets/CASIA-WebFace_PNG/3196368/*.png")
-    images = [Image.open(path).convert("RGB") for path in image_paths]
-
-    # image_paths = glob("datasets/CASIA-WebFace_MTCNN/0000045/*.jpg")
-    # images = [Image.open(path).convert("RGB") for path in image_paths]
-    # data_dir = 'datasets/CASIA-test'
-    # images = datasets.ImageFolder(data_dir, transform=transforms.Resize((512, 512)))
-
-    classifier = FaissClassifier(
-        index="datasets/vector_generous_jazz_2021-02-02_11-53-36.index"
-    )
-    # images = [Image.open("datasets/Donald_Trump_0001.jpg").convert("RGB")]
-    # im = Image.open("datasets/0000045_a/008.jpg").convert("RGB").resize((128,128))
-
-    # classifier = FaissClassifier(index = "datasets/vector_pre_trained_2021-01-28_15:22:37.index")
-
-    # new_image = Image.open("datasets/test/IMG-20140329-WA0010.jpg")
-
-    # classifier.add_person(new_image, "victor")
-
-    # labels, _ = classifier.classify_with_surroundings(new_image)
-    # print(labels[0])
-
-    # new_image_2 = Image.open("datasets/test/IMG-20140329-WA0013.jpg")
-    # labels, _ = classifier.classify_with_surroundings(new_image_2)
-    # print(labels[0])
-
-    # labels = classifier.classify_with_surroundings(im)[0][0]
-    # print("Labels:",labels)
-
-    results = [classifier.classify_with_surroundings(img)[0][0] for img in tqdm(images)]
-    # print(results)
-    correct = 0
-    incorrect = 0
-    unknown = 0
-    for result in results:
-        if result == "Nathan_Dean_Snyder":
-            correct += 1
-        elif result == "Unknown":
-            unknown += 1
-        else:
-            incorrect += 1
-
-    accuracy = correct / len(results)
-
-    print(
-        f"Results:\ncorrect: {correct},\nincorrect: {incorrect},\nunknown: {unknown} (includes images in which no face was found),\nAccuracy: {accuracy}"
-    )
-
-    values, counts = np.unique(results, return_counts=True)
-    unique_counts = list(zip(values, counts))

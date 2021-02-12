@@ -5,28 +5,23 @@ from time import perf_counter
 import numpy as np
 import torch
 import wandb
-from sklearn.metrics import accuracy_score, f1_score
-from torch.optim.lr_scheduler import MultiStepLR
-from tqdm import tqdm
-
 from classifier.faiss_classifier import FaissClassifier
 from classifier.faiss_create import create_index
 from data.data_loaders import get_data_loaders
 from data.web_face_dataset import WebfaceDataset
 from models.inception_resnet_v1 import InceptionResnetV1
+from sklearn.metrics import accuracy_score, f1_score
+from torch.optim.lr_scheduler import MultiStepLR
+from tqdm import tqdm
+from utils.vis_utils import plot_embeddings
+
 from training import triplet_generator
 from training.loss_function import OnlineTripletLoss
-from utils.vis_utils import plot_embeddings
 
 
 def train(model, train_loader, val_loader, loss_function, optimizer, scheduler, epochs):
     for epoch in range(epochs):
         print(f"epoch {epoch + 1} of {epochs}")
-
-        # if not ((epoch + 1) % 4):
-        #     margin *= 0.2
-
-        # loss_function = OnlineTripletLoss(margin, triplet_generator.get_semihard)
 
         embeddings, targets = train_epoch(model, train_loader, loss_function, optimizer)
 
@@ -197,8 +192,10 @@ if __name__ == "__main__":
 
     triplet_gen = triplet_generator.get_semihard
 
-    os.environ["WANDB_RESUME"] = "must"
-    os.environ["WANDB_RUN_ID"] = "qpilunyg"
+    # enable resuming of a training run
+    # os.environ["WANDB_RESUME"] = "must"
+    # os.environ["WANDB_RUN_ID"] = "qpilunyg"
+
     wandb.init(
         project="face-recognition",
         entity="application-challenges-ml-lab",
@@ -220,6 +217,7 @@ if __name__ == "__main__":
         },
     )
 
+    # resume training run
     if wandb.run.resumed:
         checkpoint = torch.load(
             "checkpoints/generous-jazz-275_epoch_19", map_location=torch.device("cpu")
@@ -232,9 +230,9 @@ if __name__ == "__main__":
 
     wandb.watch(model)
 
-    dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
+    # dataset = WebfaceDataset("../../data/CASIA-WebFace_MTCNN")
     # dataset = WebfaceDataset("../../data/Aligned_CASIA_WebFace")
-    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
 
     train_loader, val_loader, _ = get_data_loaders(
         dataset,

@@ -69,22 +69,6 @@ def plot_embeddings(embeddings, targets, xlim=None, ylim=None):
 
 
 def extract_embeddings(dataloader, model):
-    # if torch.cuda.is_available():
-    #     model = model.cuda()
-
-    # with torch.no_grad():
-    #     model.eval()
-
-    #     embeddings = torch.empty(0)
-    #     labels = torch.empty(0)
-
-    #     images, labels = next(iter(dataloader))
-    #     if torch.cuda.is_available():
-    #         images = images.cuda()
-    #     embeddings = model(images)
-
-    #     return embeddings.cpu().numpy(), labels.numpy()
-
     model.eval()
     with torch.no_grad():
         embeddings = np.zeros((len(dataloader.dataset), 512))

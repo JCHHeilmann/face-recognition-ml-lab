@@ -17,10 +17,8 @@ def evaluate(model, val_indices, train_labels):
 
     preprocessor = FaceAlignmentMTCNN()
 
-    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
-
     classifier = FaissClassifier(
-        index="datasets/vector_generous-jazz-275_d_2021-02-02_16-34-23.index"
+        index="datasets/vector_generous_jazz_2021-02-02_11-53-36.index"
     )
     classifier.threshold = 0.00525
 
@@ -40,11 +38,9 @@ def evaluate(model, val_indices, train_labels):
 
             if int(target) not in list(train_labels):
                 target = 0
-                print("###################################################")
-                # continue
+                continue
 
             aligned_data = preprocessor.make_align(image)
-            # aligned_data = torchvision.transforms.ToTensor()(image)
             if aligned_data == None:
                 continue
 
@@ -77,24 +73,17 @@ if __name__ == "__main__":
 
     if torch.cuda.is_available():
         checkpoint = torch.load(
-            # "checkpoints/charmed-cosmos-135_epoch_19",
-            # "checkpoints/major-cloud-212_epoch_19",
-            "checkpoints/generous-jazz-275_epoch_19",
-            map_location=torch.device("cuda"),
+            "checkpoints/generous-jazz-275_epoch_19", map_location=torch.device("cuda"),
         )
     else:
         checkpoint = torch.load(
-            # "checkpoints/charmed-cosmos-135_epoch_19",
-            # "checkpoints/major-cloud-212_epoch_19",
-            "checkpoints/generous-jazz-275_epoch_19",
-            map_location=torch.device("cpu"),
+            "checkpoints/generous-jazz-275_epoch_19", map_location=torch.device("cpu"),
         )
     model = InceptionResnetV1()
     model.load_state_dict(checkpoint["model_state_dict"])
     model.eval()
 
-    dataset = WebfaceDataset("../CASIA-WebFace")
-    # dataset = WebfaceDataset("datasets/CASIA-WebFace")
+    dataset = WebfaceDataset("datasets/CASIA-WebFace")
     # dataset = WebfaceDataset("../../data/CASIA-WebFace")
     CLASSES_PER_BATCH = 35
     SAMPLES_PER_CLASS = 40

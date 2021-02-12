@@ -58,8 +58,11 @@ class WebfaceDataset(Dataset):
     def __getitem__(self, idx):
         image = Image.open(self.image_filenames[idx]).convert("RGB")
 
-        image_tensor = self.preprocessor.make_align(image)
-        # image_tensor = self.to_tensor(image)
+        # online image alignment
+        # image_tensor = self.preprocessor.make_align(image)
+
+        # using pre-aligned images
+        image_tensor = self.to_tensor(image)
 
         split_path = self.image_filenames[idx].split(os.sep)
         label = split_path[-2]
