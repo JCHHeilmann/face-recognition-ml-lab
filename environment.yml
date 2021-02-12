@@ -16,6 +16,7 @@ dependencies:
   - click=7.1.2=py_0
   - cycler=0.10.0=py38_0
   - decorator=4.4.2=py_0
+  - faiss-cpu=1.6.5=py3.8_h0453e9c_0_cpu
   - freetype=2.10.4=ha233b18_0
   - intel-openmp=2019.4=233
   - ipykernel=5.3.4=py38h5ca1d4c_0
@@ -32,6 +33,7 @@ dependencies:
   - libcblas=3.9.0=3_h7d47d6b_netlib
   - libcxx=10.0.0=1
   - libedit=3.1.20191231=h1de35cc_1
+  - libfaiss=1.6.5=h0a76292_0_cpu
   - libffi=3.3=hb1e8313_2
   - libgfortran=4.0.0=h1a10cd1_15
   - libgfortran4=7.5.0=h1a10cd1_15
@@ -98,9 +100,16 @@ dependencies:
   - pip:
       - chardet==3.0.4
       - configparser==5.0.1
+      - dataclasses==0.6
       - dlib==19.21.1
+      - dnspython==1.16.0
       - docker-pycreds==0.4.0
+      - docopt==0.6.2
+      - docutils==0.16
+      - facenet-pytorch==2.5.1
       - fastapi==0.63.0
+      - fett==0.3.2
+      - future==0.18.2
       - gitdb==4.0.5
       - gitpython==3.1.11
       - h11==0.12.0
@@ -110,6 +119,7 @@ dependencies:
       - hyperframe==6.0.0
       - idna==2.10
       - imutils==0.5.3
+      - networkx==2.5
       - opencv-python==4.4.0.46
       - pathtools==0.1.2
       - priority==1.3.0
@@ -117,15 +127,19 @@ dependencies:
       - protobuf==3.14.0
       - psutil==5.7.3
       - pydantic==1.7.3
+      - pymongo==3.11.2
+      - python-jsonrpc-server==0.3.4
       - python-multipart==0.0.5
       - pyyaml==5.3.1
-      - requests==2.25.0
+      - requests==2.24.0
       - sentry-sdk==0.19.4
       - shortuuid==1.0.1
       - smmap==3.0.4
+      - snooty-lextudio==1.8.6.dev0
       - starlette==0.13.6
       - subprocess32==3.5.4
-      - urllib3==1.26.2
+      - ujson==1.35
+      - urllib3==1.25.11
       - wandb==0.10.12
       - watchdog==0.10.4
       - wsproto==1.0.0
