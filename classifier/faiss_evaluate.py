@@ -73,11 +73,13 @@ if __name__ == "__main__":
 
     if torch.cuda.is_available():
         checkpoint = torch.load(
-            "checkpoints/generous-jazz-275_epoch_19", map_location=torch.device("cuda"),
+            "checkpoints/generous-jazz-275_epoch_19",
+            map_location=torch.device("cuda"),
         )
     else:
         checkpoint = torch.load(
-            "checkpoints/generous-jazz-275_epoch_19", map_location=torch.device("cpu"),
+            "checkpoints/generous-jazz-275_epoch_19",
+            map_location=torch.device("cpu"),
         )
     model = InceptionResnetV1()
     model.load_state_dict(checkpoint["model_state_dict"])

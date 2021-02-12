@@ -4,11 +4,12 @@ from random import randint
 import numpy as np
 import torch
 import torchvision
+from facenet_pytorch import MTCNN
+from numpy.lib.twodim_base import mask_indices
+
 from data.face_alignment_mtcnn import FaceAlignmentMTCNN
 from data.label_names import LabelNames
-from facenet_pytorch import MTCNN
 from models.inception_resnet_v1 import InceptionResnetV1
-from numpy.lib.twodim_base import mask_indices
 
 if os.uname().machine == "ppc64le":
     import faiss_ppc as faiss
@@ -162,4 +163,3 @@ class FaissClassifier:
 
         self.indexIDMap.add_with_ids(embedding_new, random_label_array)
         self.dictionary.add_name(name, random_label)
-
